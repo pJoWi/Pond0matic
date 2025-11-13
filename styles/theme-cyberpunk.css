@@ -1,0 +1,149 @@
+/* Cyberpunk Theme - Minimal Custom CSS */
+/* Most styling uses Tailwind utilities. This file contains only essential custom properties. */
+
+:root {
+  /* Light mode (not primary focus for cyberpunk, but supported) */
+  --bg-light: #f0f0f0;
+  --text-light: #1a1a1a;
+  --border-light: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] {
+  /* Dark mode ember/fire colors */
+  --bg-dark: #0a0a0a;
+  --bg-surface: #1a0f0a;
+  --bg-elevated: #2a1810;
+  --text-primary: #fef3ef;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
+  --border-default: rgba(255, 107, 53, 0.2);
+  --border-hover: rgba(255, 107, 53, 0.4);
+
+  /* Ember neon accents */
+  --ember-glow: rgba(255, 107, 53, 0.35);
+  --ember-border: rgba(255, 107, 53, 0.45);
+  --ember-border-hover: rgba(255, 107, 53, 0.7);
+
+  /* Amber accents */
+  --amber-glow: rgba(251, 191, 36, 0.35);
+  --amber-border: rgba(251, 191, 36, 0.45);
+  --amber-border-hover: rgba(251, 191, 36, 0.7);
+
+  /* Fire red accents */
+  --fire-glow: rgba(255, 60, 56, 0.35);
+  --fire-border: rgba(255, 60, 56, 0.45);
+  --fire-border-hover: rgba(255, 60, 56, 0.7);
+}
+
+[data-theme="light"] {
+  --bg-dark: #ffffff;
+  --bg-surface: #f5f5f5;
+  --bg-elevated: #e0e0e0;
+  --text-primary: #000000;
+  --text-secondary: #404040;
+  --text-muted: #808080;
+  --border-default: rgba(0, 0, 0, 0.15);
+  --border-hover: rgba(0, 0, 0, 0.3);
+}
+
+/* Bubble canvas */
+.bubble-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  transition: opacity 0.5s ease;
+}
+
+.bubble-canvas.bubbles-off {
+  opacity: 0 !important;
+}
+
+/* Custom scrollbar for cyberpunk aesthetic */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0a0a0a;
+  border-left: 1px solid rgba(255, 20, 147, 0.1);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff1493 0%, #ff0000 100%);
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ff1493 0%, #ff006e 50%, #ff0000 100%);
+}
+
+/* Selection color */
+[data-theme="dark"] ::selection {
+  background: rgba(255, 20, 147, 0.3);
+  color: #ffffff;
+}
+
+/* Grid background pattern (optional, subtle) */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 20, 147, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 20, 147, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Mono font class for addresses and data */
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Ember glow utilities */
+.glow-ember {
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3);
+}
+
+.glow-ember-intense {
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.7), 0 0 30px rgba(255, 107, 53, 0.5), 0 0 45px rgba(255, 107, 53, 0.3);
+}
+
+.border-glow-ember {
+  border-color: rgba(255, 107, 53, 0.5);
+  box-shadow: inset 0 0 8px rgba(255, 107, 53, 0.25), 0 0 12px rgba(255, 107, 53, 0.3);
+}
+
+.border-glow-ember:hover {
+  border-color: rgba(255, 107, 53, 0.7);
+  box-shadow: inset 0 0 12px rgba(255, 107, 53, 0.4), 0 0 18px rgba(255, 107, 53, 0.5);
+}
+
+/* Amber glow utilities */
+.glow-amber {
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5), 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.border-glow-amber {
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: inset 0 0 8px rgba(251, 191, 36, 0.25), 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
+/* Text glow effects */
+.text-glow-ember {
+  color: #ff6b35;
+  text-shadow: 0 0 8px rgba(255, 107, 53, 0.7), 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+.text-glow-amber {
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.7), 0 0 15px rgba(251, 191, 36, 0.4);
+}
+
+/* Ember gradient backgrounds */
+.bg-ember-glow {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.12) 0%, rgba(249, 115, 22, 0.06) 100%);
+}
+
+.bg-amber-glow {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.06) 100%);
+}
