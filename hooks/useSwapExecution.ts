@@ -5,6 +5,8 @@ import { useSwapperContext } from "@/contexts/SwapperContext";
 import { short, solscanTx } from "@/lib/utils";
 import { b64ToUint8Array, getMintDecimals } from "@/lib/solana";
 import { TOKEN_NAMES, TOKEN_VAULTS_AFFILIATE_1, TOKEN_VAULTS_AFFILIATE_2 } from "@/lib/vaults";
+import { validateSwapTransaction, validateSwapAmount } from "@/lib/transactionValidation";
+import { getPhantomProvider } from "@/lib/windowHelpers";
 
 // Constants
 const JUP_QUOTE = "https://lite-api.jup.ag/swap/v1/quote";
@@ -52,16 +54,32 @@ export function useSwapExecution() {
    */
   const jupExecute = useCallback(
     async (pairFrom: string, pairTo: string, uiAmountStr: string) => {
-      const provider = (window as any)?.solana;
+      const provider = getPhantomProvider();
       if (!provider?.publicKey) {
         ctx.log("Connect wallet first.");
         return;
       }
       const pk = new PublicKey(provider.publicKey.toString());
+
+      // P0 FIX #3: Validate swap amount before execution
+      const tokenSymbol = TOKEN_NAMES[pairFrom] || "TOKEN";
+      const currentBalance = ctx.balances[pairFrom] || 0;
+      const amountValidation = validateSwapAmount(uiAmountStr, currentBalance, tokenSymbol);
+
+      if (!amountValidation.isValid) {
+        ctx.log(`❌ ${amountValidation.error}`);
+        return;
+      }
+
+      if (amountValidation.requiresConfirmation) {
+        ctx.log(`⚠️ Large swap detected. ${amountValidation.error}`);
+        return;
+      }
+
       const dec = await getMintDecimals(pairFrom);
       const raw = Math.floor((Number(uiAmountStr) || 0) * Math.pow(10, dec));
 
-      ctx.log(`💱 Swap: ${uiAmountStr} ${TOKEN_NAMES[pairFrom] || "TOKEN"} (${dec} decimals) → ${raw} lamports`);
+      ctx.log(`💱 Swap: ${uiAmountStr} ${tokenSymbol} (${dec} decimals) → ${raw} lamports`);
 
       if (raw > 0 && raw < 1000 && dec >= 6) {
         ctx.log(`⚠️ Warning: Very small amount detected (${raw} lamports). Check if this is intentional.`);
@@ -111,10 +129,16 @@ export function useSwapExecution() {
         const txBytes = b64ToUint8Array(swapJson.swapTransaction);
         const tx = VersionedTransaction.deserialize(txBytes);
 
-        // Validate transaction structure
-        if (!tx.message || tx.message.staticAccountKeys.length === 0) {
-          ctx.log("Invalid transaction structure from Jupiter");
+        // P0 FIX #2: Validate transaction before signing
+        const validation = validateSwapTransaction(tx, pk);
+
+        if (!validation.isValid) {
+          ctx.log(`❌ Transaction validation failed: ${validation.errors.join(', ')}`);
           return;
+        }
+
+        if (validation.warnings.length > 0) {
+          ctx.log(`⚠️ Transaction warnings: ${validation.warnings.join(', ')}`);
         }
 
         let signature = "";
@@ -199,17 +223,31 @@ export function useSwapExecution() {
    * Start auto-swap sequence
    */
   const startAuto = useCallback(async () => {
-    const provider = (window as any)?.solana;
+    const provider = getPhantomProvider();
     if (!provider?.publicKey) {
       ctx.log("Connect wallet first.");
       return;
     }
-    // Atomic check-and-set to prevent race conditions
+
+    // P0 FIX #1: Improved atomic check-and-set to prevent race conditions
+    // Double-check pattern ensures no concurrent execution
     if (ctx.running || runRef.current) {
       ctx.log("Auto-swap already running");
       return;
     }
+
+    // First barrier: set ref immediately
+    const wasRunning = runRef.current;
     runRef.current = true;
+
+    // Second barrier: double-check after setting ref
+    if (wasRunning || ctx.running) {
+      runRef.current = false;
+      ctx.log("Auto-swap prevented duplicate start");
+      return;
+    }
+
+    // Now safe to set context running state
     ctx.setRunning(true);
 
     try {
