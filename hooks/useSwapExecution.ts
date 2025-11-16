@@ -63,17 +63,23 @@ export function useSwapExecution() {
 
       // P0 FIX #3: Validate swap amount before execution
       const tokenSymbol = TOKEN_NAMES[pairFrom] || "TOKEN";
-      const currentBalance = ctx.balances[pairFrom] || 0;
-      const amountValidation = validateSwapAmount(uiAmountStr, currentBalance, tokenSymbol);
+      // Determine current balance based on token type
+      const SOL_MINT = "So11111111111111111111111111111111111111112";
+      const currentBalance = pairFrom === SOL_MINT ? ctx.solBalance : ctx.tokenBalance;
 
-      if (!amountValidation.isValid) {
-        ctx.log(`❌ ${amountValidation.error}`);
-        return;
-      }
+      // Only validate if we have balance data
+      if (currentBalance > 0) {
+        const amountValidation = validateSwapAmount(uiAmountStr, currentBalance, tokenSymbol);
 
-      if (amountValidation.requiresConfirmation) {
-        ctx.log(`⚠️ Large swap detected. ${amountValidation.error}`);
-        return;
+        if (!amountValidation.isValid) {
+          ctx.log(`❌ ${amountValidation.error}`);
+          return;
+        }
+
+        if (amountValidation.requiresConfirmation) {
+          ctx.log(`⚠️ Large swap detected. ${amountValidation.error}`);
+          return;
+        }
       }
 
       const dec = await getMintDecimals(pairFrom);
