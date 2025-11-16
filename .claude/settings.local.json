@@ -7,10 +7,11 @@
       "WebSearch",
       "WebFetch(domain:cary0x.github.io)",
       "Bash(git rm:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
   },
-  "outputStyle": "Explanatory"
+  "outputStyle": "default"
 }

@@ -28,7 +28,10 @@ export function useBalances(
 
     try {
       setFetching(true);
-      const connection = new Connection(rpc, "confirmed");
+      const connection = new Connection(rpc, {
+        commitment: "confirmed",
+        wsEndpoint: undefined, // Disable WebSocket to prevent connection errors
+      });
       const publicKey = new PublicKey(wallet);
 
       // Fetch SOL balance

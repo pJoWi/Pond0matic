@@ -40,6 +40,7 @@ npm run test:watch
 ### Key Components
 
 **SolanaJupiterSwapper** (`components/SolanaJupiterSwapper.tsx`)
+
 - Main swap interface component (340+ lines)
 - Handles wallet connection (Phantom wallet integration)
 - Manages 4 swap modes: normal, roundtrip, micro (randomized), loopreturn
@@ -48,12 +49,14 @@ npm run test:watch
 - Jupiter quote/swap flow: fetch quote → build swap transaction → sign with Phantom → send + confirm
 
 **Vault Configuration** (`lib/vaults.ts`)
+
 - Two affiliate vault mappings: `TOKEN_VAULTS_AFFILIATE_1` (pond0x) and `TOKEN_VAULTS_AFFILIATE_2` (aquavaults)
 - Each vault maps token mints to fee account addresses
 - Supported tokens: SOL, USDC, USDT, wPOND, hSOL, mSOL, PepeOnSOL
 - Vault addresses are passed as `feeAccount` in Jupiter swap requests to route platform fees
 
 **Visual Effects** (`app/(utils)/bubbles.ts` and `mount.tsx`)
+
 - Canvas-based animated bubble background
 - Mounted via `Mount` component in main page
 - Toggleable via UI button
@@ -61,11 +64,13 @@ npm run test:watch
 ### Important Patterns
 
 **Wallet Integration**
+
 - Expects `window.solana` (Phantom provider)
 - Uses `signAndSendTransaction` or fallback to `signTransaction` + manual send
 - All swaps require connected wallet with `publicKey`
 
 **Transaction Flow**
+
 1. Fetch quote from Jupiter with input/output mints, amount, slippage, platform fee
 2. Build swap transaction with quote response, user pubkey, optional fee account
 3. Deserialize base64 transaction → `VersionedTransaction`
@@ -73,14 +78,16 @@ npm run test:watch
 5. Send to RPC and confirm with "confirmed" commitment
 
 **Auto-Swap Modes**
+
 - `normal`: Single swap execution
 - `roundtrip`: Swap A→B then B→A (requires >10 USD value)
 - `micro`: Randomized amounts between base and max (10-100% of base)
 - `loopreturn`: N swaps in one direction, then one return swap
 
 **Environment Variables**
+
 - `NEXT_PUBLIC_REFERRAL_PROGRAM_ID`: Jupiter referral program ID (default: "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4")
-- `NEXT_PUBLIC_DEFAULT_RPC`: Solana RPC URL (default: "https://api.mainnet-beta.solana.com")
+- `NEXT_PUBLIC_DEFAULT_RPC`: Solana RPC URL (default: "<https://api.mainnet-beta.solana.com>")
 
 ### Testing
 

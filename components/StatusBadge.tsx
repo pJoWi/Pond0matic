@@ -22,7 +22,7 @@ export function StatusBadge({
   const [showFlyout, setShowFlyout] = useState(false);
 
   const ledColors = {
-    green: "bg-neon-green-light shadow-neon-green-sm",
+    green: "bg-neon-pink-light shadow-pink-green-sm",
     red: "bg-neon-red shadow-neon-red-sm",
     yellow: "bg-neon-red-light shadow-neon-red-sm",
     blue: "bg-neon-rose shadow-neon-rose-sm",

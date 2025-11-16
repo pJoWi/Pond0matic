@@ -52,11 +52,11 @@ export function SwapInterface({
           </select>
 
           {/* Amount Input */}
-          <div className="relative flex-1">
+          <div className="flex-1 flex gap-2">
             <input
               id="from-amount-compact"
               type="text"
-              className="w-full px-4 py-2.5 bg-cyber-black/60 border border-ember-orange/40 rounded-lg text-lg font-mono font-bold text-right text-white focus:border-ember-orange/60 focus:outline-none focus:ring-2 focus:ring-ember-orange/40 transition-all placeholder-gray-600"
+              className="flex-1 px-4 py-2.5 bg-cyber-black/60 border border-ember-orange/40 rounded-lg text-lg font-mono font-bold text-right text-white focus:border-ember-orange/60 focus:outline-none focus:ring-2 focus:ring-ember-orange/40 transition-all placeholder-gray-600"
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
               placeholder="0.0"
@@ -64,7 +64,7 @@ export function SwapInterface({
             {wallet && tokenBalance > 0 && (
               <button
                 onClick={() => onAmountChange(tokenBalance.toString())}
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-ember-orange/20 border border-ember-orange/50 rounded text-[10px] font-semibold text-ember-orange hover:bg-ember-orange/30 hover:scale-110 active:scale-95 transition-all"
+                className="px-3 py-2 bg-ember-orange/20 border border-ember-orange/50 rounded-lg text-xs font-semibold text-ember-orange hover:bg-ember-orange/30 hover:scale-105 active:scale-95 transition-all"
               >
                 MAX
               </button>

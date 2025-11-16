@@ -123,7 +123,10 @@ export function useSwapExecution() {
           signature = r.signature || r;
         } else if (provider.signTransaction) {
           const signed = await provider.signTransaction(tx);
-          const connection = new Connection(ctx.rpc, "confirmed");
+          const connection = new Connection(ctx.rpc, {
+            commitment: "confirmed",
+            wsEndpoint: undefined, // Disable WebSocket to prevent connection errors
+          });
           signature = await connection.sendRawTransaction(signed.serialize());
         } else {
           ctx.log("Wallet does not support signing.");
@@ -133,7 +136,10 @@ export function useSwapExecution() {
         ctx.log("Sent → " + short(signature, 6) + " | " + solscanTx(signature));
 
         // Confirm with timeout (30 seconds)
-        const connection = new Connection(ctx.rpc, "confirmed");
+        const connection = new Connection(ctx.rpc, {
+          commitment: "confirmed",
+          wsEndpoint: undefined, // Disable WebSocket to prevent connection errors
+        });
         const confirmPromise = connection.confirmTransaction(signature, "confirmed");
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Transaction confirmation timeout")), 30000)

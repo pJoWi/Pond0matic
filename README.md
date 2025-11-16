@@ -1,6 +1,8 @@
-# PondX Auto-Swapper 🌊
+# Pond0x Dashboard 🌊
 
-A Next.js application for automated Solana token swaps via Jupiter aggregator, integrated with the Pond0x protocol mining rig and flywheel mechanics.
+**Unified control center for Pond0x protocol tools and operations**
+
+A Next.js dashboard application providing a comprehensive interface for interacting with the Pond0x protocol on Solana. Combines automated token swapping via Jupiter, mining rig management, and void/wetware protocol operations in a single, cohesive platform.
 
 ## Features
 
@@ -38,7 +40,7 @@ A Next.js application for automated Solana token swaps via Jupiter aggregator, i
 1. **Clone the repository**
 ```bash
 git clone <your-repo-url>
-cd JwPond
+cd pond0x-dashboard
 ```
 
 2. **Install dependencies**
@@ -191,7 +193,7 @@ npm run test:watch   # Run tests in watch mode
 ## Project Structure
 
 ```
-JwPond/
+pond0x-dashboard/
 ├── app/
 │   ├── (utils)/
 │   │   ├── bubbles.ts      # Canvas animation logic

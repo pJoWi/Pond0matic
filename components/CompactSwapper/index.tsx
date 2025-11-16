@@ -11,6 +11,8 @@ import { BoostPanel } from "./components/BoostPanel";
 import { AutoSwapSection } from "./components/AutoSwapSection";
 import { ActionButton } from "./components/ActionButton";
 import { MiniActivityFeed } from "./components/MiniActivityFeed";
+import { AffiliateSelector } from "./components/AffiliateSelector";
+import { SettingsPanel } from "./components/SettingsPanel";
 
 const TOKEN_OPTIONS = Object.keys(TOKEN_NAMES);
 
@@ -80,6 +82,21 @@ export function CompactSwapper({ maxWidth = 420, showActivityFeed = true, onSwap
           onAutoActiveChange={ctx.setAutoActive}
           onAutoCountChange={ctx.setAutoCount}
           onAutoDelayChange={ctx.setAutoDelayMs}
+        />
+
+        {/* Affiliate Selector */}
+        <AffiliateSelector
+          affiliate={ctx.affiliate}
+          currentVault={ctx.currentVault}
+          onAffiliateChange={ctx.setAffiliate}
+        />
+
+        {/* Settings Panel */}
+        <SettingsPanel
+          platformFeeBps={ctx.platformFeeBps}
+          slippageBps={ctx.slippageBps}
+          onPlatformFeeChange={ctx.setPlatformFeeBps}
+          onSlippageChange={ctx.setSlippageBps}
         />
 
         {/* Action Button */}
