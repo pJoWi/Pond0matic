@@ -9,8 +9,10 @@ This guide explains how to effectively use multiple specialized agents to build,
 Your project has **7 specialized agents** located in `.claude/agents/`:
 
 ### 1. **code-refactorer** 🔴
+
 **Purpose**: Code cleanup, restructuring, and readability improvements
 **Use when**:
+
 - Code is messy or hard to read
 - Need better variable/function names
 - Want to remove dead code
@@ -18,6 +20,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Want to add helpful comments
 
 **Example commands**:
+
 ```
 "Refactor the SwapConfigPanel component for better readability"
 "Clean up this function and improve variable names"
@@ -27,8 +30,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 2. **comprehensive-code-reviewer**
+
 **Purpose**: Thorough code review and quality assurance
 **Use when**:
+
 - Completing a feature
 - Before committing major changes
 - Need security audit
@@ -36,6 +41,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Need to catch potential bugs
 
 **Example commands**:
+
 ```
 "Review the swap execution logic for bugs and security issues"
 "Audit the wallet integration code"
@@ -45,8 +51,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 3. **nextjs-ui-designer**
+
 **Purpose**: Next.js-specific UI implementation and optimization
 **Use when**:
+
 - Building new Next.js components
 - Need App Router guidance
 - Implementing client/server patterns
@@ -54,6 +62,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Need routing/layout help
 
 **Example commands**:
+
 ```
 "Design a new /analytics page using Next.js App Router"
 "Help me structure the app directory for the new mining dashboard"
@@ -63,8 +72,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 4. **pond0x-mechanics-analyst** 🟢
+
 **Purpose**: Protocol mechanics, tokenomics, and game theory analysis
 **Use when**:
+
 - Understanding Pond0x protocol design
 - Analyzing swap modes and their purpose
 - Evaluating fee structures
@@ -72,6 +83,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Strategic protocol decisions
 
 **Example commands**:
+
 ```
 "Explain the game theory behind the micro-swap mode"
 "Analyze the affiliate vault system economics"
@@ -82,8 +94,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 5. **premium-ux-designer** 💗
+
 **Purpose**: UX/UI enhancement and premium visual design
 **Use when**:
+
 - Need to improve visual design
 - Want premium-looking interfaces
 - Optimizing user flows
@@ -91,6 +105,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Enhancing accessibility
 
 **Example commands**:
+
 ```
 "Make the compact swapper look more premium"
 "Design a better user flow for the auto-swap configuration"
@@ -101,8 +116,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 6. **solana-blockchain-guide**
+
 **Purpose**: Solana blockchain integration and best practices
 **Use when**:
+
 - Implementing wallet connections
 - Building transaction flows
 - Working with Solana Web3.js
@@ -110,6 +127,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Understanding Solana-specific patterns
 
 **Example commands**:
+
 ```
 "How should I structure the transaction signing flow?"
 "Optimize the balance fetching logic"
@@ -120,8 +138,10 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ---
 
 ### 7. **ui-design-enhancer**
+
 **Purpose**: General UI improvements and design system consistency
 **Use when**:
+
 - Standardizing design patterns
 - Creating reusable components
 - Building a design system
@@ -129,6 +149,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 - Implementing theming
 
 **Example commands**:
+
 ```
 "Create a consistent design system for the dashboard"
 "Build reusable card components"
@@ -254,7 +275,7 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
        "Migrate existing components to the new design system"
 ```
 
-**Example: Adding Framer Motion Animations**
+**Example: Adding Framer Motion Animations**:
 
 ```bash
 # Step 1: Get recommendations
@@ -317,24 +338,29 @@ Your project has **7 specialized agents** located in `.claude/agents/`:
 ## 📋 Agent Invocation Syntax
 
 ### Method 1: Direct Request (Recommended)
+
 ```
 "@agent-name: your request here"
 ```
 
 Example:
+
 ```
 "@code-refactorer: Clean up the useSwapExecution hook"
 ```
 
 ### Method 2: Explicit Tool Usage
+
 ```
 Use the code-refactorer agent to clean up this code
 ```
 
 ### Method 3: Contextual Request
+
 ```
 I need to refactor this component [paste code]
 ```
+
 (Claude will automatically invoke the appropriate agent)
 
 ---
@@ -359,6 +385,7 @@ I need to refactor this component [paste code]
 ## 🔥 Power User Tips
 
 ### Tip 1: Chain Multiple Agents
+
 ```bash
 # Sequential agent usage
 "@pond0x-mechanics-analyst: Analyze boost mechanics"
@@ -369,14 +396,18 @@ I need to refactor this component [paste code]
 ```
 
 ### Tip 2: Context Preservation
+
 Agents have access to conversation history, so you can reference previous work:
+
 ```bash
 "@code-refactorer: Clean up that component we just discussed"
 "@premium-ux-designer: Use the same design language as the swapper we built earlier"
 ```
 
 ### Tip 3: Parallel Work
+
 For independent tasks, you can work on multiple features:
+
 ```bash
 # Morning: Work on analytics with one agent
 "@nextjs-ui-designer: Build the /analytics route"
@@ -386,6 +417,7 @@ For independent tasks, you can work on multiple features:
 ```
 
 ### Tip 4: Iterative Refinement
+
 ```bash
 "@premium-ux-designer: Design a mining dashboard"
 # [Review output]
@@ -395,7 +427,9 @@ For independent tasks, you can work on multiple features:
 ```
 
 ### Tip 5: Agent Specialization
+
 Match the task complexity to agent expertise:
+
 - Simple CSS tweaks → Direct request (no agent needed)
 - Component refactoring → code-refactorer
 - Complete feature design → Multiple agents in sequence
@@ -409,6 +443,7 @@ You can create new agents for specific needs:
 **Location**: `.claude/agents/your-agent-name.md`
 
 **Template**:
+
 ```markdown
 ---
 name: your-agent-name
@@ -477,14 +512,16 @@ color: blue
 
 ## 📚 Best Practices
 
-### ✅ DO:
+### ✅ DO
+
 - Use specific agent for their expertise
 - Provide context when switching agents
 - Review agent output before next step
 - Chain agents for complex features
 - Keep conversation focused per task
 
-### ❌ DON'T:
+### ❌ DON'T
+
 - Ask code-refactorer to design UX (use premium-ux-designer)
 - Ask premium-ux-designer to explain protocol mechanics (use pond0x-mechanics-analyst)
 - Overload one agent with multiple unrelated tasks
@@ -495,16 +532,19 @@ color: blue
 ## 🎓 Learning Path
 
 **Beginner**:
+
 1. Start with single-agent tasks (e.g., code-refactorer)
 2. Get comfortable with @ syntax
 3. Try 2-agent workflows
 
 **Intermediate**:
+
 1. Use full feature workflows (4-5 agents)
 2. Customize agent prompts
 3. Create your own agents
 
 **Advanced**:
+
 1. Design custom multi-agent pipelines
 2. Optimize for your specific workflow
 3. Contribute agent improvements

@@ -29,7 +29,7 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
 
       {/* Activity Feed */}
       <div className="max-h-40 overflow-y-auto custom-scrollbar">
-        {activities.map((line, i) => {
+        {[...activities].reverse().map((line, i) => {
           const isError = /error|failed/i.test(line);
           const isSuccess = /confirmed|success/i.test(line);
           const isSent = /sent/i.test(line);
@@ -52,6 +52,32 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
             ledPulsing = true;
           }
 
+          // Parse message for URLs and make them clickable
+          const renderMessageWithLinks = (text: string) => {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const parts = text.split(urlRegex);
+
+            return parts.map((part, index) => {
+              if (urlRegex.test(part)) {
+                // Reset regex lastIndex
+                urlRegex.lastIndex = 0;
+                return (
+                  <a
+                    key={index}
+                    href={part}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-ember-orange hover:text-ember-amber underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    🔗 View Tx
+                  </a>
+                );
+              }
+              return <span key={index}>{part}</span>;
+            });
+          };
+
           return (
             <div
               key={i}
@@ -59,7 +85,7 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
             >
               <StatusLED color={ledColor} pulsing={ledPulsing} size="sm" />
               {timestamp && <span className="text-[10px] font-mono text-gray-500 w-16 flex-shrink-0">{timestamp}</span>}
-              <span className="text-[11px] text-gray-300 truncate flex-1">{message}</span>
+              <span className="text-[11px] text-gray-300 truncate flex-1">{renderMessageWithLinks(message)}</span>
             </div>
           );
         })}

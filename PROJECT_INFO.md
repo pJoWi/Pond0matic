@@ -134,6 +134,7 @@ These would be separate repos in `E:\JowiBE\agents\automation\`
 ## Workspace Context
 
 Part of the **JowiBE polyrepo workspace** where:
+
 - Each project is an independent git repository
 - Projects can use different tech stacks
 - Shared code distributed via npm packages or copy/paste
@@ -149,6 +150,7 @@ Part of the **JowiBE polyrepo workspace** where:
 ## Remote Repository
 
 **Setup for GitHub**:
+
 ```bash
 git remote add origin https://github.com/yourname/pond0x-dashboard.git
 git branch -M main
@@ -158,21 +160,23 @@ git push -u origin main
 ## Security
 
 ⚠️ **Never commit**:
+
 - `.env.local` - Contains RPC API keys
 - Private keys or seed phrases
 - Wallet credentials
 
 ✅ **Always**:
+
 - Use your own RPC endpoint (Helius, Alchemy, QuickNode)
 - Test with small amounts first
 - Review transactions on Solscan before signing
 
 ## Links
 
-- Jupiter Aggregator: https://jup.ag
+- Jupiter Aggregator: <https://jup.ag>
 - Pond0x Protocol: (add official links)
-- Solana Explorer: https://solscan.io
-- Phantom Wallet: https://phantom.app
+- Solana Explorer: <https://solscan.io>
+- Phantom Wallet: <https://phantom.app>
 
 ---
 
