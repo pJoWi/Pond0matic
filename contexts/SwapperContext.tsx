@@ -4,11 +4,21 @@ import { useWallet } from "@/hooks/useWallet";
 import { useBalances } from "@/hooks/useBalances";
 import { useActivityLog } from "@/hooks/useActivityLog";
 import { useMiningRig } from "@/hooks/useMiningRig";
+import { useToast } from "@/hooks/useToast";
+import { triggerSuccessConfetti, triggerQuickConfetti } from "@/lib/confetti";
+import type { SwapMode } from "@/types/swapModes";
+import type { ToastType } from "@/components/ui/Toast";
 
 // Types
-type Mode = "normal" | "roundtrip" | "boost" | "loopreturn";
 type Affiliate = "pond0x" | "aquavaults";
 type AppTab = "autobot" | "void";
+
+interface Toast {
+  id: string;
+  message: string;
+  type: ToastType;
+  duration?: number;
+}
 
 interface SwapperContextValue {
   // Wallet & Connection
@@ -49,6 +59,19 @@ interface SwapperContextValue {
   estimatedSolUsd: number;
   estimatedWpondUsd: number;
   lastHealthUpdate: number;
+  // Manifest data
+  isPro: boolean;
+  proSwapsSol: number;
+  proSwapsBx: number;
+  badges: string;
+  hasTwitter: boolean;
+  // Health stats
+  inMempool: number;
+  sent: number;
+  failed: number;
+  drifted: number;
+  maxClaimEstimateUsd: number;
+  driftedUsd: number;
   setRigHealth: (health: number) => void;
   setRigPower: (power: number) => void;
   setRigTemp: (temp: number) => void;
@@ -64,6 +87,9 @@ interface SwapperContextValue {
   incrementBoosts: () => void;
   addPermanentBoost: (solAmount: number) => void;
   addLuckPoints: (points: number) => void;
+  // Loading
+  isLoading: boolean;
+  fetchRigData: () => Promise<void>;
 
   // Token Selection
   fromMint: string;
@@ -76,24 +102,36 @@ interface SwapperContextValue {
   setAmount: (amount: string) => void;
   maxAmount: string;
   setMaxAmount: (amount: string) => void;
-  mode: Mode;
-  setMode: (mode: Mode) => void;
+  loopReturnAmount: string;
+  setLoopReturnAmount: (amount: string) => void;
   platformFeeBps: number;
   setPlatformFeeBps: (bps: number) => void;
   slippageBps: number;
   setSlippageBps: (bps: number) => void;
-
-  // Auto-swap
-  autoActive: boolean;
-  setAutoActive: (active: boolean) => void;
-  autoCount: number;
-  setAutoCount: (count: number) => void;
   autoDelayMs: number;
   setAutoDelayMs: (ms: number) => void;
+  swapDelayMs: number; // Delay between individual swaps in boost mode
+  setSwapDelayMs: (ms: number) => void;
+
+  // New Swap Mode System
+  swapMode: SwapMode;
+  setSwapMode: (mode: SwapMode) => void;
+  referralLink: string;
+  setReferralLink: (link: string) => void;
+  swapsPerRound: number; // For boost mode
+  setSwapsPerRound: (count: number) => void;
+  numberOfRounds: number; // For boost mode (0 = infinite)
+  setNumberOfRounds: (rounds: number) => void;
+  numberOfSwaps: number; // For rewards mode (0 = infinite)
+  setNumberOfSwaps: (swaps: number) => void;
 
   // Swap State
   running: boolean;
   setRunning: (running: boolean) => void;
+  paused: boolean;
+  setPaused: (paused: boolean) => void;
+  stopping: boolean;
+  setStopping: (stopping: boolean) => void;
   currentSwapIndex: number;
   setCurrentSwapIndex: (index: number) => void;
 
@@ -109,6 +147,17 @@ interface SwapperContextValue {
   // Wetware
   lastWetwareOp: string;
   setLastWetwareOp: (op: string) => void;
+
+  // UI Feedback
+  toasts: Toast[];
+  showToast: (message: string, type?: ToastType, duration?: number) => string;
+  dismissToast: (id: string) => void;
+  successToast: (message: string) => void;
+  errorToast: (message: string) => void;
+  infoToast: (message: string) => void;
+  warningToast: (message: string) => void;
+  triggerConfetti: () => void;
+  triggerQuickConfetti: () => void;
 }
 
 const SwapperContext = createContext<SwapperContextValue | undefined>(undefined);
@@ -144,17 +193,23 @@ export function SwapperProvider({
   // Swap Configuration State
   const [amount, setAmount] = React.useState("");
   const [maxAmount, setMaxAmount] = React.useState("");
-  const [mode, setMode] = React.useState<Mode>("normal");
+  const [loopReturnAmount, setLoopReturnAmount] = React.useState("");
   const [platformFeeBps, setPlatformFeeBps] = React.useState(initialPlatformFeeBps);
   const [slippageBps, setSlippageBps] = React.useState(initialSlippageBps);
-
-  // Auto-swap State
-  const [autoActive, setAutoActive] = React.useState(false);
-  const [autoCount, setAutoCount] = React.useState(5);
   const [autoDelayMs, setAutoDelayMs] = React.useState(3000);
+  const [swapDelayMs, setSwapDelayMs] = React.useState(2000); // Default 2 seconds between swaps
+
+  // Swap Mode State
+  const [swapMode, setSwapMode] = React.useState<SwapMode>("normal");
+  const [referralLink, setReferralLink] = React.useState("");
+  const [swapsPerRound, setSwapsPerRound] = React.useState(5);
+  const [numberOfRounds, setNumberOfRounds] = React.useState(1);
+  const [numberOfSwaps, setNumberOfSwaps] = React.useState(5);
 
   // Swap Runtime State
   const [running, setRunning] = React.useState(false);
+  const [paused, setPaused] = React.useState(false);
+  const [stopping, setStopping] = React.useState(false);
   const [currentSwapIndex, setCurrentSwapIndex] = React.useState(0);
 
   // Affiliate State
@@ -171,6 +226,7 @@ export function SwapperProvider({
   const balancesHook = useBalances(walletHook.wallet, rpc, fromMint);
   const activityLogHook = useActivityLog();
   const miningRigHook = useMiningRig(walletHook.wallet, activityLogHook.log);
+  const toastHook = useToast();
 
   // Calculate current vault
   const currentVault = React.useMemo(() => {
@@ -218,6 +274,19 @@ export function SwapperProvider({
       estimatedSolUsd: miningRigHook.estimatedSolUsd,
       estimatedWpondUsd: miningRigHook.estimatedWpondUsd,
       lastHealthUpdate: miningRigHook.lastHealthUpdate,
+      // Manifest data
+      isPro: miningRigHook.isPro,
+      proSwapsSol: miningRigHook.proSwapsSol,
+      proSwapsBx: miningRigHook.proSwapsBx,
+      badges: miningRigHook.badges,
+      hasTwitter: miningRigHook.hasTwitter,
+      // Health stats
+      inMempool: miningRigHook.inMempool,
+      sent: miningRigHook.sent,
+      failed: miningRigHook.failed,
+      drifted: miningRigHook.drifted,
+      maxClaimEstimateUsd: miningRigHook.maxClaimEstimateUsd,
+      driftedUsd: miningRigHook.driftedUsd,
       setRigHealth: miningRigHook.setRigHealth,
       setRigPower: miningRigHook.setRigPower,
       setRigTemp: miningRigHook.setRigTemp,
@@ -233,6 +302,9 @@ export function SwapperProvider({
       incrementBoosts: miningRigHook.incrementBoosts,
       addPermanentBoost: miningRigHook.addPermanentBoost,
       addLuckPoints: miningRigHook.addLuckPoints,
+      // Loading
+      isLoading: miningRigHook.isLoading,
+      fetchRigData: miningRigHook.fetchRigData,
 
       // Token Selection
       fromMint,
@@ -245,24 +317,36 @@ export function SwapperProvider({
       setAmount,
       maxAmount,
       setMaxAmount,
-      mode,
-      setMode,
+      loopReturnAmount,
+      setLoopReturnAmount,
       platformFeeBps,
       setPlatformFeeBps,
       slippageBps,
       setSlippageBps,
-
-      // Auto-swap
-      autoActive,
-      setAutoActive,
-      autoCount,
-      setAutoCount,
       autoDelayMs,
       setAutoDelayMs,
+      swapDelayMs,
+      setSwapDelayMs,
+
+      // Swap Mode System
+      swapMode,
+      setSwapMode,
+      referralLink,
+      setReferralLink,
+      swapsPerRound,
+      setSwapsPerRound,
+      numberOfRounds,
+      setNumberOfRounds,
+      numberOfSwaps,
+      setNumberOfSwaps,
 
       // Swap State
       running,
       setRunning,
+      paused,
+      setPaused,
+      stopping,
+      setStopping,
       currentSwapIndex,
       setCurrentSwapIndex,
 
@@ -278,6 +362,17 @@ export function SwapperProvider({
       // Wetware
       lastWetwareOp,
       setLastWetwareOp,
+
+      // UI Feedback
+      toasts: toastHook.toasts,
+      showToast: toastHook.showToast,
+      dismissToast: toastHook.dismissToast,
+      successToast: toastHook.success,
+      errorToast: toastHook.error,
+      infoToast: toastHook.info,
+      warningToast: toastHook.warning,
+      triggerConfetti: triggerSuccessConfetti,
+      triggerQuickConfetti,
     }),
     [
       walletHook,
@@ -285,17 +380,24 @@ export function SwapperProvider({
       balancesHook,
       activityLogHook,
       miningRigHook,
+      toastHook,
       fromMint,
       toMint,
       amount,
       maxAmount,
-      mode,
+      loopReturnAmount,
       platformFeeBps,
       slippageBps,
-      autoActive,
-      autoCount,
       autoDelayMs,
+      swapDelayMs,
+      swapMode,
+      referralLink,
+      swapsPerRound,
+      numberOfRounds,
+      numberOfSwaps,
       running,
+      paused,
+      stopping,
       currentSwapIndex,
       affiliate,
       currentVault,

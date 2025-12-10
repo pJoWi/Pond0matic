@@ -8,9 +8,22 @@ const POND0X_ADDRESSES = {
   SWAP_REWARD_DISTRIBUTOR: "1orFCnFfgwPzSgUaoK6Wr3MjgXZ7mtk8NGz9Hh4iWWL",
 } as const;
 
+// Badge emoji mapping
+const BADGE_EMOJIS: Record<string, string> = {
+  pork: "🐽",
+  chef: "🧑‍🍳",
+  points: "✨",
+  swap: "🤝",
+};
+
+// Helper function to get badge emoji
+const getBadgeEmoji = (badgeName: string): string => {
+  const lowerBadge = badgeName.toLowerCase().trim();
+  return BADGE_EMOJIS[lowerBadge] || "";
+};
+
 // Mining Rig Configuration
-const MIN_BOOSTBOT_USD = 0.01;
-const MIN_PERMANENT_BOOST_SOL = 0.1;
+const MIN_PERMANENT_BOOST_SOL = 0.01;
 const MIN_LUCK_SOL = 0.001;
 const OPTIMAL_BOOST_THRESHOLD = 615; // Target boost for 100% power
 
@@ -34,17 +47,31 @@ interface MiningRigDashboardProps {
   priority: number;
   driftRisk: number;
 
+  // Additional API data
+  inMempool: number;
+  sent: number;
+  failed: number;
+  drifted: number;
+  estimatedSolUsd: number;
+  maxClaimEstimateUsd: number;
+  badges: string;
+  isPro: boolean;
+  proSwapsSol: number;
+  proSwapsBx: number;
+
+  // Navigation
+  onOpenSwapper: () => void;
+
   // Wallet state
   wallet: string;
 
+  // Loading state
+  isLoading: boolean;
+  onFetchRigData: () => void;
+
   // Actions
-  onRunBoostBot: (amount: string, count: number) => void;
   onSendPermanentBoost: (solAmount: number) => void;
   onSendLuckBurn: (solAmount: number) => void;
-
-  // Config for BoostBot
-  swapAmount: string;
-  autoCount: number;
 }
 
 export function MiningRigDashboard({
@@ -61,26 +88,75 @@ export function MiningRigDashboard({
   currentBoost,
   priority,
   driftRisk,
+  inMempool,
+  sent,
+  failed,
+  drifted,
+  estimatedSolUsd,
+  maxClaimEstimateUsd,
+  badges,
+  isPro,
+  proSwapsSol,
+  proSwapsBx,
+  onOpenSwapper,
   wallet,
-  onRunBoostBot,
+  isLoading,
+  onFetchRigData,
   onSendPermanentBoost,
   onSendLuckBurn,
-  swapAmount,
-  autoCount,
 }: MiningRigDashboardProps) {
   const [permanentBoostInput, setPermanentBoostInput] = React.useState<string>("");
   const [luckBurnInput, setLuckBurnInput] = React.useState<string>("");
 
   return (
-    <section className="bg-cyber-darker/60 backdrop-blur-md border border-ember-orange/30 rounded-xl shadow-ember-orange-md overflow-hidden transition-all duration-300 hover:border-ember-orange/50">
+    <section className="premium-panel theme-glow-intense overflow-hidden transition-all duration-300">
       {/* Header */}
       <div className="px-6 py-4 border-b border-ember-orange/20 bg-gradient-to-br from-ember-orange/10 to-ember-gold/5">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent text-center flex items-center justify-center gap-3">
-          <span>⚙️</span>
-          <span>POND0X MINING RIG</span>
-          <span>⚙️</span>
-        </h2>
-        <p className="text-center text-sm text-gray-400 mt-2">Boost your rig • Maximize mining power • Increase luck</p>
+        <div className="flex items-center justify-between">
+          <div className="flex-1" />
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent text-center flex items-center justify-center gap-3">
+            <span>⚙️</span>
+            <span>POND0X MINING RIG</span>
+            <span>⚙️</span>
+          </h2>
+          <div className="flex-1 flex justify-end">
+            <button
+              onClick={onFetchRigData}
+              disabled={!wallet || isLoading}
+              className={cn(
+                "px-4 py-2 rounded-lg font-semibold text-xs transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyber-black",
+                "bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 focus:ring-cyan-500",
+                (!wallet || isLoading) && "opacity-30 cursor-not-allowed"
+              )}
+            >
+              {isLoading ? "LOADING..." : "FETCH DATA"}
+            </button>
+          </div>
+        </div>
+        <p className="text-center text-sm text-gray-400 mt-2">
+          Boost your rig • Maximize mining power • Increase luck
+        </p>
+        {badges && (
+          <div className="flex items-center justify-center gap-2 mt-2">
+            {badges.split(", ").map((badge) => {
+              const emoji = getBadgeEmoji(badge);
+              return (
+                <span
+                  key={badge}
+                  className="px-2 py-0.5 bg-ember-gold/20 border border-ember-gold/40 rounded text-xs text-ember-gold font-medium flex items-center gap-1"
+                >
+                  {emoji && <span className="text-sm">{emoji}</span>}
+                  <span>{badge}</span>
+                </span>
+              );
+            })}
+            {isPro && (
+              <span className="px-2 py-0.5 bg-purple-500/20 border border-purple-500/40 rounded text-xs text-purple-400 font-medium">
+                PRO
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Rig Status Display */}
@@ -184,8 +260,12 @@ export function MiningRigDashboard({
         {/* Rig Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-cyber-black/50 border border-ember-orange/30 rounded-lg p-4 text-center">
-            <div className="text-xs text-gray-500 mb-1">Total Swaps</div>
-            <div className="text-2xl font-bold text-ember-orange-light">{totalBoosts}</div>
+            <div className="text-xs text-gray-500 mb-1">SOL Swaps</div>
+            <div className="text-2xl font-bold text-ember-orange-light">{proSwapsSol.toLocaleString()}</div>
+          </div>
+          <div className="bg-cyber-black/50 border border-cyan-500/30 rounded-lg p-4 text-center">
+            <div className="text-xs text-gray-500 mb-1">BX Swaps</div>
+            <div className="text-2xl font-bold text-cyan-400">{proSwapsBx.toLocaleString()}</div>
           </div>
           <div className="bg-cyber-black/50 border border-ember-gold/30 rounded-lg p-4 text-center">
             <div className="text-xs text-gray-500 mb-1">Permanent SOL</div>
@@ -195,29 +275,65 @@ export function MiningRigDashboard({
             <div className="text-xs text-gray-500 mb-1">Luck Points</div>
             <div className="text-2xl font-bold text-purple-400">{luckPoints}</div>
           </div>
-          <div className="bg-cyber-black/50 border border-blue-500/30 rounded-lg p-4 text-center">
-            <div className="text-xs text-gray-500 mb-1">Status</div>
-            <div className="text-lg font-bold text-blue-400">{boostBotActive ? "BOOSTING" : "IDLE"}</div>
-          </div>
         </div>
+
+        {/* Mining Stats from API */}
+        {miningSessionsCount > 0 && (
+          <div className="bg-gradient-to-br from-cyan-500/10 to-blue-600/5 border border-cyan-500/30 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-2xl">📊</div>
+              <div>
+                <h3 className="text-lg font-bold text-cyan-400">Mining Statistics</h3>
+                <p className="text-xs text-gray-400">Live data from Pond0x API</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-cyber-black/50 border border-cyan-500/30 rounded-lg p-3 text-center">
+                <div className="text-xs text-gray-500 mb-1">In Mempool</div>
+                <div className="text-xl font-bold text-cyan-400">{inMempool.toLocaleString()}</div>
+              </div>
+              <div className="bg-cyber-black/50 border border-green-500/30 rounded-lg p-3 text-center">
+                <div className="text-xs text-gray-500 mb-1">Sent</div>
+                <div className="text-xl font-bold text-green-400">{sent}</div>
+              </div>
+              <div className="bg-cyber-black/50 border border-red-500/30 rounded-lg p-3 text-center">
+                <div className="text-xs text-gray-500 mb-1">Failed</div>
+                <div className="text-xl font-bold text-red-400">{failed}</div>
+              </div>
+              <div className="bg-cyber-black/50 border border-yellow-500/30 rounded-lg p-3 text-center">
+                <div className="text-xs text-gray-500 mb-1">Drifted</div>
+                <div className="text-xl font-bold text-yellow-400">{drifted}</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="bg-cyber-black/50 border border-ember-gold/30 rounded-lg p-4 text-center">
+                <div className="text-xs text-gray-500 mb-1">SOL Price</div>
+                <div className="text-2xl font-bold text-ember-gold">${estimatedSolUsd.toFixed(2)}</div>
+              </div>
+              <div className="bg-cyber-black/50 border border-purple-500/30 rounded-lg p-4 text-center">
+                <div className="text-xs text-gray-500 mb-1">Max Claim Estimate</div>
+                <div className="text-2xl font-bold text-purple-400">${maxClaimEstimateUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Boost Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* BoostBot */}
-          <div className="bg-gradient-to-br from-ember-orange/20 to-ember-amber/10 border-2 border-ember-orange/40 rounded-xl p-6 space-y-4">
+          {/* Open Swapper */}
+          <div className="bg-gradient-to-br from-cyan-500/20 to-teal-600/10 border-2 border-cyan-500/40 rounded-xl p-6 space-y-4 shadow-[0_0_20px_rgba(6,182,212,0.15)]">
             <div className="text-center">
               <div className="text-4xl mb-2">🤖</div>
-              <h3 className="text-xl font-bold text-ember-orange-light mb-2">BoostBot</h3>
+              <h3 className="text-xl font-bold text-cyan-400 mb-2">Swap AutoBot</h3>
               <p className="text-xs text-gray-400 mb-4">
-                Micro swaps to SOL for temporary boost (&gt;{MIN_BOOSTBOT_USD} USD)
+                Execute automated swaps to boost your mining rig
               </p>
             </div>
             <button
-              onClick={() => onRunBoostBot(swapAmount, autoCount)}
-              disabled={!wallet || boostBotActive}
-              className="w-full px-4 py-3 bg-gradient-to-r from-ember-orange to-ember-amber rounded-lg font-bold text-sm text-white hover:shadow-ember-orange hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-ember-orange focus:ring-offset-2 focus:ring-offset-cyber-black"
+              onClick={onOpenSwapper}
+              className="w-full px-4 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-lg font-bold text-sm text-white hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-cyber-black"
             >
-              {boostBotActive ? "BOOSTING..." : "START BOOSTBOT"}
+              OPEN AUTOBOT
             </button>
             <p className="text-xs text-gray-500 text-center">
               +1/6 boost per swap • {OPTIMAL_BOOST_THRESHOLD} boost = 100% power
@@ -225,7 +341,7 @@ export function MiningRigDashboard({
           </div>
 
           {/* Permanent Boost */}
-          <div className="bg-gradient-to-br from-ember-gold/20 to-ember-orange/10 border-2 border-ember-gold/40 rounded-xl p-6 space-y-4">
+          <div className="bg-gradient-to-br from-ember-gold/20 to-ember-orange/10 border-2 border-ember-gold/40 rounded-xl p-6 space-y-4 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
             <div className="text-center">
               <div className="text-4xl mb-2">⚡</div>
               <h3 className="text-xl font-bold text-ember-gold mb-2">Permanent Boost</h3>
@@ -254,13 +370,13 @@ export function MiningRigDashboard({
               disabled={!wallet || parseFloat(permanentBoostInput) < MIN_PERMANENT_BOOST_SOL}
               className="w-full px-4 py-3 bg-gradient-to-r from-ember-gold to-ember-amber rounded-lg font-bold text-sm text-white hover:shadow-ember-gold hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-ember-gold focus:ring-offset-2 focus:ring-offset-cyber-black"
             >
-              DEPOSIT PERMANENT BOOST
+              BOOST RIG
             </button>
             <p className="text-xs text-gray-500 text-center">+10% power +15% health</p>
           </div>
 
           {/* Luck Burn */}
-          <div className="bg-gradient-to-br from-purple-500/20 to-pink-600/10 border-2 border-purple-500/40 rounded-xl p-6 space-y-4">
+          <div className="bg-gradient-to-br from-purple-500/20 to-pink-600/10 border-2 border-purple-500/40 rounded-xl p-6 space-y-4 shadow-[0_0_20px_rgba(168,85,247,0.15)]">
             <div className="text-center">
               <div className="text-4xl mb-2">🍀</div>
               <h3 className="text-xl font-bold text-purple-400 mb-2">Luck Burn</h3>

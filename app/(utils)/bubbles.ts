@@ -1,6 +1,6 @@
 "use client";
 
-// Cyberpunk neon bubble animation
+// Dark outer space animation with stars and nebula
 export function mountBubbles() {
   const canvas = document.getElementById('bubble-canvas') as HTMLCanvasElement | null;
   if (!canvas) return;
@@ -10,29 +10,58 @@ export function mountBubbles() {
   const dpr = Math.max(1, window.devicePixelRatio || 1);
   const cvs: HTMLCanvasElement = canvas;
 
+  // Stars array
+  let stars: Array<{
+    x: number;
+    y: number;
+    r: number;
+    a: number;
+    twinkle: number;
+    twinkleSpeed: number;
+  }> = [];
+
+  // Nebula clouds
+  let nebulae: Array<{
+    x: number;
+    y: number;
+    r: number;
+    colorType: number;
+    a: number;
+    pulse: number;
+    pulseSpeed: number;
+  }> = [];
+
   function resize() {
     const { innerWidth: w, innerHeight: h } = window;
     cvs.width = w * dpr;
     cvs.height = h * dpr;
     cvs.style.width = w + "px";
     cvs.style.height = h + "px";
+
+    // Recreate stars on resize
+    stars = Array.from({ length: 200 }).map(() => ({
+      x: Math.random() * cvs.width,
+      y: Math.random() * cvs.height,
+      r: (0.5 + Math.random() * 1.5) * dpr,
+      a: 0.3 + Math.random() * 0.7,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.01 + Math.random() * 0.03
+    }));
+
+    // Recreate nebulae on resize
+    nebulae = Array.from({ length: 8 }).map(() => ({
+      x: Math.random() * cvs.width,
+      y: Math.random() * cvs.height,
+      r: (100 + Math.random() * 200) * dpr,
+      colorType: Math.floor(Math.random() * 4),
+      a: 0.03 + Math.random() * 0.05,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.005 + Math.random() * 0.01
+    }));
   }
 
   resize();
   window.addEventListener('resize', resize);
-
-  // Cyberpunk neon particles - smaller, more numerous, glowing
-  const particles = Array.from({ length: 40 }).map(() => ({
-    x: Math.random() * cvs.width,
-    y: Math.random() * cvs.height,
-    r: (8 + Math.random() * 20) * dpr, // Smaller particles
-    a: 0.3 + Math.random() * 0.4, // Moderate transparency
-    dx: (-0.3 + Math.random() * 0.6) * dpr, // Slow drift
-    dy: (-0.4 + Math.random() * 0.4) * dpr,
-    colorType: Math.floor(Math.random() * 4), // 0: pink, 1: red, 2: rose, 3: light pink
-    pulse: Math.random() * Math.PI * 2,
-    pulseSpeed: 0.02 + Math.random() * 0.03
-  }));
 
   let time = 0;
 
@@ -40,81 +69,91 @@ export function mountBubbles() {
     const { width, height } = cvs;
     const ctx2 = ctx as CanvasRenderingContext2D;
 
-    // Clear with slight trail effect for smoother motion
-    ctx2.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    // Deep space background gradient
+    const bgGrad = ctx2.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, '#000005');
+    bgGrad.addColorStop(0.3, '#020108');
+    bgGrad.addColorStop(0.6, '#050210');
+    bgGrad.addColorStop(1, '#020005');
+    ctx2.fillStyle = bgGrad;
     ctx2.fillRect(0, 0, width, height);
 
     time += 0.01;
 
-    for (const p of particles) {
-      // Pulsing size effect
-      p.pulse += p.pulseSpeed;
-      const pulseScale = 1 + Math.sin(p.pulse) * 0.15;
-      const currentR = p.r * pulseScale;
+    // Draw nebula clouds (behind stars)
+    for (const n of nebulae) {
+      n.pulse += n.pulseSpeed;
+      const pulseScale = 1 + Math.sin(n.pulse) * 0.1;
+      const currentR = n.r * pulseScale;
 
-      // Choose neon color based on type
-      let color1, color2, shadowColor;
-      switch (p.colorType) {
-        case 0: // Deep Pink
-          color1 = 'rgba(255, 20, 147, 0.8)';
-          color2 = 'rgba(255, 20, 147, 0.1)';
-          shadowColor = 'rgba(255, 20, 147, 0.5)';
+      let color1, color2;
+      switch (n.colorType) {
+        case 0: // Purple nebula
+          color1 = `rgba(100, 50, 150, ${n.a})`;
+          color2 = 'rgba(100, 50, 150, 0)';
           break;
-        case 1: // Red
-          color1 = 'rgba(255, 0, 0, 0.8)';
-          color2 = 'rgba(255, 0, 0, 0.1)';
-          shadowColor = 'rgba(255, 0, 0, 0.5)';
+        case 1: // Blue nebula
+          color1 = `rgba(30, 80, 150, ${n.a})`;
+          color2 = 'rgba(30, 80, 150, 0)';
           break;
-        case 2: // Rose
-          color1 = 'rgba(255, 0, 110, 0.8)';
-          color2 = 'rgba(255, 0, 110, 0.1)';
-          shadowColor = 'rgba(255, 0, 110, 0.5)';
+        case 2: // Cyan nebula
+          color1 = `rgba(20, 100, 120, ${n.a})`;
+          color2 = 'rgba(20, 100, 120, 0)';
           break;
-        default: // Hot Pink
-          color1 = 'rgba(255, 105, 180, 0.8)';
-          color2 = 'rgba(255, 105, 180, 0.1)';
-          shadowColor = 'rgba(255, 105, 180, 0.5)';
+        default: // Deep red nebula
+          color1 = `rgba(80, 20, 40, ${n.a})`;
+          color2 = 'rgba(80, 20, 40, 0)';
       }
 
-      ctx2.beginPath();
-      ctx2.arc(p.x, p.y, currentR, 0, Math.PI * 2);
-
-      // Neon gradient from center
-      const grad = ctx2.createRadialGradient(
-        p.x,
-        p.y,
-        0,
-        p.x,
-        p.y,
-        currentR
-      );
-
+      const grad = ctx2.createRadialGradient(n.x, n.y, 0, n.x, n.y, currentR);
       grad.addColorStop(0, color1);
       grad.addColorStop(0.5, color2);
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx2.fillStyle = grad;
-      (ctx2 as any).globalAlpha = p.a;
+      ctx2.fillRect(n.x - currentR, n.y - currentR, currentR * 2, currentR * 2);
+    }
 
-      // Subtle glow effect
-      ctx2.shadowBlur = 20 * dpr;
-      ctx2.shadowColor = shadowColor;
+    // Draw twinkling stars
+    for (const s of stars) {
+      s.twinkle += s.twinkleSpeed;
+      const twinkleAlpha = s.a * (0.5 + Math.sin(s.twinkle) * 0.5);
 
+      ctx2.beginPath();
+      ctx2.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+
+      // Star glow
+      const starGrad = ctx2.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+      starGrad.addColorStop(0, `rgba(255, 255, 255, ${twinkleAlpha})`);
+      starGrad.addColorStop(0.3, `rgba(200, 220, 255, ${twinkleAlpha * 0.5})`);
+      starGrad.addColorStop(1, 'rgba(200, 220, 255, 0)');
+
+      ctx2.fillStyle = starGrad;
       ctx2.fill();
 
-      // Reset shadow
-      ctx2.shadowBlur = 0;
-      (ctx2 as any).globalAlpha = 1;
+      // Bright center
+      ctx2.beginPath();
+      ctx2.arc(s.x, s.y, s.r * 0.5, 0, Math.PI * 2);
+      ctx2.fillStyle = `rgba(255, 255, 255, ${twinkleAlpha})`;
+      ctx2.fill();
+    }
 
-      // Gentle floating movement
-      p.x += p.dx + Math.sin(time + p.pulse) * 0.2 * dpr;
-      p.y += p.dy + Math.cos(time * 0.7 + p.pulse) * 0.2 * dpr;
+    // Occasional shooting star
+    if (Math.random() < 0.002) {
+      const shootX = Math.random() * width;
+      const shootY = Math.random() * height * 0.5;
+      const shootLength = (50 + Math.random() * 100) * dpr;
 
-      // Wrap around screen
-      if (p.x < -currentR) p.x = width + currentR;
-      if (p.x > width + currentR) p.x = -currentR;
-      if (p.y < -currentR) p.y = height + currentR;
-      if (p.y > height + currentR) p.y = -currentR;
+      const shootGrad = ctx2.createLinearGradient(shootX, shootY, shootX + shootLength, shootY + shootLength * 0.5);
+      shootGrad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+      shootGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+      ctx2.strokeStyle = shootGrad;
+      ctx2.lineWidth = 2 * dpr;
+      ctx2.beginPath();
+      ctx2.moveTo(shootX, shootY);
+      ctx2.lineTo(shootX + shootLength, shootY + shootLength * 0.5);
+      ctx2.stroke();
     }
 
     requestAnimationFrame(loop);

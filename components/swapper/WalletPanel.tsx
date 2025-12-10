@@ -28,29 +28,45 @@ export function WalletPanel({
 
   return (
     <section
-      className="bg-cyber-darker/60 backdrop-blur-md border border-ember-orange/30 rounded-xl shadow-ember-orange-sm overflow-hidden transition-all duration-300 hover:border-ember-orange/50"
+      className="relative glass-intense border-2 border-lily-green/30 rounded-2xl shadow-[0_8px_32px_rgba(107,157,120,0.15)] overflow-hidden transition-all duration-500 hover:border-lily-green/50 hover:shadow-[0_12px_48px_rgba(107,157,120,0.25)] group"
       role="region"
       aria-label="Wallet connection"
     >
+      {/* Animated gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-lily-green/5 via-transparent to-pond-bright/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+      {/* Shimmer effect on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-lily-bright/10 to-transparent animate-shimmer" />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-ember-orange/20 bg-ember-glow">
-        <h2 className="text-xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent">
-          🔌 PLUG
-        </h2>
+      <div className="relative flex items-center justify-between px-6 py-4 border-b-2 border-lily-green/20 bg-gradient-to-r from-lily-green/10 via-pond-bright/10 to-lily-green/10">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 bg-lily-bright/30 rounded-full blur-lg animate-pulse" />
+            <div className="relative text-2xl">🔌</div>
+          </div>
+          <h2 className="text-2xl font-black bg-gradient-to-r from-lily-bright via-pond-bright to-lily-green bg-clip-text text-transparent tracking-tight">
+            PLUG
+          </h2>
+        </div>
         <div
           className={cn(
-            "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-all duration-300",
+            "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 border-2",
             wallet
-              ? "bg-ember-orange/10 text-ember-orange-light border border-ember-orange/40 shadow-ember-orange-sm"
-              : "bg-gray-700/50 text-gray-400 border border-gray-600"
+              ? "bg-gradient-to-r from-lily-green/20 to-pond-bright/20 text-lily-bright border-lily-green/50 shadow-[0_0_20px_rgba(107,157,120,0.3)] backdrop-blur-sm"
+              : "bg-gray-800/40 text-gray-400 border-gray-600/50 backdrop-blur-sm"
           )}
         >
           <div
             className={cn(
-              "w-2 h-2 rounded-full transition-all duration-300",
-              wallet ? "bg-ember-orange-light animate-led-pulse shadow-ember-orange-sm" : "bg-gray-500"
+              "w-2.5 h-2.5 rounded-full transition-all duration-300",
+              wallet
+                ? "bg-lily-bright shadow-[0_0_12px_rgba(139,196,159,0.8)] animate-led-pulse"
+                : "bg-gray-500"
             )}
-          ></div>
+          />
           {wallet ? "Connected" : "Disconnected"}
         </div>
       </div>

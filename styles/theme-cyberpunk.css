@@ -1,58 +1,17 @@
-/* Cyberpunk Theme - Minimal Custom CSS */
-/* Most styling uses Tailwind utilities. This file contains only essential custom properties. */
+/* ============================================
+   Pond0x Theme System - Supplementary Styles
+   Additional utilities and theme-specific effects
+   ============================================ */
 
-:root {
-  /* Light mode (not primary focus for cyberpunk, but supported) */
-  --bg-light: #f0f0f0;
-  --text-light: #1a1a1a;
-  --border-light: rgba(0, 0, 0, 0.2);
-}
-
-[data-theme="dark"] {
-  /* Dark mode ember/fire colors */
-  --bg-dark: #0a0a0a;
-  --bg-surface: #1a0f0a;
-  --bg-elevated: #2a1810;
-  --text-primary: #fef3ef;
-  --text-secondary: #b0b0b0;
-  --text-muted: #707070;
-  --border-default: rgba(255, 107, 53, 0.2);
-  --border-hover: rgba(255, 107, 53, 0.4);
-
-  /* Ember neon accents */
-  --ember-glow: rgba(255, 107, 53, 0.35);
-  --ember-border: rgba(255, 107, 53, 0.45);
-  --ember-border-hover: rgba(255, 107, 53, 0.7);
-
-  /* Amber accents */
-  --amber-glow: rgba(251, 191, 36, 0.35);
-  --amber-border: rgba(251, 191, 36, 0.45);
-  --amber-border-hover: rgba(251, 191, 36, 0.7);
-
-  /* Fire red accents */
-  --fire-glow: rgba(255, 60, 56, 0.35);
-  --fire-border: rgba(255, 60, 56, 0.45);
-  --fire-border-hover: rgba(255, 60, 56, 0.7);
-}
-
-[data-theme="light"] {
-  --bg-dark: #ffffff;
-  --bg-surface: #f5f5f5;
-  --bg-elevated: #e0e0e0;
-  --text-primary: #000000;
-  --text-secondary: #404040;
-  --text-muted: #808080;
-  --border-default: rgba(0, 0, 0, 0.15);
-  --border-hover: rgba(0, 0, 0, 0.3);
-}
-
-/* Bubble canvas */
+/* ============================================
+   BUBBLE CANVAS
+   ============================================ */
 .bubble-canvas {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.3;
   transition: opacity 0.5s ease;
 }
 
@@ -60,46 +19,100 @@
   opacity: 0 !important;
 }
 
-/* Custom scrollbar for cyberpunk aesthetic */
-[data-theme="dark"] ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-track {
-  background: #0a0a0a;
-  border-left: 1px solid rgba(255, 20, 147, 0.1);
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ff1493 0%, #ff0000 100%);
-  border-radius: 4px;
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ff1493 0%, #ff006e 50%, #ff0000 100%);
-}
-
-/* Selection color */
-[data-theme="dark"] ::selection {
-  background: rgba(255, 20, 147, 0.3);
-  color: #ffffff;
-}
-
-/* Grid background pattern (optional, subtle) */
-.grid-bg {
-  background-image:
-    linear-gradient(rgba(255, 20, 147, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 20, 147, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
-
-/* Mono font class for addresses and data */
+/* ============================================
+   MONO FONT CLASS
+   ============================================ */
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* Ember glow utilities */
+/* ============================================
+   THEME-SPECIFIC DIRECT COLOR UTILITIES
+   For when you need exact theme colors
+   ============================================ */
+
+/* Rewards/Ice Theme Direct Colors */
+[data-mode="rewards"] .text-theme-primary,
+[data-theme="rewards"] .text-theme-primary { color: #00d4ff; }
+[data-mode="rewards"] .bg-theme-primary,
+[data-theme="rewards"] .bg-theme-primary { background-color: #00d4ff; }
+[data-mode="rewards"] .border-theme-primary,
+[data-theme="rewards"] .border-theme-primary { border-color: #00d4ff; }
+
+/* Boost/Fire Theme Direct Colors */
+[data-mode="boost"] .text-theme-primary,
+[data-theme="boost"] .text-theme-primary { color: #ff6b35; }
+[data-mode="boost"] .bg-theme-primary,
+[data-theme="boost"] .bg-theme-primary { background-color: #ff6b35; }
+[data-mode="boost"] .border-theme-primary,
+[data-theme="boost"] .border-theme-primary { border-color: #ff6b35; }
+
+/* Void Theme Direct Colors */
+[data-mode="void"] .text-theme-primary,
+[data-theme="void"] .text-theme-primary { color: #a855f7; }
+[data-mode="void"] .bg-theme-primary,
+[data-theme="void"] .bg-theme-primary { background-color: #a855f7; }
+[data-mode="void"] .border-theme-primary,
+[data-theme="void"] .border-theme-primary { border-color: #a855f7; }
+
+/* Mining Theme Direct Colors */
+[data-mode="mining"] .text-theme-primary,
+[data-theme="mining"] .text-theme-primary { color: #22c55e; }
+[data-mode="mining"] .bg-theme-primary,
+[data-theme="mining"] .bg-theme-primary { background-color: #22c55e; }
+[data-mode="mining"] .border-theme-primary,
+[data-theme="mining"] .border-theme-primary { border-color: #22c55e; }
+
+/* Pond0x Mystical Theme Direct Colors */
+[data-mode="pond0x"] .text-theme-primary,
+[data-theme="pond0x"] .text-theme-primary { color: #4a7c59; }
+[data-mode="pond0x"] .bg-theme-primary,
+[data-theme="pond0x"] .bg-theme-primary { background-color: #4a7c59; }
+[data-mode="pond0x"] .border-theme-primary,
+[data-theme="pond0x"] .border-theme-primary { border-color: #4a7c59; }
+[data-mode="pond0x"] .text-theme-gold,
+[data-theme="pond0x"] .text-theme-gold { color: #f0c674; }
+[data-mode="pond0x"] .text-theme-pink,
+[data-theme="pond0x"] .text-theme-pink { color: #ffc0e3; }
+
+/* ============================================
+   POND0X MYSTICAL GLOW UTILITIES
+   ============================================ */
+
+.glow-lily {
+  box-shadow: 0 0 10px rgba(107, 157, 120, 0.5), 0 0 20px rgba(107, 157, 120, 0.3);
+}
+
+.glow-lily-intense {
+  box-shadow: 0 0 15px rgba(107, 157, 120, 0.7), 0 0 30px rgba(107, 157, 120, 0.5), 0 0 45px rgba(107, 157, 120, 0.3);
+}
+
+.glow-pond {
+  box-shadow: 0 0 10px rgba(74, 143, 184, 0.5), 0 0 20px rgba(74, 143, 184, 0.3);
+}
+
+.glow-gold-mystical {
+  box-shadow: 0 0 10px rgba(240, 198, 116, 0.6), 0 0 20px rgba(240, 198, 116, 0.4);
+}
+
+.glow-pink-soft {
+  box-shadow: 0 0 10px rgba(255, 192, 227, 0.5), 0 0 20px rgba(255, 192, 227, 0.3);
+}
+
+.border-glow-lily {
+  border-color: rgba(107, 157, 120, 0.5);
+  box-shadow: inset 0 0 8px rgba(107, 157, 120, 0.25), 0 0 12px rgba(107, 157, 120, 0.3);
+}
+
+.border-glow-lily:hover {
+  border-color: rgba(107, 157, 120, 0.7);
+  box-shadow: inset 0 0 12px rgba(107, 157, 120, 0.4), 0 0 18px rgba(107, 157, 120, 0.5);
+}
+
+/* ============================================
+   LEGACY GLOW UTILITIES (Backwards Compatible)
+   ============================================ */
+
 .glow-ember {
   box-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3);
 }
@@ -118,7 +131,6 @@
   box-shadow: inset 0 0 12px rgba(255, 107, 53, 0.4), 0 0 18px rgba(255, 107, 53, 0.5);
 }
 
-/* Amber glow utilities */
 .glow-amber {
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.5), 0 0 20px rgba(251, 191, 36, 0.3);
 }
@@ -128,7 +140,16 @@
   box-shadow: inset 0 0 8px rgba(251, 191, 36, 0.25), 0 0 12px rgba(251, 191, 36, 0.3);
 }
 
-/* Text glow effects */
+/* ============================================
+   TEXT GLOW EFFECTS - Theme Aware
+   ============================================ */
+
+.text-glow-theme {
+  color: var(--theme-primary);
+  text-shadow: 0 0 8px var(--theme-glow), 0 0 15px var(--theme-glow-soft);
+}
+
+/* Legacy text glows */
 .text-glow-ember {
   color: #ff6b35;
   text-shadow: 0 0 8px rgba(255, 107, 53, 0.7), 0 0 15px rgba(255, 107, 53, 0.4);
@@ -139,7 +160,15 @@
   text-shadow: 0 0 8px rgba(251, 191, 36, 0.7), 0 0 15px rgba(251, 191, 36, 0.4);
 }
 
-/* Ember gradient backgrounds */
+/* ============================================
+   GRADIENT BACKGROUNDS - Theme Aware
+   ============================================ */
+
+.bg-theme-glow {
+  background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-gradient-to) 100%);
+}
+
+/* Legacy gradient backgrounds */
 .bg-ember-glow {
   background: linear-gradient(135deg, rgba(255, 107, 53, 0.12) 0%, rgba(249, 115, 22, 0.06) 100%);
 }
@@ -147,3 +176,5 @@
 .bg-amber-glow {
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.06) 100%);
 }
+
+/* Removed unused utility classes - using Tailwind utilities instead */

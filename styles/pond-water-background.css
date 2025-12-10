@@ -1,0 +1,522 @@
+/**
+ * POND WATER BACKGROUND EFFECT
+ * Animated pond/water effects with ripples, lily pads, and light caustics
+ * Theme-aware design that works with pond0x theme system
+ */
+
+/* ============================================
+   POND WATER CONTAINER
+   ============================================ */
+
+.pond-water-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.75;
+  transition: opacity 0.5s ease;
+  filter: saturate(1.2) brightness(1.1);
+}
+
+.pond-water-container.water-off {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* ============================================
+   WATER SURFACE BASE
+   ============================================ */
+
+.pond-water-surface {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(26, 58, 82, 0.2) 0%,
+    rgba(13, 31, 45, 0.3) 40%,
+    rgba(10, 20, 25, 0.35) 70%,
+    rgba(5, 10, 15, 0.2) 100%
+  );
+  animation: water-breathe 6s ease-in-out infinite;
+}
+
+@keyframes water-breathe {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.7;
+  }
+  33% {
+    transform: scale(1.03) rotate(0.5deg);
+    opacity: 0.85;
+  }
+  66% {
+    transform: scale(1.06) rotate(-0.5deg);
+    opacity: 0.95;
+  }
+}
+
+/* ============================================
+   WATER RIPPLES (Multiple layers for depth)
+   ============================================ */
+
+.pond-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(74, 143, 184, 0.4);
+  box-shadow:
+    0 0 10px rgba(74, 143, 184, 0.3),
+    inset 0 0 20px rgba(74, 143, 184, 0.2);
+  animation: ripple-expand 6s ease-out infinite;
+  pointer-events: none;
+}
+
+.pond-ripple-1 {
+  top: 20%;
+  left: 15%;
+  width: 100px;
+  height: 100px;
+  animation-delay: 0s;
+}
+
+.pond-ripple-2 {
+  top: 60%;
+  left: 70%;
+  width: 150px;
+  height: 150px;
+  animation-delay: 2.5s;
+}
+
+.pond-ripple-3 {
+  top: 40%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  animation-delay: 5s;
+}
+
+.pond-ripple-4 {
+  top: 75%;
+  left: 25%;
+  width: 90px;
+  height: 90px;
+  animation-delay: 1.5s;
+}
+
+.pond-ripple-5 {
+  top: 10%;
+  left: 80%;
+  width: 110px;
+  height: 110px;
+  animation-delay: 4s;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+    border-width: 3px;
+  }
+  10% {
+    opacity: 0.8;
+    border-width: 2.5px;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0.3;
+    border-width: 1px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+/* ============================================
+   LILY PADS (Floating elements)
+   ============================================ */
+
+.lily-pad {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50% 50% 50% 0%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--lily-bright, #8bc49f) 0%,
+    var(--lily-green, #4a7c59) 50%,
+    var(--lily-green, #4a7c59) 100%
+  );
+  opacity: 0.15;
+  animation: lily-float 12s ease-in-out infinite;
+  box-shadow:
+    inset -5px -5px 15px rgba(0, 0, 0, 0.3),
+    inset 5px 5px 10px rgba(139, 196, 159, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+  transform-origin: center;
+}
+
+.lily-pad::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(139, 196, 159, 0.3) 0%,
+    transparent 60%
+  );
+  transform: translate(-50%, -50%);
+  animation: lily-shimmer 3s ease-in-out infinite;
+}
+
+.lily-pad-1 {
+  top: 15%;
+  left: 20%;
+  transform: rotate(45deg);
+  animation-delay: 0s;
+}
+
+.lily-pad-2 {
+  top: 65%;
+  left: 75%;
+  transform: rotate(-30deg) scale(1.2);
+  animation-delay: 3s;
+}
+
+.lily-pad-3 {
+  top: 80%;
+  left: 30%;
+  transform: rotate(60deg) scale(0.8);
+  animation-delay: 6s;
+}
+
+.lily-pad-4 {
+  top: 25%;
+  left: 85%;
+  transform: rotate(-15deg) scale(0.9);
+  animation-delay: 9s;
+}
+
+.lily-pad-5 {
+  top: 50%;
+  left: 10%;
+  transform: rotate(120deg) scale(1.1);
+  animation-delay: 4.5s;
+}
+
+@keyframes lily-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 0.2;
+    filter: brightness(1);
+  }
+  25% {
+    transform: translateY(-12px) translateX(6px) rotate(3deg) scale(1.05);
+    opacity: 0.3;
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: translateY(-8px) translateX(-5px) rotate(-2deg) scale(1.02);
+    opacity: 0.18;
+  }
+  75% {
+    transform: translateY(-10px) translateX(5px) rotate(3deg);
+    opacity: 0.22;
+  }
+}
+
+@keyframes lily-shimmer {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* ============================================
+   WATER LIGHT CAUSTICS (Underwater shimmer)
+   ============================================ */
+
+.water-caustics {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--pond-bright, rgba(74, 143, 184, 0.4)) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, var(--lily-light, rgba(107, 157, 120, 0.3)) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, var(--pond-light, rgba(45, 95, 127, 0.4)) 0%, transparent 50%),
+    radial-gradient(circle at 60% 20%, var(--lily-bright, rgba(139, 196, 159, 0.3)) 0%, transparent 50%);
+  background-size: 400% 400%, 350% 350%, 450% 450%, 500% 500%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%;
+  animation: caustics-move 20s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes caustics-move {
+  0%, 100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%;
+  }
+  25% {
+    background-position: 50% 25%, 75% 50%, 25% 75%, 100% 0%;
+  }
+  50% {
+    background-position: 100% 50%, 50% 25%, 0% 100%, 50% 75%;
+  }
+  75% {
+    background-position: 75% 75%, 25% 0%, 75% 25%, 25% 100%;
+  }
+}
+
+/* ============================================
+   WATER PARTICLES (Subtle floating specks)
+   ============================================ */
+
+.water-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 196, 159, 0.8) 0%, rgba(74, 143, 184, 0.4) 100%);
+  opacity: 0;
+  animation: particle-drift 12s ease-in-out infinite;
+  box-shadow:
+    0 0 8px rgba(139, 196, 159, 0.6),
+    0 0 12px rgba(74, 143, 184, 0.4);
+  filter: blur(0.5px);
+}
+
+.water-particle-1 {
+  top: 10%;
+  left: 25%;
+  animation-delay: 0s;
+}
+
+.water-particle-2 {
+  top: 70%;
+  left: 60%;
+  animation-delay: 3s;
+}
+
+.water-particle-3 {
+  top: 40%;
+  left: 85%;
+  animation-delay: 6s;
+}
+
+.water-particle-4 {
+  top: 85%;
+  left: 15%;
+  animation-delay: 9s;
+}
+
+.water-particle-5 {
+  top: 25%;
+  left: 50%;
+  animation-delay: 12s;
+}
+
+.water-particle-6 {
+  top: 55%;
+  left: 35%;
+  animation-delay: 2s;
+}
+
+.water-particle-7 {
+  top: 90%;
+  left: 70%;
+  animation-delay: 5s;
+}
+
+.water-particle-8 {
+  top: 15%;
+  left: 90%;
+  animation-delay: 8s;
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-50px) translateX(20px);
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-100px) translateX(-15px);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   POND SURFACE REFLECTION (Top shimmer)
+   ============================================ */
+
+.pond-surface-reflection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    var(--pond-light, rgba(45, 95, 127, 0.15)) 0%,
+    transparent 100%
+  );
+  opacity: 0.3;
+  animation: reflection-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes reflection-shimmer {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scaleY(1.05);
+  }
+}
+
+/* ============================================
+   WAVE LINES (Horizontal water waves)
+   ============================================ */
+
+.wave-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pond-light, rgba(45, 95, 127, 0.3)) 50%,
+    transparent 100%
+  );
+  opacity: 0.2;
+  animation: wave-drift 10s linear infinite;
+}
+
+.wave-line-1 {
+  top: 30%;
+  animation-delay: 0s;
+}
+
+.wave-line-2 {
+  top: 55%;
+  animation-delay: 3s;
+}
+
+.wave-line-3 {
+  top: 75%;
+  animation-delay: 6s;
+}
+
+@keyframes wave-drift {
+  0% {
+    transform: translateX(-100%) scaleX(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateX(100%) scaleX(1.2);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   DEPTH GRADIENT (Overall pond depth feel)
+   ============================================ */
+
+.pond-depth-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    transparent 0%,
+    rgba(13, 31, 45, 0.1) 40%,
+    rgba(10, 20, 25, 0.2) 70%,
+    rgba(10, 20, 25, 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .pond-water-container {
+    opacity: 0.4;
+  }
+
+  .lily-pad {
+    width: 40px;
+    height: 40px;
+  }
+
+  .water-caustics {
+    opacity: 0.05;
+  }
+
+  .pond-ripple {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
+   THEME VARIATIONS
+   ============================================ */
+
+/* Light mode - softer, brighter water */
+[data-theme="pond0x-light"] .pond-water-container {
+  opacity: 0.4;
+}
+
+[data-theme="pond0x-light"] .pond-water-surface {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(74, 143, 184, 0.12) 0%,
+    rgba(139, 196, 159, 0.08) 40%,
+    rgba(177, 221, 238, 0.05) 70%,
+    transparent 100%
+  );
+}
+
+[data-theme="pond0x-light"] .lily-pad {
+  opacity: 0.25;
+}
+
+[data-theme="pond0x-light"] .water-caustics {
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+}
+
+/* Performance optimization - reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .pond-water-container * {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+  }
+}

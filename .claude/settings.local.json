@@ -8,7 +8,11 @@
       "WebFetch(domain:cary0x.github.io)",
       "Bash(git rm:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm test)",
+      "Bash(git checkout:*)",
+      "WebFetch(domain:solscan.io)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

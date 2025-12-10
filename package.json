@@ -15,6 +15,7 @@
     "@solana/spl-token": "^0.1.8",
     "@solana/web3.js": "^1.95.2",
     "autoprefixer": "^10.4.20",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "critters": "^0.0.23",
@@ -26,6 +27,7 @@
     "tailwindcss": "^3.4.14"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",

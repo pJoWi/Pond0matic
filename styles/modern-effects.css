@@ -1,0 +1,575 @@
+/**
+ * Modern UI Effects - Theme-Aware Design System
+ *
+ * All effects now use CSS custom properties for theme support:
+ * - Rewards (Diamond Ice): Cyan, ice blue, white sparkles
+ * - Boost (Fire): Orange, gold, red, flames
+ * - Void (Space): Deep purple, black hole, stars
+ * - Mining Rig (Tech): Matrix green, electric blue, warning yellow
+ */
+
+/* ============================================
+   GLASSMORPHISM - Theme Aware
+   ============================================ */
+
+.glass-premium {
+  background: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--theme-border);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-intense {
+  background: linear-gradient(
+    135deg,
+    var(--theme-gradient-from) 0%,
+    var(--theme-gradient-to) 50%,
+    rgba(10, 10, 15, 0.85) 100%
+  );
+  backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  border: 1px solid var(--theme-border-hover);
+  box-shadow:
+    0 8px 32px var(--theme-glow-soft),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   MESH GRADIENTS - Theme Aware
+   ============================================ */
+
+.mesh-gradient-bg {
+  background:
+    radial-gradient(at 0% 0%, var(--theme-gradient-from) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, var(--theme-gradient-to) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--theme-glow-soft) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, var(--theme-gradient-from) 0px, transparent 50%),
+    linear-gradient(135deg, #050507 0%, #0a0a0f 100%);
+  background-size: 200% 200%;
+  animation: mesh-shift 15s ease infinite;
+}
+
+@keyframes mesh-shift {
+  0%, 100% { background-position: 0% 0%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+/* ============================================
+   NEUMORPHISM - Theme Aware
+   ============================================ */
+
+.neomorph-soft {
+  background: linear-gradient(145deg, #0f0f14, #0a0a0f);
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.5),
+    -8px -8px 16px rgba(30, 30, 40, 0.08),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.neomorph-pressed {
+  background: linear-gradient(145deg, #0a0a0f, #0f0f14);
+  box-shadow:
+    inset 6px 6px 12px rgba(0, 0, 0, 0.6),
+    inset -6px -6px 12px rgba(30, 30, 40, 0.04);
+}
+
+/* ============================================
+   MAGNETIC HOVER EFFECT
+   ============================================ */
+
+.magnetic-hover {
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.magnetic-hover:hover {
+  transform: scale(1.02) translateZ(0);
+}
+
+/* ============================================
+   FLUID GRADIENT ANIMATIONS - Theme Aware
+   ============================================ */
+
+.gradient-flow {
+  background: linear-gradient(
+    270deg,
+    var(--theme-primary),
+    var(--theme-secondary),
+    var(--theme-accent),
+    var(--theme-secondary),
+    var(--theme-primary)
+  );
+  background-size: 400% 400%;
+  animation: gradient-flow 8s ease infinite;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer-slide 2s infinite;
+}
+
+@keyframes shimmer-slide {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ============================================
+   PARTICLE EFFECT BACKGROUND - Theme Aware
+   ============================================ */
+
+.particle-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.particle-bg::before,
+.particle-bg::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: particle-float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.particle-bg::before {
+  top: -150px;
+  left: -150px;
+  background: radial-gradient(circle, var(--theme-primary), transparent);
+  animation-delay: 0s;
+}
+
+.particle-bg::after {
+  bottom: -150px;
+  right: -150px;
+  background: radial-gradient(circle, var(--theme-secondary), transparent);
+  animation-delay: 10s;
+}
+
+@keyframes particle-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+/* Removed unused layout utilities - bento grid, 3D card - using Tailwind instead */
+
+/* ============================================
+   THEME GLOW EFFECTS
+   ============================================ */
+
+.glow-theme {
+  box-shadow:
+    0 0 10px var(--theme-glow),
+    0 0 20px var(--theme-glow-soft),
+    0 0 30px rgba(0, 0, 0, 0.3),
+    inset 0 0 10px var(--theme-glow-soft);
+}
+
+.glow-theme-intense {
+  box-shadow:
+    0 0 20px var(--theme-glow-intense),
+    0 0 40px var(--theme-glow),
+    0 0 60px var(--theme-glow-soft),
+    0 0 80px rgba(0, 0, 0, 0.2),
+    inset 0 0 20px var(--theme-glow-soft);
+  animation: glow-pulse-intense 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-intense {
+  0%, 100% {
+    box-shadow:
+      0 0 20px var(--theme-glow-intense),
+      0 0 40px var(--theme-glow),
+      0 0 60px var(--theme-glow-soft),
+      inset 0 0 20px var(--theme-glow-soft);
+  }
+  50% {
+    box-shadow:
+      0 0 30px var(--theme-glow-intense),
+      0 0 60px var(--theme-glow),
+      0 0 90px var(--theme-glow-soft),
+      inset 0 0 30px var(--theme-glow);
+  }
+}
+
+/* ============================================
+   LIQUID MORPHING BUTTON
+   ============================================ */
+
+.button-liquid {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.button-liquid::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.button-liquid:hover::before {
+  width: 300%;
+  height: 300%;
+}
+
+/* Removed unused nav and scroll animation utilities */
+
+/* ============================================
+   SKELETON LOADING - Theme Aware
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 25%,
+    var(--theme-glow-soft) 50%,
+    rgba(255, 255, 255, 0.02) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================
+   MICRO-INTERACTIONS
+   ============================================ */
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple-animation 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   SPRING ANIMATIONS
+   ============================================ */
+
+.spring-bounce {
+  animation: spring-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes spring-bounce {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Additional mode selector animations */
+.animate-gradient {
+  background-size: 400% 400%;
+  animation: animate-gradient 15s ease infinite;
+}
+
+@keyframes animate-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-pulse-slow {
+  animation: animate-pulse-slow 3s ease-in-out infinite;
+}
+
+@keyframes animate-pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.animate-bounce-subtle {
+  animation: animate-bounce-subtle 2s ease-in-out infinite;
+}
+
+@keyframes animate-bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ============================================
+   GRADIENT TEXT - Theme Aware
+   ============================================ */
+
+.gradient-text-theme {
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 50%, var(--theme-accent) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradient-text-flow 3s ease infinite;
+}
+
+@keyframes gradient-text-flow {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Horizontal gradient animation for borders */
+.animate-gradient-x {
+  animation: gradient-x 4s ease infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.backdrop-blur-premium {
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+}
+
+.backdrop-blur-intense {
+  backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spring-transition {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================
+   THEME-SPECIFIC ANIMATIONS
+   ============================================ */
+
+/* Diamond Ice Sparkle - for Rewards theme */
+.animate-ice-sparkle {
+  animation: ice-sparkle 3s ease-in-out infinite;
+}
+
+@keyframes ice-sparkle {
+  0%, 100% {
+    box-shadow:
+      0 0 10px var(--theme-glow),
+      0 0 20px var(--theme-glow-soft),
+      inset 0 0 5px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px var(--theme-glow-intense),
+      0 0 40px var(--theme-glow),
+      inset 0 0 10px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Fire Flicker - for Boost theme */
+.animate-fire-glow {
+  animation: fire-glow 3s ease-in-out infinite;
+}
+
+@keyframes fire-glow {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 60px var(--theme-glow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 80px var(--theme-glow-intense),
+      0 0 120px var(--theme-glow-soft),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+
+.animate-flame-flicker {
+  animation: flame-flicker 2s ease-in-out infinite;
+}
+
+.animate-flame-flicker-delayed {
+  animation: flame-flicker 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes flame-flicker {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleY(1) translateY(0);
+  }
+  25% {
+    opacity: 0.7;
+    transform: scaleY(1.2) translateY(-2px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scaleY(0.9) translateY(1px);
+  }
+  75% {
+    opacity: 0.8;
+    transform: scaleY(1.1) translateY(-1px);
+  }
+}
+
+/* Void Pulse - for Void theme */
+.animate-void-pulse {
+  animation: void-pulse 4s ease-in-out infinite;
+}
+
+@keyframes void-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px var(--theme-glow),
+      0 0 40px var(--theme-glow-soft);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 30px var(--theme-glow-intense),
+      0 0 60px var(--theme-glow),
+      0 0 90px var(--theme-glow-soft);
+    transform: scale(1.02);
+  }
+}
+
+/* Matrix Rain - for Mining theme */
+.animate-matrix-glow {
+  animation: matrix-glow 2s ease-in-out infinite;
+}
+
+@keyframes matrix-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 10px var(--theme-glow),
+      0 0 20px var(--theme-glow-soft);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 15px var(--theme-glow-intense),
+      0 0 30px var(--theme-glow);
+    filter: brightness(1.1);
+  }
+}
+
+.animate-circuit-pulse {
+  animation: circuit-pulse 1.5s linear infinite;
+}
+
+@keyframes circuit-pulse {
+  0% {
+    box-shadow: 0 0 5px var(--theme-glow-soft);
+    opacity: 0.5;
+  }
+  50% {
+    box-shadow: 0 0 15px var(--theme-glow);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 5px var(--theme-glow-soft);
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
+   EMBER/FIRE SPECIFIC (Legacy Support)
+   ============================================ */
+
+.animate-ember-pulse {
+  animation: ember-pulse 2.5s ease-in-out infinite;
+}
+
+.animate-ember-pulse-delayed {
+  animation: ember-pulse 2.5s ease-in-out infinite 1.25s;
+}
+
+@keyframes ember-pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+/* Removed unused decorative effects - star field, floating orb, border animations, scan line */
+
+/* ============================================
+   SHIMMER EFFECT
+   ============================================ */
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

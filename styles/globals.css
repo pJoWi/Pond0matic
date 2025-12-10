@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   POND0X DASHBOARD - THEME SYSTEM
+   Four distinct themes based on mode selection
+   ============================================ */
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -12,182 +17,655 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* ============================================
+     ROOT CSS VARIABLES - POND0X MYSTICAL THEME (DEFAULT)
+     ============================================ */
+  :root {
+    /* Pond depths - mystical backgrounds */
+    --space-black: #0a1419;
+    --space-deep: #0d1f2d;
+
+    /* Default to Pond0x Mystical theme */
+    --theme-primary: #4a7c59;
+    --theme-secondary: #6b9d78;
+    --theme-tertiary: #8bc49f;
+    --theme-accent: #f0c674;
+    --theme-glow: rgba(107, 157, 120, 0.5);
+    --theme-glow-intense: rgba(107, 157, 120, 0.8);
+    --theme-glow-soft: rgba(107, 157, 120, 0.2);
+    --theme-border: rgba(74, 124, 89, 0.3);
+    --theme-border-hover: rgba(107, 157, 120, 0.6);
+    --theme-gradient-from: rgba(74, 124, 89, 0.15);
+    --theme-gradient-to: rgba(107, 157, 120, 0.05);
+    --theme-surface: rgba(74, 124, 89, 0.05);
+    --theme-surface-hover: rgba(74, 124, 89, 0.1);
+    --theme-text: #ffffff;
+    --theme-text-muted: #b8d4e6;
+    --theme-sparkle: #ffd966;
+
+    /* Pond0x specific */
+    --pond-water: #1a3a52;
+    --pond-light: #2d5f7f;
+    --lily-green: #4a7c59;
+    --lily-bright: #8bc49f;
+    --gold: #d4a444;
+    --gold-light: #f0c674;
+    --pink-soft: #f8c8dc;
+    --pink-bright: #ffc0e3;
+  }
+
+  /* ============================================
+     REWARDS THEME - Diamond Icy Blue
+     Cold, crystal clear, premium
+     ============================================ */
+  [data-mode="rewards"], [data-theme="rewards"] {
+    --theme-primary: #00d4ff;
+    --theme-secondary: #7dd3fc;
+    --theme-tertiary: #a5f3fc;
+    --theme-accent: #ffffff;
+    --theme-glow: rgba(0, 212, 255, 0.5);
+    --theme-glow-intense: rgba(0, 212, 255, 0.8);
+    --theme-glow-soft: rgba(0, 212, 255, 0.2);
+    --theme-border: rgba(0, 212, 255, 0.3);
+    --theme-border-hover: rgba(0, 212, 255, 0.6);
+    --theme-gradient-from: rgba(0, 212, 255, 0.15);
+    --theme-gradient-to: rgba(125, 211, 252, 0.05);
+    --theme-surface: rgba(0, 212, 255, 0.05);
+    --theme-surface-hover: rgba(0, 212, 255, 0.1);
+    --theme-text: #e0f7ff;
+    --theme-text-muted: #7dd3fc;
+    --theme-sparkle: #ffffff;
+
+    /* Diamond specific */
+    --diamond-shine: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #7dd3fc 100%);
+    --ice-crystal: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  }
+
+  /* ============================================
+     BOOST THEME - Fire, Black & Gold
+     Hot, intense, powerful
+     ============================================ */
+  [data-mode="boost"], [data-theme="boost"] {
+    --theme-primary: #ff6b35;
+    --theme-secondary: #fbbf24;
+    --theme-tertiary: #ef4444;
+    --theme-accent: #fcd34d;
+    --theme-glow: rgba(255, 107, 53, 0.5);
+    --theme-glow-intense: rgba(255, 107, 53, 0.8);
+    --theme-glow-soft: rgba(255, 107, 53, 0.2);
+    --theme-border: rgba(255, 107, 53, 0.3);
+    --theme-border-hover: rgba(255, 107, 53, 0.6);
+    --theme-gradient-from: rgba(255, 107, 53, 0.15);
+    --theme-gradient-to: rgba(251, 191, 36, 0.05);
+    --theme-surface: rgba(255, 107, 53, 0.05);
+    --theme-surface-hover: rgba(255, 107, 53, 0.1);
+    --theme-text: #fff1e6;
+    --theme-text-muted: #fbbf24;
+    --theme-sparkle: #fcd34d;
+
+    /* Fire specific */
+    --fire-core: linear-gradient(180deg, #fbbf24 0%, #ff6b35 50%, #ef4444 100%);
+    --ember-glow: radial-gradient(circle, rgba(255, 107, 53, 0.4) 0%, transparent 70%);
+  }
+
+  /* ============================================
+     VOID THEME - Purple, Black Hole, Space
+     Mysterious, gravitational, cosmic
+     ============================================ */
+  [data-mode="void"], [data-theme="void"] {
+    --theme-primary: #a855f7;
+    --theme-secondary: #c084fc;
+    --theme-tertiary: #7c3aed;
+    --theme-accent: #e879f9;
+    --theme-glow: rgba(168, 85, 247, 0.5);
+    --theme-glow-intense: rgba(168, 85, 247, 0.8);
+    --theme-glow-soft: rgba(168, 85, 247, 0.2);
+    --theme-border: rgba(168, 85, 247, 0.3);
+    --theme-border-hover: rgba(168, 85, 247, 0.6);
+    --theme-gradient-from: rgba(168, 85, 247, 0.15);
+    --theme-gradient-to: rgba(124, 58, 237, 0.05);
+    --theme-surface: rgba(168, 85, 247, 0.05);
+    --theme-surface-hover: rgba(168, 85, 247, 0.1);
+    --theme-text: #f3e8ff;
+    --theme-text-muted: #c084fc;
+    --theme-sparkle: #e879f9;
+
+    /* Void specific */
+    --black-hole: radial-gradient(circle, #000000 0%, rgba(168, 85, 247, 0.2) 50%, transparent 70%);
+    --event-horizon: conic-gradient(from 0deg, #7c3aed, #a855f7, #c084fc, #a855f7, #7c3aed);
+  }
+
+  /* ============================================
+     MINING RIG THEME - Green, Blue, Yellow
+     Tech, industrial, matrix
+     ============================================ */
+  [data-mode="mining"], [data-theme="mining"] {
+    --theme-primary: #22c55e;
+    --theme-secondary: #3b82f6;
+    --theme-tertiary: #eab308;
+    --theme-accent: #4ade80;
+    --theme-glow: rgba(34, 197, 94, 0.5);
+    --theme-glow-intense: rgba(34, 197, 94, 0.8);
+    --theme-glow-soft: rgba(34, 197, 94, 0.2);
+    --theme-border: rgba(34, 197, 94, 0.3);
+    --theme-border-hover: rgba(34, 197, 94, 0.6);
+    --theme-gradient-from: rgba(34, 197, 94, 0.15);
+    --theme-gradient-to: rgba(59, 130, 246, 0.05);
+    --theme-surface: rgba(34, 197, 94, 0.05);
+    --theme-surface-hover: rgba(34, 197, 94, 0.1);
+    --theme-text: #dcfce7;
+    --theme-text-muted: #4ade80;
+    --theme-sparkle: #eab308;
+
+    /* Mining specific */
+    --matrix-rain: linear-gradient(180deg, #22c55e 0%, #3b82f6 100%);
+    --circuit-glow: rgba(234, 179, 8, 0.3);
+  }
+
+  /* ============================================
+     NORMAL THEME - Pond0x Mystical (Default Swap Mode)
+     Lily greens, pond blues, enchanted gold
+     ============================================ */
+  [data-mode="normal"], [data-theme="normal"] {
+    --theme-primary: #4a7c59;
+    --theme-secondary: #6b9d78;
+    --theme-tertiary: #8bc49f;
+    --theme-accent: #f0c674;
+    --theme-glow: rgba(107, 157, 120, 0.5);
+    --theme-glow-intense: rgba(107, 157, 120, 0.8);
+    --theme-glow-soft: rgba(107, 157, 120, 0.2);
+    --theme-border: rgba(74, 124, 89, 0.3);
+    --theme-border-hover: rgba(107, 157, 120, 0.6);
+    --theme-gradient-from: rgba(74, 124, 89, 0.15);
+    --theme-gradient-to: rgba(107, 157, 120, 0.05);
+    --theme-surface: rgba(74, 124, 89, 0.05);
+    --theme-surface-hover: rgba(74, 124, 89, 0.1);
+    --theme-text: #ffffff;
+    --theme-text-muted: #b8d4e6;
+    --theme-sparkle: #ffd966;
+  }
+
+  /* ============================================
+     POND0X MYSTICAL THEME - Mystical Pond with Pink Accents (DARK)
+     Lily greens, pond blues, enchanted gold, soft pink
+     ============================================ */
+  [data-mode="pond0x"], [data-theme="pond0x"], [data-theme="pond0x-dark"] {
+    --theme-primary: #4a7c59;
+    --theme-secondary: #6b9d78;
+    --theme-tertiary: #8bc49f;
+    --theme-accent: #f0c674;
+    --theme-glow: rgba(107, 157, 120, 0.5);
+    --theme-glow-intense: rgba(107, 157, 120, 0.8);
+    --theme-glow-soft: rgba(107, 157, 120, 0.2);
+    --theme-border: rgba(74, 124, 89, 0.3);
+    --theme-border-hover: rgba(107, 157, 120, 0.6);
+    --theme-gradient-from: rgba(74, 124, 89, 0.15);
+    --theme-gradient-to: rgba(107, 157, 120, 0.05);
+    --theme-surface: rgba(74, 124, 89, 0.05);
+    --theme-surface-hover: rgba(74, 124, 89, 0.1);
+    --theme-text: #ffffff;
+    --theme-text-muted: #b8d4e6;
+    --theme-sparkle: #ffd966;
+
+    /* Background colors for dark mode */
+    --bg-primary: #0a1419;
+    --bg-secondary: #0d1f2d;
+    --bg-surface: rgba(10, 10, 15, 0.8);
+
+    /* Pond0x specific mystical elements */
+    --pond-water: #1a3a52;
+    --pond-deep: #0d1f2d;
+    --pond-light: #2d5f7f;
+    --pond-bright: #4a8fb8;
+    --lily-green: #4a7c59;
+    --lily-light: #6b9d78;
+    --lily-bright: #8bc49f;
+    --gold: #d4a444;
+    --gold-light: #f0c674;
+    --pink-soft: #f8c8dc;
+    --pink-medium: #ffb6d9;
+    --pink-bright: #ffc0e3;
+    --glow-green: rgba(107, 157, 120, 0.5);
+    --glow-blue: rgba(74, 143, 184, 0.5);
+    --glow-gold: rgba(240, 198, 116, 0.6);
+    --glow-pink: rgba(255, 192, 227, 0.5);
+  }
+
+  /* ============================================
+     POND0X LIGHT THEME - Bright Pond with Soft Pastels
+     Brighter greens, blues, warm sunlit colors
+     ============================================ */
+  [data-theme="pond0x-light"] {
+    --theme-primary: #5a9d6a;
+    --theme-secondary: #7cc28f;
+    --theme-tertiary: #a8e6bf;
+    --theme-accent: #f4d292;
+    --theme-glow: rgba(92, 157, 106, 0.4);
+    --theme-glow-intense: rgba(92, 157, 106, 0.7);
+    --theme-glow-soft: rgba(92, 157, 106, 0.15);
+    --theme-border: rgba(92, 157, 106, 0.25);
+    --theme-border-hover: rgba(92, 157, 106, 0.5);
+    --theme-gradient-from: rgba(92, 157, 106, 0.12);
+    --theme-gradient-to: rgba(124, 194, 143, 0.08);
+    --theme-surface: rgba(92, 157, 106, 0.08);
+    --theme-surface-hover: rgba(92, 157, 106, 0.15);
+    --theme-text: #1a2e35;
+    --theme-text-muted: #4a6b7f;
+    --theme-sparkle: #ffd966;
+
+    /* Background colors for light mode */
+    --bg-primary: #f0f7f4;
+    --bg-secondary: #e1efe8;
+    --bg-surface: rgba(255, 255, 255, 0.85);
+
+    /* Pond0x specific light elements */
+    --pond-water: #b1d8e8;
+    --pond-deep: #7eb3d1;
+    --pond-light: #d4ebf5;
+    --pond-bright: #a8d5ed;
+    --lily-green: #5a9d6a;
+    --lily-light: #7cc28f;
+    --lily-bright: #a8e6bf;
+    --gold: #e6bc5a;
+    --gold-light: #f4d292;
+    --pink-soft: #fde6f0;
+    --pink-medium: #fcd4e5;
+    --pink-bright: #ffc0e3;
+    --glow-green: rgba(92, 157, 106, 0.3);
+    --glow-blue: rgba(168, 213, 237, 0.4);
+    --glow-gold: rgba(244, 210, 146, 0.5);
+    --glow-pink: rgba(255, 212, 229, 0.4);
+  }
+
+  /* ============================================
+     BODY STYLES
+     ============================================ */
   body {
     margin: 0;
     min-height: 100vh;
     overflow-x: hidden;
-    padding-top: 8rem;
-    transition: background-color 0.3s, color 0.3s;
+    padding-top: 5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-primary, var(--space-black));
+    color: var(--theme-text);
+
+    /* Mystical pond background with subtle theme glow */
+    background-image:
+      radial-gradient(ellipse at 50% 0%, var(--theme-glow-soft) 0%, transparent 50%),
+      radial-gradient(circle at 15% 85%, rgba(74, 124, 89, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 85% 15%, rgba(212, 164, 68, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(248, 200, 220, 0.03) 0%, transparent 60%);
   }
 
-  [data-theme="dark"] body {
-    background-color: #000000;
+  /* Light mode body adjustments */
+  [data-theme="pond0x-light"] body {
+    background-image:
+      radial-gradient(ellipse at 50% 0%, var(--theme-glow-soft) 0%, transparent 50%),
+      radial-gradient(circle at 15% 85%, rgba(92, 157, 106, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 85% 15%, rgba(230, 188, 90, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(253, 230, 240, 0.05) 0%, transparent 60%);
+  }
+
+  /* ============================================
+     SCROLLBAR STYLES
+     ============================================ */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--space-deep);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-primary);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-secondary);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--theme-glow);
     color: #ffffff;
-    background-image: radial-gradient(circle at 10% 20%, rgba(255, 20, 147, 0.05) 0%, transparent 50%),
-                      radial-gradient(circle at 90% 80%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
+  }
+}
+
+@layer components {
+  /* ============================================
+     DASHBOARD CONTAINER - Centered & Compact
+     ============================================ */
+  .dashboard-container {
+    width: 100%;
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 5rem 1rem 1rem 1rem; /* pt-20 for fixed header */
   }
 
-  [data-theme="light"] body {
-    background-color: #f9fafb;
-    color: #111827;
-    background-image: radial-gradient(circle at 10% 20%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
-                      radial-gradient(circle at 90% 80%, rgba(255, 157, 77, 0.08) 0%, transparent 50%);
+  @media (max-width: 640px) {
+    .dashboard-container {
+      max-width: 100%;
+      padding: 5rem 0.75rem 1rem 0.75rem;
+    }
   }
 
-  /* Light mode component overrides */
-  [data-theme="light"] .bg-cyber-darker {
-    background-color: #ffffff;
-    border-color: rgba(255, 107, 53, 0.2);
+  @media (min-width: 641px) and (max-width: 768px) {
+    .dashboard-container {
+      max-width: 520px;
+    }
   }
 
-  [data-theme="light"] .bg-cyber-black,
-  [data-theme="light"] .bg-cyber-black\/50,
-  [data-theme="light"] .bg-cyber-black\/90 {
-    background-color: #f3f4f6;
+  .dashboard-container-wide {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 1rem;
   }
 
-  [data-theme="light"] .bg-cyber-black\/30 {
-    background-color: rgba(243, 244, 246, 0.3);
+  /* ============================================
+     GLASS CARD - Premium Panel Style
+     ============================================ */
+  .glass-card {
+    background: var(--bg-surface, rgba(10, 10, 15, 0.8));
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid var(--theme-border);
+    border-radius: 1rem;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
   }
 
-  /* Text color adjustments */
-  [data-theme="light"] .text-gray-400 {
-    color: #6b7280;
+  .glass-card:hover {
+    border-color: var(--theme-border-hover);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      0 0 20px var(--theme-glow-soft),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
-  [data-theme="light"] .text-gray-300 {
-    color: #4b5563;
+  /* Light mode glass card */
+  [data-theme="pond0x-light"] .glass-card {
+    background: var(--bg-surface);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 0 0 1px rgba(92, 157, 106, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
 
-  [data-theme="light"] .text-gray-500 {
-    color: #6b7280;
+  [data-theme="pond0x-light"] .glass-card:hover {
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      0 0 20px var(--theme-glow-soft),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
-  [data-theme="light"] .text-gray-600 {
-    color: #4b5563;
+  /* ============================================
+     THEME GLOW EFFECTS
+     ============================================ */
+  .theme-glow {
+    box-shadow:
+      0 0 10px var(--theme-glow),
+      0 0 20px var(--theme-glow-soft);
   }
 
-  /* Ember color adjustments for better visibility */
-  [data-theme="light"] .text-ember-orange {
-    color: #ea580c;
+  .theme-glow-intense {
+    box-shadow:
+      0 0 20px var(--theme-glow-intense),
+      0 0 40px var(--theme-glow),
+      0 0 60px var(--theme-glow-soft),
+      0 0 80px var(--theme-glow-soft);
   }
 
-  [data-theme="light"] .text-ember-amber {
-    color: #d97706;
+  .theme-glow-subtle {
+    box-shadow: 0 0 10px var(--theme-glow-soft);
   }
 
-  [data-theme="light"] .text-ember-gold {
-    color: #ca8a04;
+  /* ============================================
+     THEME BORDERS
+     ============================================ */
+  .theme-border {
+    border: 1px solid var(--theme-border);
   }
 
-  /* Border adjustments */
-  [data-theme="light"] .border-ember-orange\/20,
-  [data-theme="light"] .border-ember-orange\/30 {
-    border-color: rgba(234, 88, 12, 0.4);
+  .theme-border-hover:hover {
+    border-color: var(--theme-border-hover);
   }
 
-  [data-theme="light"] .border-ember-amber\/30 {
-    border-color: rgba(217, 119, 6, 0.4);
+  .theme-border-glow {
+    border: 1px solid var(--theme-border);
+    box-shadow:
+      inset 0 0 8px var(--theme-glow-soft),
+      0 0 12px var(--theme-glow-soft);
   }
 
-  [data-theme="light"] .border-ember-gold\/30 {
-    border-color: rgba(202, 138, 4, 0.4);
+  .theme-border-glow:hover {
+    border-color: var(--theme-border-hover);
+    box-shadow:
+      inset 0 0 12px var(--theme-glow),
+      0 0 18px var(--theme-glow);
   }
 
-  [data-theme="light"] .border-green-500\/30 {
-    border-color: rgba(34, 197, 94, 0.5);
+  /* ============================================
+     THEME GRADIENTS
+     ============================================ */
+  .theme-gradient-bg {
+    background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-gradient-to) 100%);
   }
 
-  [data-theme="light"] .border-red-500\/30 {
-    border-color: rgba(239, 68, 68, 0.5);
+  .theme-gradient-text {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  [data-theme="light"] .border-yellow-500\/30 {
-    border-color: rgba(234, 179, 8, 0.5);
+  /* ============================================
+     THEME BUTTONS
+     ============================================ */
+  .theme-button {
+    background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-surface) 100%);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
 
-  [data-theme="light"] .border-blue-500\/30 {
-    border-color: rgba(59, 130, 246, 0.5);
+  .theme-button:hover {
+    background: linear-gradient(135deg, var(--theme-surface-hover) 0%, var(--theme-gradient-from) 100%);
+    border-color: var(--theme-border-hover);
+    box-shadow: 0 0 15px var(--theme-glow-soft);
   }
 
-  [data-theme="light"] .border-purple-500\/30 {
-    border-color: rgba(168, 85, 247, 0.5);
+  .theme-button:active {
+    transform: scale(0.98);
   }
 
-  /* Gradient backgrounds */
-  [data-theme="light"] .from-ember-gold\/10 {
-    --tw-gradient-from: rgba(202, 138, 4, 0.15);
+  .theme-button-solid {
+    background: var(--theme-primary);
+    border: none;
+    color: #000000;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--theme-glow);
   }
 
-  [data-theme="light"] .from-ember-orange\/10 {
-    --tw-gradient-from: rgba(234, 88, 12, 0.15);
+  .theme-button-solid:hover {
+    background: var(--theme-secondary);
+    box-shadow: 0 0 25px var(--theme-glow-intense);
+    transform: translateY(-1px);
   }
 
-  [data-theme="light"] .to-ember-orange\/5 {
-    --tw-gradient-to: rgba(234, 88, 12, 0.08);
-  }
-
-  /* Status badge backgrounds */
-  [data-theme="light"] .bg-green-500\/10 {
-    background-color: rgba(34, 197, 94, 0.15);
-  }
-
-  [data-theme="light"] .bg-red-500\/10 {
-    background-color: rgba(239, 68, 68, 0.15);
-  }
-
-  [data-theme="light"] .bg-yellow-500\/10 {
-    background-color: rgba(234, 179, 8, 0.15);
-  }
-
-  [data-theme="light"] .bg-blue-500\/10 {
-    background-color: rgba(59, 130, 246, 0.15);
-  }
-
-  [data-theme="light"] .bg-purple-500\/10 {
-    background-color: rgba(168, 85, 247, 0.15);
-  }
-
-  [data-theme="light"] .bg-ember-red\/10 {
-    background-color: rgba(220, 38, 38, 0.15);
-  }
-
-  /* Button hover states */
-  [data-theme="light"] button:hover {
-    filter: brightness(0.95);
-  }
-
-  /* Backdrop blur adjustments */
-  [data-theme="light"] .backdrop-blur-cyber {
-    backdrop-filter: blur(12px);
-    background-color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* Shadow adjustments for depth */
-  [data-theme="light"] .shadow-neon-pink-sm {
-    box-shadow: 0 0 10px rgba(234, 88, 12, 0.2);
-  }
-
-  [data-theme="light"] .shadow-neon-red-sm {
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
-  }
-
-  /* Input field adjustments */
-  [data-theme="light"] input[type="text"],
-  [data-theme="light"] input[type="number"],
-  [data-theme="light"] select {
-    background-color: #ffffff;
-    border-color: rgba(209, 213, 219, 0.5);
-    color: #111827;
-  }
-
-  [data-theme="light"] input[type="text"]:focus,
-  [data-theme="light"] input[type="number"]:focus,
-  [data-theme="light"] select:focus {
-    border-color: rgba(234, 88, 12, 0.5);
+  /* ============================================
+     THEME INPUTS
+     ============================================ */
+  .theme-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-text);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+  }
+
+  .theme-input:focus {
+    border-color: var(--theme-border-hover);
+    box-shadow: 0 0 0 3px var(--theme-glow-soft);
+  }
+
+  .theme-input::placeholder {
+    color: var(--theme-text-muted);
+    opacity: 0.5;
+  }
+
+  /* ============================================
+     THEME TEXT
+     ============================================ */
+  .theme-text-primary {
+    color: var(--theme-primary);
+  }
+
+  .theme-text-secondary {
+    color: var(--theme-secondary);
+  }
+
+  .theme-text-accent {
+    color: var(--theme-accent);
+  }
+
+  .theme-text-muted {
+    color: var(--theme-text-muted);
+  }
+
+  .theme-text-glow {
+    color: var(--theme-primary);
+    text-shadow:
+      0 0 8px var(--theme-glow),
+      0 0 15px var(--theme-glow-soft);
+  }
+
+  /* ============================================
+     COMPACT SPACING UTILITIES
+     ============================================ */
+  .compact-spacing {
+    padding: 0.75rem;
+  }
+
+  .compact-spacing-sm {
+    padding: 0.5rem;
+  }
+
+  .compact-gap {
+    gap: 0.5rem;
+  }
+
+  .compact-gap-sm {
+    gap: 0.25rem;
+  }
+
+  /* ============================================
+     PREMIUM PANEL - Pond-themed Enhancement
+     ============================================ */
+  .premium-panel {
+    background: rgba(10, 10, 15, 0.9);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 2px solid var(--theme-border-hover);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 0 40px var(--theme-glow-soft),
+      0 0 80px var(--theme-glow-soft),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    position: relative;
+  }
+
+  .premium-panel::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1.25rem;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary), var(--theme-tertiary));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .premium-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 1.25rem;
+    background: linear-gradient(135deg, transparent 0%, var(--theme-glow-soft) 50%, transparent 100%);
+    background-size: 200% 200%;
+    animation: borderGlow 6s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  @keyframes borderGlow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  /* ============================================
+     SLEEK DIVIDER
+     ============================================ */
+  .sleek-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--theme-border) 50%, transparent 100%);
+    margin: 0.75rem 0;
+  }
+
+  /* ============================================
+     STATUS INDICATORS
+     ============================================ */
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--theme-primary);
+    box-shadow: 0 0 8px var(--theme-glow);
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes status-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.9); }
+  }
+
+  /* ============================================
+     FLOATING LABEL
+     ============================================ */
+  .floating-label {
+    position: absolute;
+    top: -0.5rem;
+    left: 0.75rem;
+    background: var(--space-deep);
+    padding: 0 0.25rem;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--theme-text-muted);
   }
 }
 
@@ -195,5 +673,58 @@
   /* Utility for mono font */
   .font-mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  /* Theme background surface */
+  .bg-theme-surface {
+    background-color: var(--theme-surface);
+  }
+
+  /* Theme primary bg */
+  .bg-theme-primary {
+    background-color: var(--theme-primary);
+  }
+
+  /* Quick transitions */
+  .transition-theme {
+    transition: all 0.3s ease;
+  }
+
+  /* ============================================
+     RIPPLE ANIMATION
+     Tactile feedback for button interactions
+     ============================================ */
+  @keyframes ripple {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 0.5;
+      transform: translate(-50%, -50%);
+    }
+    100% {
+      width: 300px;
+      height: 300px;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  .animate-ripple {
+    animation: ripple 600ms ease-out;
+  }
+
+  /* Ripple element styling */
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    animation: ripple 600ms ease-out;
+    pointer-events: none;
+  }
+
+  /* Ensure parent buttons are positioned for ripple effect */
+  button {
+    position: relative;
+    overflow: hidden;
   }
 }

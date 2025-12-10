@@ -30,9 +30,9 @@ export function SwapInterface({
   wallet,
 }: SwapInterfaceProps) {
   return (
-    <div className="space-y-3">
+    <div className="relative">
       {/* FROM Section */}
-      <div>
+      <div className="pb-3">
         <label htmlFor="from-token-compact" className="block text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1.5">
           From
         </label>
@@ -40,7 +40,7 @@ export function SwapInterface({
           {/* Token Selector */}
           <select
             id="from-token-compact"
-            className="w-[100px] px-3 py-2.5 bg-cyber-black/60 border border-ember-orange/40 rounded-lg text-sm font-bold text-ember-orange-light focus:border-ember-orange/60 focus:outline-none focus:ring-2 focus:ring-ember-orange/40 transition-all cursor-pointer hover:border-ember-orange/50"
+            className="w-[100px] theme-input text-sm font-bold text-white cursor-pointer"
             value={fromMint}
             onChange={(e) => onFromMintChange(e.target.value)}
           >
@@ -56,7 +56,7 @@ export function SwapInterface({
             <input
               id="from-amount-compact"
               type="text"
-              className="flex-1 px-4 py-2.5 bg-cyber-black/60 border border-ember-orange/40 rounded-lg text-lg font-mono font-bold text-right text-white focus:border-ember-orange/60 focus:outline-none focus:ring-2 focus:ring-ember-orange/40 transition-all placeholder-gray-600"
+              className="flex-1 theme-input text-lg font-mono font-bold text-right"
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
               placeholder="0.0"
@@ -64,7 +64,7 @@ export function SwapInterface({
             {wallet && tokenBalance > 0 && (
               <button
                 onClick={() => onAmountChange(tokenBalance.toString())}
-                className="px-3 py-2 bg-ember-orange/20 border border-ember-orange/50 rounded-lg text-xs font-semibold text-ember-orange hover:bg-ember-orange/30 hover:scale-105 active:scale-95 transition-all"
+                className="px-2 py-2 rounded-lg text-[10px] font-bold theme-text-primary hover:theme-text-secondary hover:scale-105 active:scale-95 transition-all flex-shrink-0"
               >
                 MAX
               </button>
@@ -78,17 +78,19 @@ export function SwapInterface({
         )}
       </div>
 
-      {/* Swap Direction Button */}
-      <SwapDirectionButton onSwap={onSwapDirection} disabled={!wallet} />
+      {/* Swap Direction Button - Centered and Overlapping */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 translate-y-0 z-10">
+        <SwapDirectionButton onSwap={onSwapDirection} disabled={!wallet} />
+      </div>
 
       {/* TO Section */}
-      <div>
+      <div className="pt-3">
         <label htmlFor="to-token-compact" className="block text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1.5">
           To
         </label>
         <select
           id="to-token-compact"
-          className="w-full px-3 py-2.5 bg-cyber-black/60 border border-ember-amber/40 rounded-lg text-sm font-bold text-ember-amber-light focus:border-ember-amber/60 focus:outline-none focus:ring-2 focus:ring-ember-amber/40 transition-all cursor-pointer hover:border-ember-amber/50"
+          className="w-full theme-input text-sm font-bold text-white cursor-pointer"
           value={toMint}
           onChange={(e) => onToMintChange(e.target.value)}
         >
