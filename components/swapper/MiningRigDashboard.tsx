@@ -23,7 +23,11 @@ const getBadgeEmoji = (badgeName: string): string => {
 };
 
 // Mining Rig Configuration
+<<<<<<< HEAD
 const MIN_PERMANENT_BOOST_SOL = 0.01;
+=======
+const MIN_PERMANENT_BOOST_SOL = 0.1;
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
 const MIN_LUCK_SOL = 0.001;
 const OPTIMAL_BOOST_THRESHOLD = 615; // Target boost for 100% power
 

@@ -37,7 +37,11 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
       </div>
 
       {/* Activity Feed */}
+<<<<<<< HEAD
       <div className="max-h-40 overflow-y-auto custom-scrollbar backdrop-blur-sm">
+=======
+      <div className="max-h-40 overflow-y-auto custom-scrollbar">
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
         {[...activities].reverse().map((line, i) => {
           const isError = /error|failed/i.test(line);
           const isSuccess = /confirmed|success/i.test(line);
@@ -100,6 +104,7 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <StatusLED color={ledColor} pulsing={ledPulsing} size="sm" />
+<<<<<<< HEAD
               {timestamp && (
                 <span className="text-[10px] font-mono text-pond-bright/70 group-hover:text-pond-bright w-16 flex-shrink-0 transition-colors">
                   {timestamp}
@@ -108,6 +113,10 @@ export function MiniActivityFeed({ activities, onClear }: MiniActivityFeedProps)
               <span className="text-[11px] text-gray-300 group-hover:text-lily-bright truncate flex-1 transition-colors">
                 {renderMessageWithLinks(message)}
               </span>
+=======
+              {timestamp && <span className="text-[10px] font-mono text-gray-500 w-16 flex-shrink-0">{timestamp}</span>}
+              <span className="text-[11px] text-gray-300 truncate flex-1">{renderMessageWithLinks(message)}</span>
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
             </div>
           );
         })}

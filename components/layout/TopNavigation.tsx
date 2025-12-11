@@ -8,8 +8,13 @@ import type { SwapMode } from "@/types/swapModes";
 interface TopNavigationProps {
   theme: 'dark' | 'light';
   onThemeToggle: () => void;
+<<<<<<< HEAD
   waterEffect: boolean;
   onWaterToggle: () => void;
+=======
+  bubbles: boolean;
+  onBubblesToggle: () => void;
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
   swapMode: SwapMode;
   onSwapModeChange: (mode: SwapMode) => void;
 }
@@ -17,8 +22,13 @@ interface TopNavigationProps {
 export function TopNavigation({
   theme,
   onThemeToggle,
+<<<<<<< HEAD
   waterEffect,
   onWaterToggle,
+=======
+  bubbles,
+  onBubblesToggle,
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
   swapMode,
   onSwapModeChange
 }: TopNavigationProps) {
@@ -123,11 +133,19 @@ export function TopNavigation({
           </nav>
 
           {/* Right: Controls */}
+<<<<<<< HEAD
           <div className="flex items-center justify-end gap-2">
             {/* Theme Toggle */}
             <button
               onClick={onThemeToggle}
               className="group relative px-3 py-2 rounded-lg font-semibold text-xs transition-all duration-300"
+=======
+          <div className="flex items-center justify-end gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={onThemeToggle}
+              className="group relative px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
               style={{
                 background: 'rgba(15, 15, 25, 0.8)',
                 border: '1px solid rgba(255, 107, 183, 0.3)',
@@ -143,6 +161,7 @@ export function TopNavigation({
               }}
               title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
+<<<<<<< HEAD
               <span className="flex items-center gap-1.5">
                 {theme === 'dark' ? '🌙' : '☀️'}
                 <span className="hidden sm:inline">{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
@@ -162,11 +181,32 @@ export function TopNavigation({
                 if (waterEffect) {
                   e.currentTarget.style.borderColor = 'rgba(74, 143, 184, 0.8)';
                   e.currentTarget.style.boxShadow = '0 0 20px rgba(74, 143, 184, 0.3)';
+=======
+              <span className="flex items-center gap-2">
+                {theme === 'dark' ? '🌙 DARK' : '☀️ LIGHT'}
+              </span>
+            </button>
+
+            {/* Bubbles Toggle */}
+            <button
+              onClick={onBubblesToggle}
+              className="group relative px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"
+              style={{
+                background: bubbles ? 'rgba(255, 107, 107, 0.15)' : 'rgba(15, 15, 25, 0.8)',
+                border: `1px solid ${bubbles ? 'rgba(255, 107, 107, 0.5)' : 'rgba(100, 100, 120, 0.4)'}`,
+                color: bubbles ? '#ff6b6b' : 'rgba(156, 163, 175, 1)'
+              }}
+              onMouseEnter={(e) => {
+                if (bubbles) {
+                  e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.8)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 107, 107, 0.3)';
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
                 } else {
                   e.currentTarget.style.borderColor = 'rgba(100, 100, 120, 0.6)';
                 }
               }}
               onMouseLeave={(e) => {
+<<<<<<< HEAD
                 e.currentTarget.style.borderColor = waterEffect ? 'rgba(74, 143, 184, 0.5)' : 'rgba(100, 100, 120, 0.4)';
                 e.currentTarget.style.boxShadow = 'none';
               }}
@@ -178,6 +218,17 @@ export function TopNavigation({
               </span>
             </button>
 
+=======
+                e.currentTarget.style.borderColor = bubbles ? 'rgba(255, 107, 107, 0.5)' : 'rgba(100, 100, 120, 0.4)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+              title={`${bubbles ? 'Disable' : 'Enable'} background animation`}
+            >
+              <span className="flex items-center gap-2">
+                {bubbles ? '✨ FX ON' : '💤 FX OFF'}
+              </span>
+            </button>
+>>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
           </div>
         </div>
       </div>
