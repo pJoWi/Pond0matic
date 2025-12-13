@@ -74,7 +74,7 @@ export default function CompactPage() {
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500">
             Powered by{" "}
-            <span className="text-ember-orange font-semibold mx-1">PondX</span>
+            <span className="text-ember-orange font-semibold mx-1">Pond</span>
             <span className="mx-1">&</span>
             <span className="text-blue-400 font-semibold mx-1">Jupiter</span>
           </p>

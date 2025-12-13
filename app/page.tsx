@@ -6,7 +6,7 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="pt-20 pb-8 min-h-screen">
+    <div className="pt-16 pb-8 min-h-screen">
       <Dashboard onOpenSwapper={() => router.push('/swapper')} />
     </div>
   );

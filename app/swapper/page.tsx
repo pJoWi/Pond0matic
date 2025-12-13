@@ -31,7 +31,7 @@ export default function SwapperPage() {
   }, [stopAuto]);
 
   return (
-    <div className="pb-8 min-h-screen" style={{ paddingTop: '140px' }}>
+    <div className="pb-8 min-h-screen pt-10">
       <div className="max-w-xl mx-auto px-4">
         <CompactSwapper
           onSwap={handleSwap}

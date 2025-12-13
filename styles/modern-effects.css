@@ -17,8 +17,7 @@
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--theme-border);
-  box-shadow:
-    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -32,8 +31,7 @@
   backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
   -webkit-backdrop-filter: blur(60px) saturate(200%) brightness(1.1);
   border: 1px solid var(--theme-border-hover);
-  box-shadow:
-    0 8px 32px var(--theme-glow-soft),
+  box-shadow: 0 8px 32px var(--theme-glow-soft),
     inset 0 -1px 2px rgba(255, 255, 255, 0.1),
     inset 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -43,8 +41,11 @@
    ============================================ */
 
 .mesh-gradient-bg {
-  background:
-    radial-gradient(at 0% 0%, var(--theme-gradient-from) 0px, transparent 50%),
+  background: radial-gradient(
+      at 0% 0%,
+      var(--theme-gradient-from) 0px,
+      transparent 50%
+    ),
     radial-gradient(at 100% 0%, var(--theme-gradient-to) 0px, transparent 50%),
     radial-gradient(at 100% 100%, var(--theme-glow-soft) 0px, transparent 50%),
     radial-gradient(at 0% 100%, var(--theme-gradient-from) 0px, transparent 50%),
@@ -54,10 +55,19 @@
 }
 
 @keyframes mesh-shift {
-  0%, 100% { background-position: 0% 0%; }
-  25% { background-position: 100% 0%; }
-  50% { background-position: 100% 100%; }
-  75% { background-position: 0% 100%; }
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
 }
 
 /* ============================================
@@ -66,8 +76,7 @@
 
 .neomorph-soft {
   background: linear-gradient(145deg, #0f0f14, #0a0a0f);
-  box-shadow:
-    8px 8px 16px rgba(0, 0, 0, 0.5),
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.5),
     -8px -8px 16px rgba(30, 30, 40, 0.08),
     inset 1px 1px 2px rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.02);
@@ -75,8 +84,7 @@
 
 .neomorph-pressed {
   background: linear-gradient(145deg, #0a0a0f, #0f0f14);
-  box-shadow:
-    inset 6px 6px 12px rgba(0, 0, 0, 0.6),
+  box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.6),
     inset -6px -6px 12px rgba(30, 30, 40, 0.04);
 }
 
@@ -111,9 +119,15 @@
 }
 
 @keyframes gradient-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .gradient-shimmer {
@@ -122,7 +136,7 @@
 }
 
 .gradient-shimmer::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -138,8 +152,116 @@
 }
 
 @keyframes shimmer-slide {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* ============================================
+   POND WATER RIPPLE EFFECT
+   ============================================ */
+
+.water-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.water-ripple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(74, 143, 184, 0.15) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  animation: ripple-expand 2s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-expand {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+/* ============================================
+   FLOATING ANIMATION - Like Lily Pads
+   ============================================ */
+
+.float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+@keyframes float-gentle {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-8px) translateX(4px);
+  }
+  50% {
+    transform: translateY(-4px) translateX(-4px);
+  }
+  75% {
+    transform: translateY(-10px) translateX(2px);
+  }
+}
+
+/* ============================================
+   GLOW PULSE - Bioluminescent Effect
+   ============================================ */
+
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 8px var(--theme-glow-soft));
+  }
+  50% {
+    filter: brightness(1.2) drop-shadow(0 0 16px var(--theme-glow));
+  }
+}
+
+/* ============================================
+   WAVE ANIMATION - Water Surface
+   ============================================ */
+
+.wave-motion {
+  animation: wave-motion 6s ease-in-out infinite;
+}
+
+@keyframes wave-motion {
+  0%,
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+  25% {
+    transform: translateX(-2px) scaleX(1.01);
+  }
+  50% {
+    transform: translateX(2px) scaleX(0.99);
+  }
+  75% {
+    transform: translateX(-1px) scaleX(1.005);
+  }
 }
 
 /* ============================================
@@ -153,7 +275,7 @@
 
 .particle-bg::before,
 .particle-bg::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 300px;
   height: 300px;
@@ -179,9 +301,16 @@
 }
 
 @keyframes particle-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.1); }
-  66% { transform: translate(-30px, 30px) scale(0.9); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.9);
+  }
 }
 
 /* Removed unused layout utilities - bento grid, 3D card - using Tailwind instead */
@@ -191,37 +320,26 @@
    ============================================ */
 
 .glow-theme {
-  box-shadow:
-    0 0 10px var(--theme-glow),
-    0 0 20px var(--theme-glow-soft),
-    0 0 30px rgba(0, 0, 0, 0.3),
-    inset 0 0 10px var(--theme-glow-soft);
+  box-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow-soft),
+    0 0 30px rgba(0, 0, 0, 0.3), inset 0 0 10px var(--theme-glow-soft);
 }
 
 .glow-theme-intense {
-  box-shadow:
-    0 0 20px var(--theme-glow-intense),
-    0 0 40px var(--theme-glow),
-    0 0 60px var(--theme-glow-soft),
-    0 0 80px rgba(0, 0, 0, 0.2),
+  box-shadow: 0 0 20px var(--theme-glow-intense), 0 0 40px var(--theme-glow),
+    0 0 60px var(--theme-glow-soft), 0 0 80px rgba(0, 0, 0, 0.2),
     inset 0 0 20px var(--theme-glow-soft);
   animation: glow-pulse-intense 2s ease-in-out infinite;
 }
 
 @keyframes glow-pulse-intense {
-  0%, 100% {
-    box-shadow:
-      0 0 20px var(--theme-glow-intense),
-      0 0 40px var(--theme-glow),
-      0 0 60px var(--theme-glow-soft),
-      inset 0 0 20px var(--theme-glow-soft);
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--theme-glow-intense), 0 0 40px var(--theme-glow),
+      0 0 60px var(--theme-glow-soft), inset 0 0 20px var(--theme-glow-soft);
   }
   50% {
-    box-shadow:
-      0 0 30px var(--theme-glow-intense),
-      0 0 60px var(--theme-glow),
-      0 0 90px var(--theme-glow-soft),
-      inset 0 0 30px var(--theme-glow);
+    box-shadow: 0 0 30px var(--theme-glow-intense), 0 0 60px var(--theme-glow),
+      0 0 90px var(--theme-glow-soft), inset 0 0 30px var(--theme-glow);
   }
 }
 
@@ -236,7 +354,7 @@
 }
 
 .button-liquid::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -272,8 +390,12 @@
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ============================================
@@ -310,9 +432,15 @@
 }
 
 @keyframes spring-bounce {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Additional mode selector animations */
@@ -322,8 +450,13 @@
 }
 
 @keyframes animate-gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .animate-pulse-slow {
@@ -331,8 +464,13 @@
 }
 
 @keyframes animate-pulse-slow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
 }
 
 .animate-bounce-subtle {
@@ -340,8 +478,13 @@
 }
 
 @keyframes animate-bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 /* ============================================
@@ -349,7 +492,12 @@
    ============================================ */
 
 .gradient-text-theme {
-  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 50%, var(--theme-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--theme-primary) 0%,
+    var(--theme-secondary) 50%,
+    var(--theme-accent) 100%
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -358,8 +506,13 @@
 }
 
 @keyframes gradient-text-flow {
-  0%, 100% { background-position: 0% center; }
-  50% { background-position: 100% center; }
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
 }
 
 /* Horizontal gradient animation for borders */
@@ -368,8 +521,13 @@
 }
 
 @keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* ============================================
@@ -409,16 +567,13 @@
 }
 
 @keyframes ice-sparkle {
-  0%, 100% {
-    box-shadow:
-      0 0 10px var(--theme-glow),
-      0 0 20px var(--theme-glow-soft),
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow-soft),
       inset 0 0 5px rgba(255, 255, 255, 0.2);
   }
   50% {
-    box-shadow:
-      0 0 20px var(--theme-glow-intense),
-      0 0 40px var(--theme-glow),
+    box-shadow: 0 0 20px var(--theme-glow-intense), 0 0 40px var(--theme-glow),
       inset 0 0 10px rgba(255, 255, 255, 0.4);
   }
 }
@@ -429,17 +584,14 @@
 }
 
 @keyframes fire-glow {
-  0%, 100% {
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.5),
-      0 0 60px var(--theme-glow),
+  0%,
+  100% {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 60px var(--theme-glow),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   50% {
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.5),
-      0 0 80px var(--theme-glow-intense),
-      0 0 120px var(--theme-glow-soft),
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+      0 0 80px var(--theme-glow-intense), 0 0 120px var(--theme-glow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 }
@@ -453,7 +605,8 @@
 }
 
 @keyframes flame-flicker {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     transform: scaleY(1) translateY(0);
   }
@@ -477,16 +630,13 @@
 }
 
 @keyframes void-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 20px var(--theme-glow),
-      0 0 40px var(--theme-glow-soft);
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--theme-glow), 0 0 40px var(--theme-glow-soft);
     transform: scale(1);
   }
   50% {
-    box-shadow:
-      0 0 30px var(--theme-glow-intense),
-      0 0 60px var(--theme-glow),
+    box-shadow: 0 0 30px var(--theme-glow-intense), 0 0 60px var(--theme-glow),
       0 0 90px var(--theme-glow-soft);
     transform: scale(1.02);
   }
@@ -498,16 +648,13 @@
 }
 
 @keyframes matrix-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 10px var(--theme-glow),
-      0 0 20px var(--theme-glow-soft);
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--theme-glow), 0 0 20px var(--theme-glow-soft);
     filter: brightness(1);
   }
   50% {
-    box-shadow:
-      0 0 15px var(--theme-glow-intense),
-      0 0 30px var(--theme-glow);
+    box-shadow: 0 0 15px var(--theme-glow-intense), 0 0 30px var(--theme-glow);
     filter: brightness(1.1);
   }
 }
@@ -544,7 +691,8 @@
 }
 
 @keyframes ember-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.2;
     transform: scale(1);
   }

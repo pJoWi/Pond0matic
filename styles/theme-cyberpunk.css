@@ -1,10 +1,6 @@
 /* ============================================
    Pond0x Theme System - Supplementary Styles
-<<<<<<< HEAD
    Additional utilities and theme-specific effects
-=======
-   Additional utilities and legacy support
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
    ============================================ */
 
 /* ============================================
@@ -31,8 +27,6 @@
 }
 
 /* ============================================
-<<<<<<< HEAD
-=======
    GRID BACKGROUND PATTERN
    ============================================ */
 .grid-bg {
@@ -43,7 +37,6 @@
 }
 
 /* ============================================
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
    THEME-SPECIFIC DIRECT COLOR UTILITIES
    For when you need exact theme colors
    ============================================ */
@@ -194,9 +187,6 @@
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.06) 100%);
 }
 
-<<<<<<< HEAD
-/* Removed unused utility classes - using Tailwind utilities instead */
-=======
 /* ============================================
    COMPACT CARD STYLES
    ============================================ */
@@ -409,4 +399,188 @@
 .hover-overlay:hover::after {
   opacity: 0.05;
 }
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
+
+/* ============================================
+   POND0X WATER THEME ANIMATIONS
+   Enhanced animations for the mystical pond aesthetic
+   ============================================ */
+
+/* Bubble float animation */
+@keyframes bubble-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.bubble-float {
+  animation: bubble-float 3s ease-in-out infinite;
+}
+
+/* Lily pad gentle sway */
+@keyframes lily-sway {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(1deg) translateY(-2px);
+  }
+  75% {
+    transform: rotate(-1deg) translateY(-1px);
+  }
+}
+
+.lily-sway {
+  animation: lily-sway 4s ease-in-out infinite;
+}
+
+/* Pond ripple on hover */
+.pond-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.pond-ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(74, 143, 184, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.6s ease-out;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.pond-ripple:hover::after {
+  opacity: 1;
+  transform: scale(1.5);
+  transition: all 0.6s ease-out;
+}
+
+/* Bioluminescent glow effect */
+@keyframes bio-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--glow-green), 0 0 20px var(--glow-green);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--glow-green), 0 0 40px var(--glow-green), 0 0 60px rgba(107, 157, 120, 0.3);
+    filter: brightness(1.15);
+  }
+}
+
+.bio-glow {
+  animation: bio-glow 3s ease-in-out infinite;
+}
+
+/* Water shimmer effect */
+@keyframes water-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.4;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.6;
+  }
+}
+
+.water-shimmer {
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(139, 196, 159, 0.2) 25%,
+    rgba(74, 143, 184, 0.2) 50%,
+    rgba(139, 196, 159, 0.2) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: water-shimmer 4s ease-in-out infinite;
+}
+
+/* Mystical sparkle */
+@keyframes mystical-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.mystical-sparkle {
+  animation: mystical-sparkle 2s ease-in-out infinite;
+}
+
+/* Depth fade - creates sense of water depth */
+.depth-fade {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(10, 31, 45, 0.3) 50%,
+    rgba(10, 31, 45, 0.6) 100%
+  );
+}
+
+/* Underwater glow trails */
+@keyframes glow-trail {
+  0% {
+    transform: translateX(-100%) translateY(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(100%) translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.glow-trail {
+  animation: glow-trail 4s ease-in-out infinite;
+}
+
+/* Card entrance animation */
+@keyframes card-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-entrance {
+  animation: card-entrance 0.4s ease-out forwards;
+}
+
+/* Stagger delay utilities for card entrance */
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}

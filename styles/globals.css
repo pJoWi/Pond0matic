@@ -7,11 +7,6 @@
    Four distinct themes based on mode selection
    ============================================ */
 
-/* ============================================
-   POND0X DASHBOARD - THEME SYSTEM
-   Four distinct themes based on mode selection
-   ============================================ */
-
 @layer base {
   * {
     box-sizing: border-box;
@@ -20,6 +15,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   /* ============================================
@@ -289,9 +285,7 @@
     margin: 0;
     min-height: 100vh;
     overflow-x: hidden;
-    padding-top: 5rem;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding-top: 5rem;
+    padding-top: 1rem;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--bg-primary, var(--space-black));
@@ -350,39 +344,7 @@
     width: 100%;
     max-width: 580px;
     margin: 0 auto;
-    padding: 5rem 1rem 1rem 1rem; /* pt-20 for fixed header */
-  }
-
-  @media (max-width: 640px) {
-    .dashboard-container {
-      max-width: 100%;
-      padding: 5rem 0.75rem 1rem 0.75rem;
-    }
-  }
-
-  @media (min-width: 641px) and (max-width: 768px) {
-    .dashboard-container {
-      max-width: 520px;
-    }
-  }
-
-  .dashboard-container-wide {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-}
-
-@layer components {
-  /* ============================================
-     DASHBOARD CONTAINER - Centered & Compact
-     ============================================ */
-  .dashboard-container {
-    width: 100%;
-    max-width: 580px;
-    margin: 0 auto;
-    padding: 5rem 1rem 1rem 1rem; /* pt-20 for fixed header */
+    padding: 2rem 1rem 1rem 1rem; /* pt-20 for fixed header */
   }
 
   @media (max-width: 640px) {
@@ -517,18 +479,6 @@
     font-weight: 500;
     transition: all 0.2s ease;
     cursor: pointer;
-  /* ============================================
-     THEME BUTTONS
-     ============================================ */
-  .theme-button {
-    background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-surface) 100%);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: pointer;
   }
 
   .theme-button:hover {
@@ -539,26 +489,8 @@
 
   .theme-button:active {
     transform: scale(0.98);
-  .theme-button:hover {
-    background: linear-gradient(135deg, var(--theme-surface-hover) 0%, var(--theme-gradient-from) 100%);
-    border-color: var(--theme-border-hover);
-    box-shadow: 0 0 15px var(--theme-glow-soft);
   }
 
-  .theme-button:active {
-    transform: scale(0.98);
-  }
-
-  .theme-button-solid {
-    background: var(--theme-primary);
-    border: none;
-    color: #000000;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    box-shadow: 0 0 15px var(--theme-glow);
   .theme-button-solid {
     background: var(--theme-primary);
     border: none;
@@ -588,36 +520,13 @@
     border-radius: 0.5rem;
     transition: all 0.2s ease;
     outline: none;
-  .theme-button-solid:hover {
-    background: var(--theme-secondary);
-    box-shadow: 0 0 25px var(--theme-glow-intense);
-    transform: translateY(-1px);
-  }
-
-  /* ============================================
-     THEME INPUTS
-     ============================================ */
-  .theme-input {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--theme-border);
-    color: var(--theme-text);
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-    outline: none;
   }
 
   .theme-input:focus {
     border-color: var(--theme-border-hover);
     box-shadow: 0 0 0 3px var(--theme-glow-soft);
-  .theme-input:focus {
-    border-color: var(--theme-border-hover);
-    box-shadow: 0 0 0 3px var(--theme-glow-soft);
   }
 
-  .theme-input::placeholder {
-    color: var(--theme-text-muted);
-    opacity: 0.5;
   .theme-input::placeholder {
     color: var(--theme-text-muted);
     opacity: 0.5;
@@ -628,19 +537,8 @@
      ============================================ */
   .theme-text-primary {
     color: var(--theme-primary);
-  /* ============================================
-     THEME TEXT
-     ============================================ */
-  .theme-text-primary {
-    color: var(--theme-primary);
   }
 
-  .theme-text-secondary {
-    color: var(--theme-secondary);
-  }
-
-  .theme-text-accent {
-    color: var(--theme-accent);
   .theme-text-secondary {
     color: var(--theme-secondary);
   }
@@ -658,34 +556,8 @@
     text-shadow:
       0 0 8px var(--theme-glow),
       0 0 15px var(--theme-glow-soft);
-  .theme-text-muted {
-    color: var(--theme-text-muted);
   }
 
-  .theme-text-glow {
-    color: var(--theme-primary);
-    text-shadow:
-      0 0 8px var(--theme-glow),
-      0 0 15px var(--theme-glow-soft);
-  }
-
-  /* ============================================
-     COMPACT SPACING UTILITIES
-     ============================================ */
-  .compact-spacing {
-    padding: 0.75rem;
-  }
-
-  .compact-spacing-sm {
-    padding: 0.5rem;
-  }
-
-  .compact-gap {
-    gap: 0.5rem;
-  }
-
-  .compact-gap-sm {
-    gap: 0.25rem;
   /* ============================================
      COMPACT SPACING UTILITIES
      ============================================ */
@@ -729,59 +601,13 @@
     padding: 2px;
     background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary), var(--theme-tertiary));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0.5;
-    pointer-events: none;
-  /* ============================================
-     PREMIUM PANEL - Pond-themed Enhancement
-     ============================================ */
-  .premium-panel {
-    background: rgba(10, 10, 15, 0.9);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    border: 2px solid var(--theme-border-hover);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 0 40px var(--theme-glow-soft),
-      0 0 80px var(--theme-glow-soft),
-      inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    position: relative;
-  }
-
-  .premium-panel::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 1.25rem;
-    padding: 2px;
-    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary), var(--theme-tertiary));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0.5;
     pointer-events: none;
   }
 
-  .premium-panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 1.25rem;
-    background: linear-gradient(135deg, transparent 0%, var(--theme-glow-soft) 50%, transparent 100%);
-    background-size: 200% 200%;
-    animation: borderGlow 6s ease-in-out infinite;
-    pointer-events: none;
-    opacity: 0.3;
-  }
-
-  @keyframes borderGlow {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
   .premium-panel::after {
     content: '';
     position: absolute;
@@ -822,45 +648,8 @@
     background: var(--theme-primary);
     box-shadow: 0 0 8px var(--theme-glow);
     animation: status-pulse 2s ease-in-out infinite;
-  /* ============================================
-     SLEEK DIVIDER
-     ============================================ */
-  .sleek-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--theme-border) 50%, transparent 100%);
-    margin: 0.75rem 0;
   }
 
-  /* ============================================
-     STATUS INDICATORS
-     ============================================ */
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--theme-primary);
-    box-shadow: 0 0 8px var(--theme-glow);
-    animation: status-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes status-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.9); }
-  }
-
-  /* ============================================
-     FLOATING LABEL
-     ============================================ */
-  .floating-label {
-    position: absolute;
-    top: -0.5rem;
-    left: 0.75rem;
-    background: var(--space-deep);
-    padding: 0 0.25rem;
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--theme-text-muted);
   @keyframes status-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(0.9); }
@@ -941,56 +730,215 @@
     overflow: hidden;
   }
 
-  /* Theme background surface */
-  .bg-theme-surface {
-    background-color: var(--theme-surface);
-  }
-
-  /* Theme primary bg */
-  .bg-theme-primary {
-    background-color: var(--theme-primary);
-  }
-
-  /* Quick transitions */
-  .transition-theme {
-    transition: all 0.3s ease;
+  /* ============================================
+     SMOOTH SCALE UTILITIES
+     ============================================ */
+  .scale-102 {
+    transform: scale(1.02);
   }
 
   /* ============================================
-     RIPPLE ANIMATION
-     Tactile feedback for button interactions
+     FADE IN ANIMATION
      ============================================ */
-  @keyframes ripple {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  /* ============================================
+     SLIDE IN ANIMATIONS
+     ============================================ */
+  @keyframes slide-in-from-bottom {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-bottom {
+    animation: slide-in-from-bottom 0.5s ease-out;
+  }
+
+  @keyframes slide-in-from-top {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-top {
+    animation: slide-in-from-top 0.5s ease-out;
+  }
+
+  /* Pond Water Wave Animation */
+  @keyframes wave {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.3;
+    }
+    25% {
+      transform: translate(5%, -5%) scale(1.05);
+      opacity: 0.4;
+    }
+    50% {
+      transform: translate(-3%, 3%) scale(0.98);
+      opacity: 0.35;
+    }
+    75% {
+      transform: translate(-5%, -3%) scale(1.02);
+      opacity: 0.38;
+    }
+  }
+
+  /* Pond Bubble Rising Animation */
+  @keyframes bubble-rise {
     0% {
-      width: 0;
-      height: 0;
-      opacity: 0.5;
-      transform: translate(-50%, -50%);
+      transform: translateY(0) scale(0.8);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-100%) scale(1);
+      opacity: 0.8;
+    }
+    90% {
+      opacity: 0.4;
     }
     100% {
-      width: 300px;
-      height: 300px;
+      transform: translateY(-200%) scale(1.2);
       opacity: 0;
-      transform: translate(-50%, -50%);
     }
   }
 
-  .animate-ripple {
-    animation: ripple 600ms ease-out;
+  /* Lily Pad Float Animation */
+  @keyframes lily-float {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.7;
+    }
+    25% {
+      transform: translate(3px, -5px) scale(1.1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: translate(-2px, -8px) scale(1.05);
+      opacity: 1;
+    }
+    75% {
+      transform: translate(2px, -4px) scale(0.95);
+      opacity: 0.85;
+    }
   }
 
-  /* Ripple element styling */
-  .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
-    animation: ripple 600ms ease-out;
-    pointer-events: none;
+  /* Fire Flicker Animation */
+  @keyframes fire-flicker {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      filter: brightness(1);
+    }
+    25% {
+      transform: translateY(-2px) scale(1.15);
+      opacity: 0.9;
+      filter: brightness(1.3);
+    }
+    50% {
+      transform: translateY(-4px) scale(0.95);
+      opacity: 0.7;
+      filter: brightness(0.9);
+    }
+    75% {
+      transform: translateY(-1px) scale(1.1);
+      opacity: 0.85;
+      filter: brightness(1.2);
+    }
   }
 
-  /* Ensure parent buttons are positioned for ripple effect */
-  button {
-    position: relative;
-    overflow: hidden;
+  /* Ice Shimmer Animation */
+  @keyframes ice-shimmer {
+    0%, 100% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      opacity: 0.8;
+      filter: brightness(1);
+    }
+    25% {
+      transform: translate(2px, -3px) scale(1.05) rotate(5deg);
+      opacity: 1;
+      filter: brightness(1.4);
+    }
+    50% {
+      transform: translate(-2px, -5px) scale(0.98) rotate(-5deg);
+      opacity: 0.6;
+      filter: brightness(0.8);
+    }
+    75% {
+      transform: translate(1px, -2px) scale(1.02) rotate(3deg);
+      opacity: 0.9;
+      filter: brightness(1.2);
+    }
+  }
+
+  /* ============================================
+     CIRCUITBOARD ANIMATION WITH SPARKS
+     ============================================ */
+
+  /* Spark traveling animation */
+  @keyframes spark-travel {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%) scale(0);
+    }
+    10% {
+      opacity: 1;
+      transform: translateX(-80%) scale(1);
+    }
+    90% {
+      opacity: 1;
+      transform: translateX(80%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%) scale(0);
+    }
+  }
+
+  /* Spark pulse at intersection */
+  @keyframes spark-pulse {
+    0%, 100% {
+      opacity: 0.3;
+      box-shadow: 0 0 4px rgba(255, 179, 71, 0.3);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 12px rgba(255, 179, 71, 0.8), 0 0 24px rgba(255, 140, 0, 0.5);
+    }
+  }
+
+  /* Circuit line glow animation */
+  @keyframes circuit-glow {
+    0%, 100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.4;
+    }
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { ScrollIcon } from "@/components/icons";
 
 interface ActivityLogProps {
   activities: string[];
@@ -12,8 +13,8 @@ export function ActivityLog({ activities, onClear }: ActivityLogProps) {
     <section className="bg-cyber-darker/60 backdrop-blur-md border border-ember-orange/30 rounded-xl shadow-ember-orange-md overflow-hidden transition-all duration-300 hover:border-ember-orange/50">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-ember-orange/20 bg-gradient-to-br from-ember-orange/10 to-ember-amber/5">
-        <h2 className="text-xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent">
-          📜 Activity Log
+        <h2 className="text-xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent flex items-center gap-2">
+          <ScrollIcon className="inline-block text-ember-orange" size={24} /> Activity Log
         </h2>
         <button
           onClick={onClear}

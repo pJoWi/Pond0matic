@@ -13,27 +13,27 @@ A cutting-edge, futuristic dashboard for the Pond0x Mining Rig featuring:
 
 ### API Routes
 
-```
 app/api/wpond-price/route.ts       - Fetches live wPOND price from Jupiter
 app/api/wpond-stats/route.ts       - Fetches market stats from DexScreener
 app/api/vault-balance/route.ts     - Fetches vault SOL balance
-```
+
+```text
 
 ### Components
 
-```
+```text
 components/swapper/EnhancedMiningDashboard.tsx  - Main dashboard component
 ```
 
 ### Styles
 
-```
+```text
 styles/mining-dashboard.css  - Advanced visual effects and animations
 ```
 
 ### Documentation
 
-```
+```text
 DASHBOARD_IMPLEMENTATION.md  - Technical implementation guide
 DASHBOARD_VISUAL_GUIDE.md    - Visual design reference
 DASHBOARD_README.md          - This file
@@ -41,7 +41,7 @@ DASHBOARD_README.md          - This file
 
 ### Modified Files
 
-```
+```text
 app/layout.tsx           - Added CSS import
 components/Dashboard.tsx - Added view toggle and enhanced dashboard
 ```
@@ -212,7 +212,7 @@ Edit `styles/mining-dashboard.css` or use Tailwind theme:
 
 ### API Errors
 
-```
+```text
 Error: Failed to fetch price data
 Solution: Check Jupiter API availability
 
@@ -248,7 +248,7 @@ Solution: Check DexScreener API availability
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │           User Interface (Dashboard)         │
 └─────────────────┬───────────────────────────┘
@@ -270,7 +270,7 @@ Solution: Check DexScreener API availability
 
 ## Data Flow
 
-```
+```text
 1. Component Mounts
    ↓
 2. Initial API Calls (Parallel)
@@ -291,7 +291,7 @@ Solution: Check DexScreener API availability
 
 ### Class Naming Convention
 
-```
+```text
 .holographic-card          - Main visual effect
 .metric-card               - Functional component
 .gradient-text-animated    - State + style descriptor

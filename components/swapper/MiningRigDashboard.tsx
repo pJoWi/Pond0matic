@@ -23,11 +23,7 @@ const getBadgeEmoji = (badgeName: string): string => {
 };
 
 // Mining Rig Configuration
-<<<<<<< HEAD
 const MIN_PERMANENT_BOOST_SOL = 0.01;
-=======
-const MIN_PERMANENT_BOOST_SOL = 0.1;
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
 const MIN_LUCK_SOL = 0.001;
 const OPTIMAL_BOOST_THRESHOLD = 615; // Target boost for 100% power
 
@@ -111,31 +107,43 @@ export function MiningRigDashboard({
 }: MiningRigDashboardProps) {
   const [permanentBoostInput, setPermanentBoostInput] = React.useState<string>("");
   const [luckBurnInput, setLuckBurnInput] = React.useState<string>("");
+  const [boostLoading, setBoostLoading] = React.useState(false);
+  const [luckLoading, setLuckLoading] = React.useState(false);
 
   return (
-    <section className="premium-panel theme-glow-intense overflow-hidden transition-all duration-300">
+    <section className="relative overflow-hidden rounded-2xl border-2 border-lily-green/40 backdrop-blur-xl bg-gradient-to-br from-pond-water/50 via-pond-deep/40 to-pond-water/50 shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
+      {/* Pond Water Animation */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-500/10 to-teal-500/20 animate-[wave_8s_ease-in-out_infinite]"></div>
+        <div className="absolute inset-0 bg-gradient-to-tl from-blue-400/10 via-cyan-400/5 to-blue-500/10 animate-[wave_6s_ease-in-out_infinite_reverse]"></div>
+      </div>
+
+      {/* Pond Water Bubbles & Droplets */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Rising bubbles */}
+        <div className="absolute bottom-[10%] left-[15%] w-3 h-3 bg-cyan-400/40 rounded-full animate-[bubble-rise_6s_ease-in-out_infinite] shadow-[0_0_12px_rgba(34,211,238,0.4)]"></div>
+        <div className="absolute bottom-[5%] right-[25%] w-2 h-2 bg-teal-400/50 rounded-full animate-[bubble-rise_8s_ease-in-out_infinite_1s] shadow-[0_0_10px_rgba(45,212,191,0.5)]"></div>
+        <div className="absolute bottom-[15%] left-[60%] w-2.5 h-2.5 bg-blue-300/40 rounded-full animate-[bubble-rise_7s_ease-in-out_infinite_2s] shadow-[0_0_15px_rgba(147,197,253,0.4)]"></div>
+        <div className="absolute bottom-[8%] right-[50%] w-1.5 h-1.5 bg-cyan-300/60 rounded-full animate-[bubble-rise_9s_ease-in-out_infinite_3s] shadow-[0_0_8px_rgba(103,232,249,0.5)]"></div>
+        <div className="absolute bottom-[12%] left-[40%] w-2 h-2 bg-blue-400/45 rounded-full animate-[bubble-rise_7.5s_ease-in-out_infinite_1.5s] shadow-[0_0_10px_rgba(96,165,250,0.5)]"></div>
+        <div className="absolute bottom-[20%] right-[70%] w-1.5 h-1.5 bg-teal-300/55 rounded-full animate-[bubble-rise_8.5s_ease-in-out_infinite_2.5s] shadow-[0_0_8px_rgba(94,234,212,0.5)]"></div>
+
+        {/* Floating lily sparkles */}
+        <div className="absolute top-[30%] left-[25%] w-1.5 h-1.5 bg-emerald-400/70 rounded-full animate-[lily-float_5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(52,211,153,0.6)]"></div>
+        <div className="absolute top-[50%] right-[35%] w-2 h-2 bg-teal-300/60 rounded-full animate-[lily-float_6s_ease-in-out_infinite_1.5s] shadow-[0_0_12px_rgba(94,234,212,0.5)]"></div>
+        <div className="absolute bottom-[40%] left-[70%] w-1 h-1 bg-cyan-500/50 rounded-full animate-[lily-float_7s_ease-in-out_infinite_2.5s] shadow-[0_0_8px_rgba(6,182,212,0.5)]"></div>
+        <div className="absolute top-[60%] left-[50%] w-1.5 h-1.5 bg-emerald-300/65 rounded-full animate-[lily-float_5.5s_ease-in-out_infinite_1s] shadow-[0_0_10px_rgba(110,231,183,0.6)]"></div>
+        <div className="absolute bottom-[55%] right-[60%] w-1 h-1 bg-teal-400/55 rounded-full animate-[lily-float_6.5s_ease-in-out_infinite_2s] shadow-[0_0_8px_rgba(45,212,191,0.5)]"></div>
+      </div>
+
       {/* Header */}
-      <div className="px-6 py-4 border-b border-ember-orange/20 bg-gradient-to-br from-ember-orange/10 to-ember-gold/5">
-        <div className="flex items-center justify-between">
-          <div className="flex-1" />
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-ember-orange via-ember-amber to-ember-gold bg-clip-text text-transparent text-center flex items-center justify-center gap-3">
+      <div className="relative z-10 px-6 py-4 border-b border-lily-green/30">
+        <div className="flex items-center justify-center">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-lily-bright via-emerald-400 to-lily-bright bg-clip-text text-transparent text-center flex items-center justify-center gap-3">
             <span>⚙️</span>
             <span>POND0X MINING RIG</span>
             <span>⚙️</span>
           </h2>
-          <div className="flex-1 flex justify-end">
-            <button
-              onClick={onFetchRigData}
-              disabled={!wallet || isLoading}
-              className={cn(
-                "px-4 py-2 rounded-lg font-semibold text-xs transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyber-black",
-                "bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 focus:ring-cyan-500",
-                (!wallet || isLoading) && "opacity-30 cursor-not-allowed"
-              )}
-            >
-              {isLoading ? "LOADING..." : "FETCH DATA"}
-            </button>
-          </div>
         </div>
         <p className="text-center text-sm text-gray-400 mt-2">
           Boost your rig • Maximize mining power • Increase luck
@@ -164,7 +172,7 @@ export function MiningRigDashboard({
       </div>
 
       {/* Rig Status Display */}
-      <div className="p-6 space-y-6">
+      <div className="relative z-10 p-6 space-y-6">
         {/* Status Meters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Health */}
@@ -364,17 +372,27 @@ export function MiningRigDashboard({
               className="w-full px-3 py-2 bg-cyber-black/50 border border-ember-gold/30 rounded-lg text-sm font-mono text-white text-center focus:border-ember-gold/60 focus:outline-none focus:ring-2 focus:ring-ember-gold/40 transition-all"
             />
             <button
-              onClick={() => {
+              onClick={async () => {
                 const val = parseFloat(permanentBoostInput);
                 if (val >= MIN_PERMANENT_BOOST_SOL) {
-                  onSendPermanentBoost(val);
-                  setPermanentBoostInput("");
+                  setBoostLoading(true);
+                  try {
+                    await onSendPermanentBoost(val);
+                    setPermanentBoostInput("");
+                  } finally {
+                    setBoostLoading(false);
+                  }
                 }
               }}
-              disabled={!wallet || parseFloat(permanentBoostInput) < MIN_PERMANENT_BOOST_SOL}
-              className="w-full px-4 py-3 bg-gradient-to-r from-ember-gold to-ember-amber rounded-lg font-bold text-sm text-white hover:shadow-ember-gold hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-ember-gold focus:ring-offset-2 focus:ring-offset-cyber-black"
+              disabled={!wallet || parseFloat(permanentBoostInput) < MIN_PERMANENT_BOOST_SOL || boostLoading}
+              className={cn(
+                "w-full px-4 py-3 rounded-lg font-bold text-sm text-white transition-all focus:outline-none focus:ring-2 focus:ring-ember-gold focus:ring-offset-2 focus:ring-offset-cyber-black",
+                boostLoading
+                  ? "bg-gradient-to-r from-ember-gold/50 to-ember-amber/50 cursor-wait"
+                  : "bg-gradient-to-r from-ember-gold to-ember-amber hover:shadow-ember-gold hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
+              )}
             >
-              BOOST RIG
+              {boostLoading ? "SENDING..." : "BOOST RIG"}
             </button>
             <p className="text-xs text-gray-500 text-center">+10% power +15% health</p>
           </div>
@@ -399,17 +417,27 @@ export function MiningRigDashboard({
               className="w-full px-3 py-2 bg-cyber-black/50 border border-purple-500/30 rounded-lg text-sm font-mono text-white text-center focus:border-purple-500/60 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all"
             />
             <button
-              onClick={() => {
+              onClick={async () => {
                 const val = parseFloat(luckBurnInput);
                 if (val >= MIN_LUCK_SOL) {
-                  onSendLuckBurn(val);
-                  setLuckBurnInput("");
+                  setLuckLoading(true);
+                  try {
+                    await onSendLuckBurn(val);
+                    setLuckBurnInput("");
+                  } finally {
+                    setLuckLoading(false);
+                  }
                 }
               }}
-              disabled={!wallet || parseFloat(luckBurnInput) < MIN_LUCK_SOL}
-              className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg font-bold text-sm text-white hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-cyber-black"
+              disabled={!wallet || parseFloat(luckBurnInput) < MIN_LUCK_SOL || luckLoading}
+              className={cn(
+                "w-full px-4 py-3 rounded-lg font-bold text-sm text-white transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-cyber-black",
+                luckLoading
+                  ? "bg-gradient-to-r from-purple-500/50 to-pink-600/50 cursor-wait"
+                  : "bg-gradient-to-r from-purple-500 to-pink-600 hover:shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
+              )}
             >
-              SEND LUCK BURN
+              {luckLoading ? "SENDING..." : "SEND LUCK BURN"}
             </button>
             <p className="text-xs text-gray-500 text-center">+5% health +luck points</p>
           </div>

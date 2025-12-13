@@ -64,7 +64,7 @@ export function SwapModeNavigation({
               mode="normal"
               active={swapMode === "normal"}
               onClick={() => onSwapModeChange("normal")}
-              label="Normal"
+              label="🤝 Normal"
               description="Single swap execution"
               color="lily"
             />
@@ -74,8 +74,8 @@ export function SwapModeNavigation({
               mode="boost"
               active={swapMode === "boost"}
               onClick={() => onSwapModeChange("boost")}
-              label="Boost"
-              description="Multi-swap rounds"
+              label="⚡Boost"
+              description="Multi(micro)-swap rounds"
               color="fire"
             />
 
@@ -84,8 +84,8 @@ export function SwapModeNavigation({
               mode="rewards"
               active={swapMode === "rewards"}
               onClick={() => onSwapModeChange("rewards")}
-              label="Rewards"
-              description="Earn points & rewards"
+              label="💰 Rewards"
+              description="Earn swap rewards"
               color="ice"
             />
           </nav>

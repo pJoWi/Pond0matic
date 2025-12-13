@@ -1,413 +1,354 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { SwapMode } from "@/types/swapModes";
 
 interface TopNavigationProps {
-  theme: 'dark' | 'light';
+  theme: "dark" | "light";
   onThemeToggle: () => void;
-<<<<<<< HEAD
   waterEffect: boolean;
   onWaterToggle: () => void;
-=======
-  bubbles: boolean;
-  onBubblesToggle: () => void;
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
-  swapMode: SwapMode;
-  onSwapModeChange: (mode: SwapMode) => void;
 }
 
 export function TopNavigation({
   theme,
   onThemeToggle,
-<<<<<<< HEAD
   waterEffect,
   onWaterToggle,
-=======
-  bubbles,
-  onBubblesToggle,
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
-  swapMode,
-  onSwapModeChange
 }: TopNavigationProps) {
   const pathname = usePathname();
-  const isSwapperRoute = pathname === '/swapper';
+  const navItems = [
+    { href: "/", label: "Dashboard", tone: "lily" as const },
+    { href: "/swapper", label: "Swapper", tone: "wave" as const },
+    { href: "/activity", label: "Activity", tone: "spark" as const },
+  ];
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl"
       style={{
-        background: 'linear-gradient(to bottom, rgba(10, 20, 25, 0.95), rgba(10, 20, 25, 0.9))',
-        borderBottom: '1px solid rgba(255, 107, 183, 0.15)',
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 107, 183, 0.1)'
+        background:
+          "linear-gradient(120deg, rgba(10, 20, 25, 0.92), rgba(13, 31, 45, 0.92))",
+        borderBottom: "1px solid var(--theme-border, rgba(107,157,120,0.35))",
+        boxShadow:
+          "0 8px 32px rgba(0, 0, 0, 0.45), 0 0 24px var(--theme-glow-soft, rgba(107,157,120,0.25))",
       }}
     >
-      {/* Animated glow line */}
+      <div className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 10% 10%, rgba(74, 143, 184, 0.08), transparent 35%), radial-gradient(circle at 80% 0%, rgba(240, 198, 116, 0.08), transparent 30%), radial-gradient(circle at 50% 80%, rgba(139, 196, 159, 0.12), transparent 40%)",
+          filter: "blur(32px)",
+        }}
+      />
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 107, 183, 0.5) 50%, transparent 100%)',
-          animation: 'shimmer 3s ease-in-out infinite'
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(139, 196, 159, 0.55) 50%, transparent 100%)",
+          animation: "shimmer 3s ease-in-out infinite",
         }}
       />
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
-        <div
-          className="grid items-center gap-4 py-3"
-          style={{
-            gridTemplateColumns: 'minmax(200px, 1fr) minmax(auto, 600px) minmax(200px, 1fr)',
-          }}
-        >
-          {/* Left: Logo & Brand */}
-          <Link href="/" className="flex items-center gap-3 group w-fit">
+        <div className="py-3 grid gap-3 md:grid-cols-[minmax(240px,1fr)_minmax(auto,620px)_minmax(260px,1fr)] items-center">
+          <Link href="/" className="group flex items-center gap-3 w-fit" aria-label="Pond0x Dashboard">
             <div className="relative">
+              <span className="absolute inset-0 rounded-full blur-2xl opacity-60 transition group-hover:opacity-90"
+                style={{ background: "radial-gradient(circle, var(--glow-blue, rgba(74,143,184,0.5)) 0%, transparent 60%)" }}
+              />
               <img
-                className="w-10 h-10 rounded-full transition-transform duration-300 group-hover:scale-110"
+                className="relative w-14 h-14 rounded-full border border-[color:var(--theme-border,rgba(107,157,120,0.35))] shadow-lg shadow-[rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-105"
                 src="/pond0x-logo.png"
-                alt="PondX Logo"
+                alt="Pond0x Logo"
                 style={{
-                  filter: 'drop-shadow(0 0 12px rgba(255, 107, 183, 0.8))',
-                  animation: 'pulse-glow 2s ease-in-out infinite'
+                  background: "radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05), transparent 50%)",
+                  filter: "drop-shadow(0 0 10px var(--glow-blue, rgba(74,143,184,0.35)))",
                 }}
               />
             </div>
-            <h1
-              className="text-xl font-bold tracking-wider bg-clip-text text-transparent transition-all duration-300"
-              style={{
-                backgroundImage: 'linear-gradient(135deg, #ff6bb7 0%, #ff8ba7 50%, #ff6b6b 100%)',
-                backgroundSize: '200% auto',
-                animation: 'gradient-shift 3s ease infinite'
-              }}
-            >
-              PondX AutoBot
-            </h1>
+            <div className="flex flex-col">
+              <span
+                className="text-lg sm:text-xl font-bold tracking-wider bg-clip-text text-transparent transition-all duration-500 group-hover:tracking-[0.22em]"
+                style={{
+                  backgroundImage: "linear-gradient(120deg, var(--theme-primary), var(--theme-secondary), var(--pink-bright, #ffc0e3))",
+                  backgroundSize: "200% auto",
+                  animation: "gradient-shift 6s ease infinite",
+                }}
+              >
+                Pond0matic
+              </span>
+              <span className="text-xs text-[color:var(--theme-text-muted)]">
+                Dashboard & Swapper 
+              </span>
+            </div>
           </Link>
 
-          {/* Center: Navigation */}
           <nav
-            className="relative flex items-center justify-center gap-1.5 p-1.5 rounded-2xl"
+            className="relative flex items-center justify-center gap-2 rounded-2xl px-2 py-1.5 shadow-lg overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(10, 10, 20, 0.95), rgba(15, 15, 25, 0.95))',
-              border: '1px solid rgba(255, 107, 183, 0.2)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+              background: "linear-gradient(135deg, rgba(26,58,82,0.92), rgba(10,18,26,0.9))",
+              border: "1px solid var(--theme-border, rgba(107,157,120,0.25))",
+              boxShadow: "0 10px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04)",
             }}
+            aria-label="Primary navigation"
           >
-            {/* Animated background glow */}
             <div
-              className="absolute inset-0 rounded-2xl opacity-30 pointer-events-none"
+              className="pointer-events-none absolute inset-0 opacity-30"
               style={{
-                background: 'linear-gradient(135deg, rgba(255, 107, 183, 0.05), rgba(255, 139, 167, 0.05), rgba(255, 107, 107, 0.05))',
-                backgroundSize: '200% auto',
-                animation: 'gradient-shift 6s ease infinite'
+                background: "linear-gradient(135deg, rgba(74,124,89,0.12), rgba(74,143,184,0.12), rgba(240,198,116,0.12))",
+                backgroundSize: "220% 220%",
+                animation: "gradient-shift 9s ease infinite",
               }}
             />
-
-            {/* Dashboard Link */}
-            <NavLink
-              href="/"
-              active={pathname === '/'}
-              icon={<DashboardIcon />}
-              label="Dashboard"
-              color="orange"
-            />
-
-            {/* Swapper Link */}
-            <NavLink
-              href="/swapper"
-              active={isSwapperRoute}
-              icon={<SwapIcon />}
-              label="Swapper"
-              color="pink"
-            />
-
-            {/* Activity Link */}
-            <NavLink
-              href="/activity"
-              active={pathname === '/activity'}
-              icon={<ActivityIcon />}
-              label="Activity"
-              color="purple"
-            />
+            <div className="flex items-center gap-1.5 relative">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  active={pathname === item.href}
+                  label={item.label}
+                  tone={item.tone}
+                />
+              ))}
+            </div>
           </nav>
 
-          {/* Right: Controls */}
-<<<<<<< HEAD
-          <div className="flex items-center justify-end gap-2">
-            {/* Theme Toggle */}
-            <button
+          <div className="flex flex-wrap items-end justify-end gap-2">
+            <ControlToggle
+              active={theme === "dark"}
+              activeLabel="Dark"
+              inactiveLabel="Light"
+              icon={theme === "dark" ? <MoonIcon /> : <SunIcon />}
               onClick={onThemeToggle}
-              className="group relative px-3 py-2 rounded-lg font-semibold text-xs transition-all duration-300"
-=======
-          <div className="flex items-center justify-end gap-3">
-            {/* Theme Toggle */}
-            <button
-              onClick={onThemeToggle}
-              className="group relative px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
-              style={{
-                background: 'rgba(15, 15, 25, 0.8)',
-                border: '1px solid rgba(255, 107, 183, 0.3)',
-                color: '#ff6bb7'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 107, 183, 0.6)';
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 107, 183, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 107, 183, 0.3)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-            >
-<<<<<<< HEAD
-              <span className="flex items-center gap-1.5">
-                {theme === 'dark' ? '🌙' : '☀️'}
-                <span className="hidden sm:inline">{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
-              </span>
-            </button>
-
-            {/* Water Effect Toggle */}
-            <button
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              tone="lily"
+            />
+            <ControlToggle
+              active={waterEffect}
+              activeLabel="Water"
+              inactiveLabel="Water"
+              icon={waterEffect ? <DropletIcon /> : <WaveIcon />}
               onClick={onWaterToggle}
-              className="group relative px-3 py-2 rounded-lg font-semibold text-xs transition-all duration-300"
-              style={{
-                background: waterEffect ? 'rgba(74, 143, 184, 0.15)' : 'rgba(15, 15, 25, 0.8)',
-                border: `1px solid ${waterEffect ? 'rgba(74, 143, 184, 0.5)' : 'rgba(100, 100, 120, 0.4)'}`,
-                color: waterEffect ? '#4a8fb8' : 'rgba(156, 163, 175, 1)'
-              }}
-              onMouseEnter={(e) => {
-                if (waterEffect) {
-                  e.currentTarget.style.borderColor = 'rgba(74, 143, 184, 0.8)';
-                  e.currentTarget.style.boxShadow = '0 0 20px rgba(74, 143, 184, 0.3)';
-=======
-              <span className="flex items-center gap-2">
-                {theme === 'dark' ? '🌙 DARK' : '☀️ LIGHT'}
-              </span>
-            </button>
-
-            {/* Bubbles Toggle */}
-            <button
-              onClick={onBubblesToggle}
-              className="group relative px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300"
-              style={{
-                background: bubbles ? 'rgba(255, 107, 107, 0.15)' : 'rgba(15, 15, 25, 0.8)',
-                border: `1px solid ${bubbles ? 'rgba(255, 107, 107, 0.5)' : 'rgba(100, 100, 120, 0.4)'}`,
-                color: bubbles ? '#ff6b6b' : 'rgba(156, 163, 175, 1)'
-              }}
-              onMouseEnter={(e) => {
-                if (bubbles) {
-                  e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.8)';
-                  e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 107, 107, 0.3)';
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
-                } else {
-                  e.currentTarget.style.borderColor = 'rgba(100, 100, 120, 0.6)';
-                }
-              }}
-              onMouseLeave={(e) => {
-<<<<<<< HEAD
-                e.currentTarget.style.borderColor = waterEffect ? 'rgba(74, 143, 184, 0.5)' : 'rgba(100, 100, 120, 0.4)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-              title={`${waterEffect ? 'Disable' : 'Enable'} pond water effect`}
-            >
-              <span className="flex items-center gap-1.5">
-                {waterEffect ? '💧' : '🌊'}
-                <span className="hidden sm:inline">{waterEffect ? 'WATER' : 'WATER'}</span>
-              </span>
-            </button>
-
-=======
-                e.currentTarget.style.borderColor = bubbles ? 'rgba(255, 107, 107, 0.5)' : 'rgba(100, 100, 120, 0.4)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-              title={`${bubbles ? 'Disable' : 'Enable'} background animation`}
-            >
-              <span className="flex items-center gap-2">
-                {bubbles ? '✨ FX ON' : '💤 FX OFF'}
-              </span>
-            </button>
->>>>>>> a0b5e4fc1862c9ff2e8fd02ba49fc6c001dc2ea1
+              title={`${waterEffect ? "Disable" : "Enable"} pond water effect`}
+              tone="wave"
+            />
           </div>
         </div>
       </div>
 
-      {/* CSS Animations */}
       <style jsx>{`
         @keyframes shimmer {
           0%, 100% { opacity: 0.5; }
           50% { opacity: 1; }
         }
-        @keyframes pulse-glow {
-          0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 107, 183, 0.8)); }
-          50% { filter: drop-shadow(0 0 20px rgba(255, 107, 183, 1)); }
-        }
         @keyframes gradient-shift {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
-        }
-        @keyframes slideInFromTop {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
         }
       `}</style>
     </header>
   );
 }
 
-// NavLink Component
+type NavTone = "lily" | "wave" | "spark";
+
 interface NavLinkProps {
   href: string;
   active: boolean;
-  icon: React.ReactNode;
   label: string;
-  color: "orange" | "pink" | "purple" | "gray";
-  hasDropdown?: boolean;
-  dropdownOpen?: boolean;
-  onDropdownClick?: (e: React.MouseEvent) => void;
+  tone: NavTone;
 }
 
-function NavLink({ href, active, icon, label, color, hasDropdown, dropdownOpen, onDropdownClick }: NavLinkProps) {
-  const colorStyles = {
-    orange: {
-      active: {
-        background: 'linear-gradient(135deg, #ff6b35 0%, #ffaa00 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 16px rgba(255, 107, 53, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-        color: '#ffffff'
-      },
-      inactive: {
-        color: 'rgba(156, 163, 175, 1)',
-        hoverColor: '#ff6b35'
-      }
+function NavLink({ href, active, label, tone }: NavLinkProps) {
+  const tones: Record<
+    NavTone,
+    { from: string; to: string; border: string; glow: string }
+  > = {
+    lily: {
+      from: "var(--theme-primary)",
+      to: "var(--theme-secondary)",
+      border: "rgba(139, 196, 159, 0.55)",
+      glow: "rgba(139, 196, 159, 0.28)",
     },
-    pink: {
-      active: {
-        background: 'linear-gradient(135deg, #ff6bb7 0%, #ff6b6b 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 16px rgba(255, 107, 183, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-        color: '#ffffff'
-      },
-      inactive: {
-        color: 'rgba(156, 163, 175, 1)',
-        hoverColor: '#ff6bb7'
-      }
+    wave: {
+      from: "var(--pond-bright, #4a8fb8)",
+      to: "var(--pond-light, #2d5f7f)",
+      border: "rgba(74, 143, 184, 0.6)",
+      glow: "rgba(74, 143, 184, 0.25)",
     },
-    purple: {
-      active: {
-        background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 16px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-        color: '#ffffff'
-      },
-      inactive: {
-        color: 'rgba(156, 163, 175, 1)',
-        hoverColor: '#a855f7'
-      }
+    spark: {
+      from: "var(--gold-light, #f0c674)",
+      to: "var(--pink-bright, #ffc0e3)",
+      border: "rgba(240, 198, 116, 0.6)",
+      glow: "rgba(255, 192, 227, 0.26)",
     },
-    gray: {
-      active: {
-        background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 4px 16px rgba(107, 114, 128, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-        color: '#ffffff'
-      },
-      inactive: {
-        color: 'rgba(156, 163, 175, 1)',
-        hoverColor: '#9ca3af'
-      }
-    }
   };
 
-  const styles = colorStyles[color];
-
-  const content = (
-    <span className="flex items-center gap-2 relative z-10">
-      <span className="w-4 h-4 transition-transform duration-300 group-hover:scale-110">
-        {icon}
-      </span>
-      <span>{label}</span>
-      {hasDropdown && (
-        <svg
-          className="w-3 h-3 transition-transform duration-300"
-          style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2.5}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      )}
-    </span>
-  );
-
-  const commonProps = {
-    className: "group relative px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-cyber-black",
-    style: active ? styles.active : {
-      background: 'transparent',
-      border: '1px solid transparent',
-      color: styles.inactive.color
-    },
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
-      if (!active) {
-        e.currentTarget.style.color = styles.inactive.hoverColor;
-        e.currentTarget.style.background = `${styles.inactive.hoverColor}08`;
-        e.currentTarget.style.borderColor = `${styles.inactive.hoverColor}30`;
-      }
-    },
-    onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
-      if (!active) {
-        e.currentTarget.style.color = styles.inactive.color;
-        e.currentTarget.style.background = 'transparent';
-        e.currentTarget.style.borderColor = 'transparent';
-      }
-    }
-  };
-
-  if (hasDropdown) {
-    return (
-      <button {...commonProps} onClick={onDropdownClick}>
-        {content}
-      </button>
-    );
-  }
+  const vars = {
+    "--tone-from": tones[tone].from,
+    "--tone-to": tones[tone].to,
+    "--tone-border": tones[tone].border,
+    "--tone-glow": tones[tone].glow,
+  } as CSSProperties;
 
   return (
-    <Link {...commonProps} href={href}>
-      {content}
+    <Link
+      href={href}
+      className={cn(
+        "group relative px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300",
+        "flex items-center gap-2 overflow-hidden",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--tone-border)] focus-visible:ring-offset-[rgba(13,31,45,0.8)]",
+        active ? "text-white" : "text-[color:var(--theme-text-muted)] hover:text-white"
+      )}
+      style={{
+        ...vars,
+        border: active ? "1px solid var(--tone-border)" : "1px solid transparent",
+        background: active
+          ? "linear-gradient(135deg, var(--tone-from), var(--tone-to))"
+          : "rgba(255,255,255,0.02)",
+        boxShadow: active
+          ? "0 8px 26px var(--tone-glow), inset 0 1px 0 rgba(255,255,255,0.08)"
+          : "0 0 0 1px rgba(255,255,255,0.02)",
+      }}
+      aria-current={active ? "page" : undefined}
+    >
+      <span
+        className={cn(
+          "absolute inset-0 rounded-xl transition-opacity duration-300 pointer-events-none",
+          active ? "opacity-40" : "opacity-0 group-hover:opacity-20"
+        )}
+        style={{
+          background: "linear-gradient(135deg, var(--tone-from), var(--tone-to))",
+          filter: "blur(10px)",
+        }}
+      />
+      <span className="relative flex items-center gap-2">
+        <span className="relative z-10">{label}</span>
+      </span>
+      {active && (
+        <span
+          className="absolute inset-0 rounded-xl pointer-events-none"
+          style={{
+            boxShadow:
+              "0 0 0 1px var(--tone-border), inset 0 0 0 1px rgba(255,255,255,0.08)",
+          }}
+        />
+      )}
     </Link>
   );
 }
 
-// Icon Components
-function DashboardIcon() {
+interface ControlToggleProps {
+  active: boolean;
+  activeLabel: string;
+  inactiveLabel: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  title: string;
+  tone: NavTone;
+}
+
+function ControlToggle({
+  active,
+  activeLabel,
+  inactiveLabel,
+  icon,
+  onClick,
+  title,
+  tone,
+}: ControlToggleProps) {
+  const tones: Record<NavTone, { border: string; glow: string; surface: string }> = {
+    lily: {
+      border: "rgba(139, 196, 159, 0.6)",
+      glow: "rgba(139, 196, 159, 0.35)",
+      surface: "rgba(26, 58, 82, 0.75)",
+    },
+    wave: {
+      border: "rgba(74, 143, 184, 0.6)",
+      glow: "rgba(74, 143, 184, 0.35)",
+      surface: "rgba(20, 38, 52, 0.75)",
+    },
+    spark: {
+      border: "rgba(240, 198, 116, 0.55)",
+      glow: "rgba(240, 198, 116, 0.3)",
+      surface: "rgba(40, 30, 18, 0.7)",
+    },
+  };
+
+  const toneValues = tones[tone];
+
   return (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      title={title}
+      className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[rgba(255,255,255,0.4)] focus-visible:ring-offset-[rgba(13,31,45,0.9)]"
+      style={{
+        background: toneValues.surface,
+        border: `1px solid ${active ? toneValues.border : "rgba(255,255,255,0.06)"}`,
+        color: active
+          ? "var(--theme-text)"
+          : "var(--theme-text-muted, rgba(156,163,175,1))",
+        boxShadow: active
+          ? `0 0 0 1px ${toneValues.border}, 0 10px 28px ${toneValues.glow}`
+          : "0 1px 0 rgba(255,255,255,0.08)",
+      }}
+    >
+      <span className="relative flex items-center gap-2">
+        <span
+          className={cn(
+            "flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300",
+            active ? "bg-white/15" : "bg-white/5"
+          )}
+          style={{
+            boxShadow: active
+              ? `0 0 14px ${toneValues.glow}`
+              : "0 0 0 transparent",
+          }}
+        >
+          <span className="text-base leading-none">{icon}</span>
+        </span>
+        <span className="hidden sm:inline">
+          {active ? activeLabel : inactiveLabel}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
     </svg>
   );
 }
 
-function SwapIcon() {
+function SunIcon() {
   return (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
+      <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-7.364L16.95 5.05M7.05 16.95l-1.414 1.414m0-13.657L7.05 5.05m9.9 9.9l1.414 1.414" />
     </svg>
   );
 }
 
-function ActivityIcon() {
+function DropletIcon() {
   return (
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <path d="M12.66 2.58a1 1 0 00-1.32 0C9.07 4.5 5 8.73 5 12.5 5 17.19 8.58 20 12 20s7-2.81 7-7.5c0-3.77-4.07-8-6.34-9.92zM12 18c-2.14 0-5-1.2-5-5.5 0-2.41 2.33-5.53 5-8.03 2.67 2.5 5 5.62 5 8.03C17 16.8 14.14 18 12 18z" />
+    </svg>
+  );
+}
+
+function WaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+      <path d="M4.5 15c1.5 0 2.25-1 3.75-1s2.25 1 3.75 1 2.25-1 3.75-1 2.25 1 3.75 1v2c-1.5 0-2.25-1-3.75-1s-2.25 1-3.75 1-2.25-1-3.75-1-2.25 1-3.75 1V15z" />
+      <path d="M4.5 9c1.5 0 2.25-1 3.75-1S10.5 9 12 9s2.25-1 3.75-1S18 9 19.5 9v2c-1.5 0-2.25-1-3.75-1S13.5 11 12 11s-2.25-1-3.75-1S6 11 4.5 11V9z" />
     </svg>
   );
 }

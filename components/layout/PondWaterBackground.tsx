@@ -37,8 +37,6 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       <div className="lily-pad lily-pad-1" />
       <div className="lily-pad lily-pad-2" />
       <div className="lily-pad lily-pad-3" />
-      <div className="lily-pad lily-pad-4" />
-      <div className="lily-pad lily-pad-5" />
 
       {/* Underwater light caustics */}
       <div className="water-caustics" />
@@ -60,6 +58,8 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       <div className="wave-line wave-line-1" />
       <div className="wave-line wave-line-2" />
       <div className="wave-line wave-line-3" />
+
+
     </div>
   );
 }

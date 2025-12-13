@@ -1,10 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { useSwapperContext } from "@/contexts/SwapperContext";
+import { useViewMode } from "@/components/layout/LayoutClient";
 import { MiningRigDashboard } from "@/components/swapper/MiningRigDashboard";
 import { CompactPond0xDashboard } from "@/components/swapper/CompactPond0xDashboard";
 import { ActivityLog } from "@/components/swapper/ActivityLog";
-import { WalletPanel } from "@/components/swapper/WalletPanel";
+import { LiveActivityMonitor } from "@/components/LiveActivityMonitor";
 
 interface DashboardProps {
   onOpenSwapper: () => void;
@@ -12,58 +13,33 @@ interface DashboardProps {
 
 export function Dashboard({ onOpenSwapper }: DashboardProps) {
   const ctx = useSwapperContext();
-  const [viewMode, setViewMode] = useState<"enhanced" | "classic">("enhanced");
+  const viewMode = useViewMode();
 
   return (
-    <div className="pt-20 pb-8 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 space-y-6">
-        {/* Wallet Panel */}
-        <WalletPanel
-          wallet={ctx.wallet}
-          connecting={ctx.connecting}
-          rpc={ctx.rpc}
-          onConnect={async () => {
-            await ctx.connect();
-          }}
-          onDisconnect={async () => {
-            await ctx.disconnect();
-          }}
-          onRpcChange={ctx.setRpc}
+    <div className="space-y-6 animate-fade-in">
+        {/* Token prices / overview */}
+        <CompactPond0xDashboard
+          proSwapsSol={ctx.proSwapsSol}
+          proSwapsBx={ctx.proSwapsBx}
+          variant="tokens"
+          badges={ctx.badges}
+          isPro={ctx.isPro}
+          rigHealth={ctx.rigHealth}
+          isLoading={ctx.isLoading}
+          onFetchRigData={ctx.fetchRigData}
+          estimatedSolUsd={ctx.estimatedSolUsd}
+          maxClaimEstimateUsd={ctx.maxClaimEstimateUsd}
         />
 
-        {/* View Toggle */}
-        <div className="flex justify-end">
-          <div className="inline-flex items-center gap-2 bg-pond-water/90 backdrop-blur-md border-2 border-lily-green/30 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode("enhanced")}
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
-                viewMode === "enhanced"
-                  ? "bg-lily-green text-white shadow-[0_0_20px_var(--glow-green)]"
-                  : "text-text-secondary hover:text-white"
-              }`}
-            >
-              🐸 Pond0x View
-            </button>
-            <button
-              onClick={() => setViewMode("classic")}
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
-                viewMode === "classic"
-                  ? "bg-pond-bright text-white shadow-[0_0_20px_var(--glow-blue)]"
-                  : "text-text-secondary hover:text-white"
-              }`}
-            >
-              📊 Classic View
-            </button>
-          </div>
-        </div>
-
-        {/* Conditional Dashboard Rendering */}
+        {/* Mining rig stats - conditional render based on viewMode */}
         {viewMode === "enhanced" ? (
           <CompactPond0xDashboard
             proSwapsSol={ctx.proSwapsSol}
             proSwapsBx={ctx.proSwapsBx}
             onOpenSwapper={onOpenSwapper}
+            variant="stats"
             totalBoosts={ctx.totalBoosts}
+            rigHealth={ctx.rigHealth}
             isPro={ctx.isPro}
             miningSessionsCount={ctx.miningSessionsCount}
             isLoading={ctx.isLoading}
@@ -71,6 +47,10 @@ export function Dashboard({ onOpenSwapper }: DashboardProps) {
             badges={ctx.badges}
             estimatedSolUsd={ctx.estimatedSolUsd}
             maxClaimEstimateUsd={ctx.maxClaimEstimateUsd}
+            inMempool={ctx.inMempool}
+            sent={ctx.sent}
+            failed={ctx.failed}
+            drifted={ctx.drifted}
           />
         ) : (
           <MiningRigDashboard
@@ -110,9 +90,9 @@ export function Dashboard({ onOpenSwapper }: DashboardProps) {
           />
         )}
 
-        {/* Activity Log */}
-        <ActivityLog activities={ctx.activities} onClear={ctx.clearLog} />
-      </div>
+        {/* Live Activity Monitor */}
+        <LiveActivityMonitor maxItems={10} autoScroll={true} />
+
     </div>
   );
 }

@@ -17,6 +17,13 @@
   opacity: 0.75;
   transition: opacity 0.5s ease;
   filter: saturate(1.2) brightness(1.1);
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(26, 58, 82, 0.3) 0%,
+    rgba(13, 31, 45, 0.2) 40%,
+    rgba(10, 20, 25, 0.25) 70%,
+    transparent 100%
+  );
 }
 
 .pond-water-container.water-off {
@@ -65,7 +72,7 @@
   border-radius: 50%;
   border: 2px solid rgba(74, 143, 184, 0.4);
   box-shadow:
-    0 0 10px rgba(74, 143, 184, 0.3),
+    0 0 10px rgba(153, 74, 184, 0.3),
     inset 0 0 20px rgba(74, 143, 184, 0.2);
   animation: ripple-expand 6s ease-out infinite;
   pointer-events: none;
@@ -171,7 +178,7 @@
   border-radius: inherit;
   background: radial-gradient(
     circle at 40% 40%,
-    rgba(139, 196, 159, 0.3) 0%,
+    rgba(37, 102, 60, 0.3) 0%,
     transparent 60%
   );
   transform: translate(-50%, -50%);
@@ -254,7 +261,7 @@
   inset: 0;
   opacity: 0.08;
   background-image:
-    radial-gradient(circle at 20% 30%, var(--pond-bright, rgba(74, 143, 184, 0.4)) 0%, transparent 50%),
+    radial-gradient(circle at 20% 30%, var(--pond-bright, rgba(9, 69, 104, 0.4)) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, var(--lily-light, rgba(107, 157, 120, 0.3)) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, var(--pond-light, rgba(45, 95, 127, 0.4)) 0%, transparent 50%),
     radial-gradient(circle at 60% 20%, var(--lily-bright, rgba(139, 196, 159, 0.3)) 0%, transparent 50%);
@@ -465,7 +472,7 @@
    RESPONSIVE ADJUSTMENTS
    ============================================ */
 
-@media (max-width: 768px) {
+@media (max-width: 580px) {
   .pond-water-container {
     opacity: 0.4;
   }
@@ -490,7 +497,13 @@
 
 /* Light mode - softer, brighter water */
 [data-theme="pond0x-light"] .pond-water-container {
-  opacity: 0.4;
+   background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(34, 117, 165, 0.527) 0%,
+    rgba(139, 196, 159, 0.082) 40%,
+    rgba(177, 221, 238, 0.171) 70%,
+    transparent 100%
+  );
 }
 
 [data-theme="pond0x-light"] .pond-water-surface {

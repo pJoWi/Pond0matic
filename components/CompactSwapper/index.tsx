@@ -8,7 +8,6 @@ import { CompactHeader } from "./components/CompactHeader";
 import { SwapInterface } from "./components/SwapInterface";
 import { ActionButton } from "./components/ActionButton";
 import { MiniActivityFeed } from "./components/MiniActivityFeed";
-import { AffiliateSelector } from "./components/AffiliateSelector";
 import { SettingsPanel } from "./components/SettingsPanel";
 
 // Mode system components
@@ -198,12 +197,6 @@ export function CompactSwapper({
 
         {/* Main Content */}
         <div className="p-4 space-y-3 relative z-10">
-          {/* Affiliate Selector */}
-          <AffiliateSelector
-            affiliate={ctx.affiliate}
-            currentVault={ctx.currentVault}
-            onAffiliateChange={ctx.setAffiliate}
-          />
           {/* Swap Interface */}
           <SwapInterface
             fromMint={ctx.fromMint}
@@ -287,8 +280,6 @@ export function CompactSwapper({
               )}
             </>
           )}
-
-         
 
           {/* Settings Panel */}
           <SettingsPanel
