@@ -73,6 +73,16 @@ export async function fetchTokenBalance(
   reserveSolFees: boolean = true
 ): Promise<BalanceResult> {
   try {
+    if (!rpcUrl) {
+      return {
+        uiAmount: 0,
+        rawAmount: 0,
+        decimals: 0,
+        isNative: tokenMint === SOL_MINT,
+        error: "RPC URL is missing",
+      };
+    }
+
     const connection = new Connection(rpcUrl, {
       commitment: "confirmed",
       wsEndpoint: undefined, // Disable WebSocket to prevent connection errors
@@ -83,49 +93,71 @@ export async function fetchTokenBalance(
     const decimals = await getMintDecimals(tokenMint);
 
     if (isNative) {
-      // Fetch SOL balance
-      const balance = await connection.getBalance(publicKey);
-      const uiAmount = balance / Math.pow(10, decimals);
+      try {
+        // Fetch SOL balance
+        const balance = await connection.getBalance(publicKey);
+        const uiAmount = balance / Math.pow(10, decimals);
 
-      // Reserve SOL for transaction fees if requested
-      const availableAmount = reserveSolFees
-        ? Math.max(0, uiAmount - SOL_FEE_RESERVE)
-        : uiAmount;
+        // Reserve SOL for transaction fees if requested
+        const availableAmount = reserveSolFees
+          ? Math.max(0, uiAmount - SOL_FEE_RESERVE)
+          : uiAmount;
 
-      const availableRaw = Math.floor(availableAmount * Math.pow(10, decimals));
+        const availableRaw = Math.floor(availableAmount * Math.pow(10, decimals));
 
-      return {
-        uiAmount: availableAmount,
-        rawAmount: availableRaw,
-        decimals,
-        isNative: true,
-      };
+        return {
+          uiAmount: availableAmount,
+          rawAmount: availableRaw,
+          decimals,
+          isNative: true,
+        };
+      } catch (err: any) {
+        console.error("Error fetching SOL balance:", err);
+        return {
+          uiAmount: 0,
+          rawAmount: 0,
+          decimals,
+          isNative: true,
+          error: err?.message || "Failed to fetch SOL balance",
+        };
+      }
     } else {
-      // Fetch SPL token balance
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
-        mint: new PublicKey(tokenMint),
-      });
+      try {
+        // Fetch SPL token balance
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+          mint: new PublicKey(tokenMint),
+        });
 
-      if (tokenAccounts.value.length === 0) {
+        if (tokenAccounts.value.length === 0) {
+          return {
+            uiAmount: 0,
+            rawAmount: 0,
+            decimals,
+            isNative: false,
+            error: "No token account found for this mint",
+          };
+        }
+
+        // Get the first token account (usually there's only one per mint)
+        const tokenAccount = tokenAccounts.value[0];
+        const balance = tokenAccount.account.data.parsed.info.tokenAmount;
+
+        return {
+          uiAmount: parseFloat(balance.uiAmountString || "0"),
+          rawAmount: parseInt(balance.amount, 10),
+          decimals: balance.decimals,
+          isNative: false,
+        };
+      } catch (err: any) {
+        console.error("Error fetching SPL token balance:", err);
         return {
           uiAmount: 0,
           rawAmount: 0,
           decimals,
           isNative: false,
-          error: "No token account found for this mint",
+          error: err?.message || "Failed to fetch token balance",
         };
       }
-
-      // Get the first token account (usually there's only one per mint)
-      const tokenAccount = tokenAccounts.value[0];
-      const balance = tokenAccount.account.data.parsed.info.tokenAmount;
-
-      return {
-        uiAmount: parseFloat(balance.uiAmountString || "0"),
-        rawAmount: parseInt(balance.amount, 10),
-        decimals: balance.decimals,
-        isNative: false,
-      };
     }
   } catch (error: any) {
     console.error("Error fetching token balance:", error);

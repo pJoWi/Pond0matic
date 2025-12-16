@@ -78,8 +78,6 @@ npm run dev
 
 ### Visual Effects
 
-- **Holographic Cards**: Rotating conic gradients
-- **Scan Lines**: Progressive shimmer effect
 - **Neon Borders**: Animated multi-color borders
 - **Progress Bars**: Glowing, animated indicators
 - **Shimmer Loading**: Skeleton states with shine

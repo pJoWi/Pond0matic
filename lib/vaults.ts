@@ -1,5 +1,5 @@
 export const REFERRAL_PROGRAM_ID = process.env.NEXT_PUBLIC_REFERRAL_PROGRAM_ID || "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4";
-export const DEFAULT_RPC = process.env.NEXT_PUBLIC_DEFAULT_RPC || "https://api.mainnet-beta.solana.com";
+export const DEFAULT_RPC = process.env.NEXT_PUBLIC_DEFAULT_RPC || "https://api.mainnet.solana.com";
 export const TOKEN_VAULTS_AFFILIATE_1: Record<string, string> = {
   "So11111111111111111111111111111111111111112": "9hCLuXrQrHCU9i7y648Nh7uuWKHUsKDiZ5zyBHdZPWtG",
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "6NqvoPpSYCPEtLEukQaSNs7mS3yK6k285saH9o3vgC96",

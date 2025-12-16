@@ -3,7 +3,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
 import { TopNavigation } from "./TopNavigation";
-import { StatusBar, type DashboardType } from "./StatusBar";
+import type { DashboardType } from "./StatusBar";
 import { PondWaterBackground } from "./PondWaterBackground";
 import { ClientProviders } from "./ClientProviders";
 import { useSwapperContext } from "@/contexts/SwapperContext";
@@ -83,10 +83,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     setWaterEffect(w => !w);
   };
 
-  const handleViewModeChange = (mode: "enhanced" | "classic") => {
-    setViewMode(mode);
-  };
-
   const handleDashboardChange = (dashboard: DashboardType) => {
     setCurrentDashboard(dashboard);
   };
@@ -99,36 +95,35 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         onThemeToggle={handleThemeToggle}
         waterEffect={waterEffect}
         onWaterToggle={handleWaterToggle}
+        wallet={ctx.wallet}
+        isConnected={ctx.isConnected}
+        connecting={ctx.connecting}
+        onConnect={ctx.connect}
+        onDisconnect={ctx.disconnect}
+        rpc={ctx.rpc}
+        onRpcChange={ctx.setRpc}
+        affiliate={ctx.affiliate as "pond0x" | "aquavaults"}
+        onAffiliateChange={ctx.setAffiliate}
+        currentVault={ctx.currentVault}
+        swapMode={ctx.swapMode}
+        onSwapModeChange={ctx.setSwapMode}
+        isSwapper={pathname === "/swapper"}
+        currentDashboard={currentDashboard}
+        onDashboardChange={handleDashboardChange}
+        swapProgress={{
+          current: ctx.currentSwapIndex || 0,
+          total: ctx.numberOfRounds === 0 ? ctx.currentSwapIndex || 0 : ctx.numberOfRounds * Math.max(1, ctx.swapsPerRound),
+          status: ctx.running ? "running" : "idle",
+        }}
+        fromTokenBalance={ctx.solBalance}
+        fromTokenLabel="SOL"
       />
-
-      {/* Secondary status bar for wallet, affiliate, and swap controls */}
-      <div className="relative z-30 pt-24 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <StatusBar
-            wallet={ctx.wallet}
-            isConnected={ctx.isConnected}
-            connecting={ctx.connecting}
-            onConnect={ctx.connect}
-            onDisconnect={ctx.disconnect}
-            rpc={ctx.rpc}
-            onRpcChange={ctx.setRpc}
-            affiliate={ctx.affiliate as "pond0x" | "aquavaults"}
-            onAffiliateChange={ctx.setAffiliate}
-            currentVault={ctx.currentVault}
-            swapMode={ctx.swapMode}
-            onSwapModeChange={ctx.setSwapMode}
-            isSwapper={pathname === "/swapper"}
-            currentDashboard={currentDashboard}
-            onDashboardChange={handleDashboardChange}
-          />
-        </div>
-      </div>
 
       {/* Water Background Effect */}
       <PondWaterBackground enabled={waterEffect} />
 
       {/* Main Content - with proper spacing for fixed header + status bar */}
-      <main className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-6 pb-8 min-h-screen">
+      <main className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-56 pb-8 min-h-screen">
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

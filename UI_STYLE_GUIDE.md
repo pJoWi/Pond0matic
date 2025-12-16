@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide documents the UI/UX enhancements made to the PondX Auto-Swapper, focusing on proper dark/light mode implementation and an immersive animated pond water background effect.
+This guide documents the UI/UX enhancements made to the Pond0matic webapplication, focusing on proper dark/light mode implementation and an immersive animated pond water background effect.
 
 ---
 
@@ -10,14 +10,14 @@ This guide documents the UI/UX enhancements made to the PondX Auto-Swapper, focu
 
 ### Implementation Summary
 
-The application now features a **fully functional dark/light mode toggle** that works seamlessly with the existing pond0x theme system.
+The application features a **fully functional dark/light mode toggle** that works seamlessly with the pond0matic theme system.
 
 ### Key Features
 
 #### Theme Variants
 
-- **Pond0x Dark** (`pond0x-dark`): The default mystical pond theme with deep blues, greens, and dark backgrounds
-- **Pond0x Light** (`pond0x-light`): A bright, sunlit pond theme with soft pastels and light backgrounds
+- **Pond0matic Dark** (`pond0matic-dark`): The default mystical pond theme with deep purples, greens, and dark backgrounds with fitting light text
+- **Pond0matic Light** (`pond0matic-light`): A bright, sunlit pond theme with soft pastels and light backgrounds with fitting dark text
 
 #### Theme Variables
 
@@ -26,7 +26,7 @@ The application now features a **fully functional dark/light mode toggle** that 
 - Primary: `#4a7c59` (Lily green)
 - Secondary: `#6b9d78` (Lily light)
 - Tertiary: `#8bc49f` (Lily bright)
-- Accent: `#f0c674` (Gold)
+- Accent:  (deep space purple) + gold
 - Background: `#0a1419` (Deep space black)
 
 **Light Mode Colors:**
@@ -34,7 +34,7 @@ The application now features a **fully functional dark/light mode toggle** that 
 - Primary: `#5a9d6a` (Brighter lily green)
 - Secondary: `#7cc28f` (Soft green)
 - Tertiary: `#a8e6bf` (Pastel green)
-- Accent: `#f4d292` (Warm gold)
+- Accent: (pink) + warm gold
 - Background: `#f0f7f4` (Soft mint)
 
 #### Technical Implementation
@@ -42,7 +42,7 @@ The application now features a **fully functional dark/light mode toggle** that 
 **Files Modified:**
 
 1. `styles/globals.css`
-   - Added `[data-theme="pond0x-light"]` selector with light mode CSS variables
+   - Added `[data-theme="Pond0matic-light"]` selector with light mode CSS variables
    - Updated body styles to use `var(--bg-primary)` and `var(--theme-text)`
    - Added light mode variants for glass-card components
 
@@ -52,26 +52,25 @@ The application now features a **fully functional dark/light mode toggle** that 
    - Sets both `data-theme` and `data-mode` attributes on `<html>` element
 
 3. `components/layout/TopNavigation.tsx`
-   - Added theme toggle button with moon/sun icons
+   - Add theme toggle button with leaf-light and leaf-dark images
    - Button shows current theme state with visual feedback
 
 4. `app/layout.tsx`
-   - Default theme set to `pond0x-dark`
+   - Default theme set to `Pond0matic-dark`
    - Added `suppressHydrationWarning` to prevent theme flash
 
 #### User Experience
 
 **Toggle Button:**
 
-- Located in top navigation bar (top-right)
-- Shows moon icon (🌙 DARK) for dark mode
-- Shows sun icon (☀️ LIGHT) for light mode
+- Located in top navigation bar (top-right) animated as a slide
+- Shows leaf-dark.png (DARK) for dark mode
+- Shows leaf-light.png (LIGHT) for light mode
 - Smooth transitions between themes (0.3s ease)
 - Persistent preference saved to localStorage
 
 **Visual Feedback:**
 
-- Pink border glow on hover
 - All theme-aware components automatically adjust colors
 - Glass morphism effects adapt to light/dark backgrounds
 
@@ -81,13 +80,18 @@ The application now features a **fully functional dark/light mode toggle** that 
 
 ### Implementation Summary
 
-A **beautiful, performant animated pond water effect** that evokes the feeling of a mystical pond with gentle ripples, floating lily pads, light caustics, and drifting particles.
+A **beautiful, performant animated pond water effect** that evokes the feeling of a mystical magic frog pond with gentle ripples, floating lily pads, light caustics, and popping bubbles.
 
 ### Visual Elements
 
+Water ripples: A large repeating radial gradient slowly shifts position to create a moving ripple effect.
+Lily pads: Circular green gradients with a small dark split to mimic real lily leaves.
+fireflies: glowing pink and purple fireflies flying over the water surface to make the dark lily pond scene more magical.
+small bubbles: small bubbles popping up to the water surface.
+
 #### 1. Water Surface Base
 
-- Radial gradient that creates pond depth illusion
+- A large repeating radial gradient slowly shifts position to create a moving ripple effect.
 - Breathing animation (8s cycle) simulating gentle water movement
 - Opacity: 0.6 (subtle, non-intrusive)
 
@@ -101,11 +105,11 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
 
 #### 3. Floating Lily Pads (5 Instances)
 
-- Semi-circular shapes with notch (realistic lily pad form)
+- Lily pads/ Circular green gradients with a small dark split to mimic real lily leaves.
 - Gentle floating animation (12s cycle)
 - Inner shimmer effect (3s pulse)
 - Radial gradient from bright center to darker edges
-- Rotation and scale variations for depth
+- Rotation and scale variations
 - Opacity: 0.15 (subtle presence)
 - Colors: Lily greens (`var(--lily-green)`, `var(--lily-bright)`)
 
@@ -125,21 +129,20 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
 - Subtle glow shadow
 - Colors: Theme tertiary color
 
+#### 5. fireflies (8 Particles)
+
+- glowing pink and purple fireflies flying over the water surface to make the dark lily pond scene more magical.
+
 #### 6. Surface Reflection
+
+moon or sunlight reflections to make the lily pond scene more magical.
 
 - Top 40% gradient shimmer
 - Simulates water surface reflections
 - 6s shimmer cycle
 - Opacity pulses between 0.2 and 0.4
 
-#### 7. Wave Lines (3 Horizontal Waves)
-
-- Horizontal gradient lines
-- Drift across screen (10s cycle)
-- Create sense of water movement
-- Opacity: 0.2
-
-#### 8. Depth Gradient
+#### 7. Depth Gradient
 
 - Overall radial gradient from light to dark
 - Creates sense of pond depth
@@ -161,8 +164,7 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
    - Renders all water effect layers as HTML divs
    - `enabled` prop for toggle control
    - Zero JavaScript animations (all CSS)
-
-**Files Modified:**
+   - latest 2025 design techniques
 
 3. `components/layout/LayoutClient.tsx`
    - Added `waterEffect` state
@@ -172,11 +174,11 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
 4. `components/layout/TopNavigation.tsx`
    - Added water effect toggle button
    - Droplet icon (💧 WATER) when enabled
-   - Wave icon (🌊 WATER) when disabled
+   - Wave icon (🌵 DRY) when disabled
    - Blue theme color for visual consistency
 
 5. `app/layout.tsx`
-   - Imported pond water CSS
+   - Import pond water CSS
 
 ### Performance Optimizations
 
@@ -203,7 +205,7 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
 
 - Adds immersive pond atmosphere
 - Non-intrusive (layered behind content at z-index: 1)
-- Works harmoniously with existing bubble animation
+- expandable with other animations
 - Complements both dark and light themes
 - No performance impact on user interactions
 
@@ -211,7 +213,7 @@ A **beautiful, performant animated pond water effect** that evokes the feeling o
 
 **Dark Mode Water:**
 
-- Deeper blues and greens
+- Deeper blues, purples and greens
 - More dramatic light caustics
 - Higher contrast ripples
 - Opacity: 0.6
@@ -320,24 +322,11 @@ pond0x-dashboard/
 
 | Variable | Dark Value | Light Value | Usage |
 |----------|-----------|-------------|-------|
-| `--theme-primary` | `#4a7c59` | `#5a9d6a` | Primary theme color |
-| `--theme-secondary` | `#6b9d78` | `#7cc28f` | Secondary accents |
-| `--theme-tertiary` | `#8bc49f` | `#a8e6bf` | Tertiary highlights |
-| `--theme-accent` | `#f0c674` | `#f4d292` | Gold accents |
-| `--theme-text` | `#ffffff` | `#1a2e35` | Body text color |
-| `--theme-text-muted` | `#b8d4e6` | `#4a6b7f` | Muted text |
-| `--bg-primary` | `#0a1419` | `#f0f7f4` | Body background |
-| `--bg-surface` | `rgba(10,10,15,0.8)` | `rgba(255,255,255,0.85)` | Card/surface bg |
 
 ### Pond-Specific Variables
 
 | Variable | Dark Value | Light Value | Usage |
 |----------|-----------|-------------|-------|
-| `--pond-water` | `#1a3a52` | `#b1d8e8` | Water base color |
-| `--pond-light` | `#2d5f7f` | `#d4ebf5` | Light water |
-| `--pond-bright` | `#4a8fb8` | `#a8d5ed` | Bright water accents |
-| `--lily-green` | `#4a7c59` | `#5a9d6a` | Lily pad color |
-| `--lily-bright` | `#8bc49f` | `#a8e6bf` | Lily highlights |
 
 ---
 
@@ -358,10 +347,14 @@ pond0x-dashboard/
 
 ### Lily Float
 
-- **Duration:** 12s
+- **Duration:** 15s
 - **Type:** ease-in-out infinite
 - **Effect:** Gentle Y/X translation with rotation
 - **Delays:** 0s, 3s, 4.5s, 6s, 9s
+
+### Fireflies
+
+- fl
 
 ### Caustics Move
 
