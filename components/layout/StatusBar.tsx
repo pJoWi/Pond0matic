@@ -83,7 +83,15 @@ export function StatusBar({
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between text-[12px] text-text-secondary px-1">
-          <span>Status</span>
+          <div className="flex items-center gap-2">
+            <span>Status</span>
+            <StatusLEDs
+              isConnected={isConnected}
+              swapStatus={progress.status}
+              swapMode={swapMode}
+              palette={modeTheme}
+            />
+          </div>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -174,6 +182,70 @@ export function StatusBar({
             />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusLEDs({
+  isConnected,
+  swapStatus,
+  swapMode,
+  palette,
+}: {
+  isConnected: boolean;
+  swapStatus: "idle" | "running";
+  swapMode: SwapMode;
+  palette: { border: string; text: string; glow: string; bar: string };
+}) {
+  const modeLEDColors = {
+    normal: { bg: "bg-lily-green", glow: "shadow-lily-green/60" },
+    boost: { bg: "bg-orange-400", glow: "shadow-orange-400/60" },
+    rewards: { bg: "bg-cyan-400", glow: "shadow-cyan-400/60" },
+  }[swapMode];
+
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/20 border border-white/10">
+      {/* Connection LED */}
+      <div className="flex items-center gap-1" title={isConnected ? "Wallet Connected" : "Wallet Disconnected"}>
+        <div
+          className={cn(
+            "w-1.5 h-1.5 rounded-full transition-all duration-300",
+            isConnected
+              ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+              : "bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]"
+          )}
+        />
+      </div>
+
+      {/* Activity LED */}
+      <div className="flex items-center gap-1" title={swapStatus === "running" ? "Swap Running" : "Swap Idle"}>
+        <div
+          className={cn(
+            "w-1.5 h-1.5 rounded-full transition-all duration-300",
+            swapStatus === "running"
+              ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)] animate-pulse"
+              : "bg-slate-500 shadow-[0_0_4px_rgba(100,116,139,0.5)]"
+          )}
+        />
+      </div>
+
+      {/* Mode LED */}
+      <div className="flex items-center gap-1" title={`Mode: ${swapMode.toUpperCase()}`}>
+        <div
+          className={cn(
+            "w-1.5 h-1.5 rounded-full transition-all duration-300",
+            modeLEDColors.bg,
+            modeLEDColors.glow
+          )}
+          style={{
+            boxShadow: swapMode === "normal"
+              ? "0 0 6px rgba(107,157,120,0.8)"
+              : swapMode === "boost"
+              ? "0 0 6px rgba(251,146,60,0.8)"
+              : "0 0 6px rgba(34,211,238,0.8)"
+          }}
+        />
       </div>
     </div>
   );
