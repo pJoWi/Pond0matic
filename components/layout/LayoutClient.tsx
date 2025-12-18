@@ -115,8 +115,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           total: ctx.numberOfRounds === 0 ? ctx.currentSwapIndex || 0 : ctx.numberOfRounds * Math.max(1, ctx.swapsPerRound),
           status: ctx.running ? "running" : "idle",
         }}
-        fromTokenBalance={ctx.solBalance}
-        fromTokenLabel="SOL"
       />
 
       {/* Water Background Effect */}

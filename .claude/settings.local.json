@@ -16,7 +16,8 @@
       "Bash(curl:*)",
       "Bash(file:*)",
       "Bash(ls:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

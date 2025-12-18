@@ -4,7 +4,6 @@ import { useSwapperContext } from "@/contexts/SwapperContext";
 import { useViewMode } from "@/components/layout/LayoutClient";
 import { MiningRigDashboard } from "@/components/swapper/MiningRigDashboard";
 import { CompactPond0xDashboard } from "@/components/swapper/CompactPond0xDashboard";
-import { ActivityLog } from "@/components/swapper/ActivityLog";
 import { LiveActivityMonitor } from "@/components/LiveActivityMonitor";
 
 interface DashboardProps {

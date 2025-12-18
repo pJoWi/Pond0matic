@@ -70,12 +70,6 @@ export function CompactHeader({ wallet, networkStatus, onConnect, onDisconnect, 
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <span className="text-lg">🐽</span>
-            <span className="text-sm font-semibold tracking-wide text-white">PondX</span>
-          </div>
-
-          {/* Mode Badge + Wallet Status */}
-          <div className="flex items-center gap-3">
             {/* Mode Badge */}
             {useNewModes && (
               <div
@@ -91,6 +85,11 @@ export function CompactHeader({ wallet, networkStatus, onConnect, onDisconnect, 
                 {mode === "rewards" && "❄️ Rewards"}
               </div>
             )}
+          </div>
+
+          {/* Mode Badge + Wallet Status */}
+          <div className="flex items-center gap-3">
+           
 
             {/* Wallet Status */}
             {wallet ? (

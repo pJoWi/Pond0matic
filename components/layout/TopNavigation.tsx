@@ -54,8 +54,6 @@ export function TopNavigation({
   currentDashboard,
   onDashboardChange,
   swapProgress,
-  fromTokenBalance,
-  fromTokenLabel,
 }: TopNavigationProps) {
   const pathname = usePathname();
   const [editingRpc, setEditingRpc] = useState(false);
@@ -207,7 +205,6 @@ export function TopNavigation({
                 }}
                 error={rpcError}
               />
-              <BalanceBadge label={fromTokenLabel || "SOL"} amount={fromTokenBalance} />
             </div>
           </div>
 
@@ -228,8 +225,6 @@ export function TopNavigation({
             onDashboardChange={onDashboardChange}
             swapProgress={swapProgress}
             inline
-            fromTokenBalance={fromTokenBalance}
-            fromTokenLabel={fromTokenLabel}
           />
         </div>
       </div>
