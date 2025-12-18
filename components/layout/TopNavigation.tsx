@@ -179,7 +179,7 @@ export function TopNavigation({
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black/25 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)] p-2 space-y-2">
-          <div className="relative overflow-hidden rounded-xl border border-pond-bright/25 bg-gradient-to-r from-pond-water/35 via-pond-deep/45 to-pond-water/35 p-2 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
+          <div className="relative rounded-xl border border-pond-bright/25 bg-gradient-to-r from-pond-water/35 via-pond-deep/45 to-pond-water/35 p-2 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
             <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <ConnectionPill
                 wallet={wallet}
