@@ -77,11 +77,11 @@ export interface SwapConfig {
  * Default boost mode configuration
  */
 export const DEFAULT_BOOST_CONFIG: BoostModeConfig = {
-  minAmount: "0.01",
-  maxAmount: "0.1",
-  swapsPerRound: 5,
-  numberOfRounds: 3,
-  delayMs: 5000,
+  minAmount: process.env.NEXT_PUBLIC_DEFAULT_MIN_AMOUNT || "0.01",
+  maxAmount: process.env.NEXT_PUBLIC_DEFAULT_MAX_AMOUNT || "0.02",
+  swapsPerRound: Number(process.env.NEXT_PUBLIC_DEFAULT_SWAPS_PER_ROUND) || 18,
+  numberOfRounds: Number(process.env.NEXT_PUBLIC_DEFAULT_ROUNDS) || 3,
+  delayMs: Number(process.env.NEXT_PUBLIC_DEFAULT_SWAP_DELAY_MS) || 6000,
   infinite: false,
 };
 
@@ -89,8 +89,8 @@ export const DEFAULT_BOOST_CONFIG: BoostModeConfig = {
  * Default rewards mode configuration
  */
 export const DEFAULT_REWARDS_CONFIG: RewardsModeConfig = {
-  amount: "0.01",
-  numberOfSwaps: 5,
+  amount: process.env.NEXT_PUBLIC_DEFAULT_REWARDS_AMOUNT || "10",
+  numberOfSwaps: Number(process.env.NEXT_PUBLIC_DEFAULT_REWARDS_SWAPS) || 5,
   delayMs: 3000,
   infinite: false,
 };

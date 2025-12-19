@@ -7,6 +7,7 @@ import type { DashboardType } from "./StatusBar";
 import { PondWaterBackground } from "./PondWaterBackground";
 import { ClientProviders } from "./ClientProviders";
 import { useSwapperContext } from "@/contexts/SwapperContext";
+import { useSwapExecution } from "@/hooks/useSwapExecution";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface LayoutClientProps {
@@ -23,10 +24,41 @@ export function useViewMode() {
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const ctx = useSwapperContext();
   const pathname = usePathname();
+  const {
+    executeNormalMode,
+    executeBoostMode,
+    executeRewardsMode,
+    stopAuto,
+  } = useSwapExecution();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [waterEffect, setWaterEffect] = useState(true);
   const [viewMode, setViewMode] = useState<"enhanced" | "classic">("enhanced");
   const [currentDashboard, setCurrentDashboard] = useState<DashboardType>("pond0x");
+
+  // Handler to start swap based on current mode
+  const handleStartSwap = async () => {
+    // Check if wallet is connected
+    if (!ctx.isConnected) {
+      ctx.log("❌ Wallet not connected. Please connect your wallet first.");
+      return;
+    }
+
+    if (ctx.swapMode === "boost") {
+      ctx.log("▶ Starting Boost mode...");
+      await executeBoostMode();
+    } else if (ctx.swapMode === "rewards") {
+      ctx.log("▶ Starting Rewards mode...");
+      await executeRewardsMode();
+    } else {
+      ctx.log("▶ Starting Normal mode...");
+      await executeNormalMode();
+    }
+  };
+
+  const handleStopSwap = () => {
+    ctx.log("■ Stopping swap...");
+    stopAuto();
+  };
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('pond-theme') as 'dark' | 'light' | null;
@@ -112,9 +144,39 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         onDashboardChange={handleDashboardChange}
         swapProgress={{
           current: ctx.currentSwapIndex || 0,
-          total: ctx.numberOfRounds === 0 ? ctx.currentSwapIndex || 0 : ctx.numberOfRounds * Math.max(1, ctx.swapsPerRound),
+          total: (() => {
+            // Calculate total swaps based on mode
+            if (ctx.swapMode === "normal") {
+              return 1; // Normal mode = single swap
+            } else if (ctx.swapMode === "boost") {
+              // Boost mode = swapsPerRound × numberOfRounds
+              if (ctx.numberOfRounds === 0) {
+                // Infinite mode - show current as total
+                return ctx.currentSwapIndex || 0;
+              }
+              return ctx.swapsPerRound * ctx.numberOfRounds;
+            } else {
+              // Rewards mode = numberOfSwaps
+              if (ctx.numberOfSwaps === 0) {
+                // Infinite mode - show current as total
+                return ctx.currentSwapIndex || 0;
+              }
+              return ctx.numberOfSwaps;
+            }
+          })(),
           status: ctx.running ? "running" : "idle",
         }}
+        onStart={handleStartSwap}
+        onStop={handleStopSwap}
+        setFromMint={ctx.setFromMint}
+        setToMint={ctx.setToMint}
+        setAmount={ctx.setAmount}
+        setMaxAmount={ctx.setMaxAmount}
+        setSwapsPerRound={ctx.setSwapsPerRound}
+        setNumberOfRounds={ctx.setNumberOfRounds}
+        setSwapDelayMs={ctx.setSwapDelayMs}
+        setNumberOfSwaps={ctx.setNumberOfSwaps}
+        log={ctx.log}
       />
 
       {/* Water Background Effect */}

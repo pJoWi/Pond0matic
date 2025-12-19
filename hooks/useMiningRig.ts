@@ -49,6 +49,10 @@ export interface MiningRigState {
   drifted: number;
   maxClaimEstimateUsd: number;
   driftedUsd: number;
+
+  // Vault Stats (On-chain data)
+  vaultTotalSol: number;
+  vaultTransactionCount: number;
 }
 
 export interface HealthApiResponse {
@@ -85,6 +89,11 @@ export interface ManifestApiResponse {
   badges: string;
   hasTwitter: boolean;
   cope: boolean;
+}
+
+export interface VaultStatsApiResponse {
+  totalSolSent: number;
+  transactionCount: number;
 }
 
 export function useMiningRig(wallet: string, onLog?: (message: string) => void) {
@@ -127,6 +136,10 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
   const [maxClaimEstimateUsd, setMaxClaimEstimateUsd] = useState<number>(0);
   const [driftedUsd, setDriftedUsd] = useState<number>(0);
 
+  // Vault Stats State (On-chain data)
+  const [vaultTotalSol, setVaultTotalSol] = useState<number>(0);
+  const [vaultTransactionCount, setVaultTransactionCount] = useState<number>(0);
+
   // Loading State
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -157,6 +170,39 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
       return data;
     } catch (error: any) {
       onLog?.(`Manifest fetch error: ${error?.message || String(error)}`);
+      return null;
+    }
+  }, [wallet, onLog]);
+
+  /**
+   * Fetch vault statistics (on-chain transaction data)
+   * Includes total SOL sent and transaction count to Hashrate Booster vault
+   *
+   * @returns Vault stats data object or null if fetch fails
+   */
+  const fetchVaultStats = useCallback(async () => {
+    if (!wallet) return null;
+
+    try {
+      const response = await fetch(`/api/rig/vault-stats/${wallet}`);
+      if (!response.ok) {
+        // Don't log as error - vault stats are optional
+        return null;
+      }
+      const data: VaultStatsApiResponse = await response.json();
+
+      // Update state with vault stats
+      setVaultTotalSol(data.totalSolSent);
+      setVaultTransactionCount(data.transactionCount);
+
+      // Only log if we have actual stats
+      if (data.transactionCount > 0) {
+        onLog?.(`Vault stats loaded: ${data.transactionCount} transactions | ${data.totalSolSent.toFixed(4)} SOL`);
+      }
+      return data;
+    } catch (error: any) {
+      // Vault stats are optional - fail silently
+      console.debug("Vault stats unavailable:", error?.message);
       return null;
     }
   }, [wallet, onLog]);
@@ -273,13 +319,14 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
     onLog?.("Fetching rig data...");
 
     try {
-      // Fetch health and manifest data in parallel
-      const [healthResult, manifestResult] = await Promise.all([
+      // Fetch health, manifest, and vault stats data in parallel
+      const [healthResult, manifestResult, vaultStatsResult] = await Promise.all([
         fetchHealth(),
-        fetchManifest()
+        fetchManifest(),
+        fetchVaultStats()
       ]);
 
-      if (healthResult || manifestResult) {
+      if (healthResult || manifestResult || vaultStatsResult) {
         onLog?.("Rig data loaded successfully");
       } else {
         onLog?.("Failed to fetch rig data - check connection");
@@ -287,7 +334,7 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
     } finally {
       setIsLoading(false);
     }
-  }, [wallet, fetchHealth, fetchManifest, onLog, isLoading]);
+  }, [wallet, fetchHealth, fetchManifest, fetchVaultStats, onLog, isLoading]);
 
   return {
     // State
@@ -323,6 +370,10 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
     maxClaimEstimateUsd,
     driftedUsd,
 
+    // Vault Stats State
+    vaultTotalSol,
+    vaultTransactionCount,
+
     // Setters
     setRigHealth,
     setRigPower,
@@ -341,6 +392,7 @@ export function useMiningRig(wallet: string, onLog?: (message: string) => void) 
     // Actions
     fetchManifest,
     fetchHealth,
+    fetchVaultStats,
     fetchRigData,
     incrementBoosts,
     addPermanentBoost,

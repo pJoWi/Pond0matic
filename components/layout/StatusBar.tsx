@@ -2,8 +2,14 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { SwapMode } from "@/types/swapModes";
+import { DEFAULT_BOOST_CONFIG, DEFAULT_REWARDS_CONFIG } from "@/types/swapModes";
 
 export type DashboardType = "pond0x" | "void" | "aqua";
+
+// Token mint addresses
+const SOL_MINT_ADDRESS = "So11111111111111111111111111111111111111112";
+const USDC_MINT_ADDRESS = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const WPOND_MINT_ADDRESS = "3JgFwoYV74f6LwWjQWnr3YDPFnmBdwQfNyubv99jqUoq";
 
 interface StatusBarProps {
   wallet: string;
@@ -27,6 +33,19 @@ interface StatusBarProps {
   };
   embedded?: boolean;
   inline?: boolean;
+  // Swap control handlers
+  onStart?: () => void;
+  onStop?: () => void;
+  // Context setters for applying defaults
+  setFromMint?: (mint: string) => void;
+  setToMint?: (mint: string) => void;
+  setAmount?: (amount: string) => void;
+  setMaxAmount?: (amount: string) => void;
+  setSwapsPerRound?: (count: number) => void;
+  setNumberOfRounds?: (rounds: number) => void;
+  setSwapDelayMs?: (ms: number) => void;
+  setNumberOfSwaps?: (swaps: number) => void;
+  log?: (message: string) => void;
 }
 
 export function StatusBar({
@@ -47,6 +66,17 @@ export function StatusBar({
   swapProgress,
   embedded = false,
   inline = false,
+  onStart,
+  onStop,
+  setFromMint,
+  setToMint,
+  setAmount,
+  setMaxAmount,
+  setSwapsPerRound,
+  setNumberOfRounds,
+  setSwapDelayMs,
+  setNumberOfSwaps,
+  log,
 }: StatusBarProps) {
   const modeTheme = {
     normal: {
@@ -77,6 +107,43 @@ export function StatusBar({
 
   const progress = swapProgress ?? { current: 0, total: 0, status: "idle" as const };
   const ratio = progress.total > 0 ? Math.min(100, Math.max(0, (progress.current / progress.total) * 100)) : 0;
+
+  /**
+   * Handle mode change with automatic defaults application
+   * - Normal mode: SOL → wPOND, clear amounts
+   * - Boost mode: USDC → SOL, apply boost defaults
+   * - Rewards mode: USDC → SOL, apply rewards defaults
+   */
+  const handleModeChangeWithDefaults = (mode: SwapMode) => {
+    // Set the mode
+    onSwapModeChange(mode);
+
+    if (mode === "normal") {
+      // Normal mode: SOL → wPOND, set default amount
+      setFromMint?.(SOL_MINT_ADDRESS);
+      setToMint?.(WPOND_MINT_ADDRESS);
+      setAmount?.("0.01");
+      setMaxAmount?.("");
+      log?.("Mode: Normal | SOL → wPOND | 0.01 SOL");
+    } else if (mode === "boost") {
+      // Boost mode: USDC → SOL, apply boost defaults
+      setFromMint?.(USDC_MINT_ADDRESS);
+      setToMint?.(SOL_MINT_ADDRESS);
+      setAmount?.(DEFAULT_BOOST_CONFIG.minAmount);
+      setMaxAmount?.(DEFAULT_BOOST_CONFIG.maxAmount);
+      setSwapsPerRound?.(DEFAULT_BOOST_CONFIG.swapsPerRound);
+      setNumberOfRounds?.(DEFAULT_BOOST_CONFIG.numberOfRounds);
+      setSwapDelayMs?.(DEFAULT_BOOST_CONFIG.delayMs);
+      log?.(`Mode: Boost | USDC → SOL | ${DEFAULT_BOOST_CONFIG.swapsPerRound} swaps × ${DEFAULT_BOOST_CONFIG.numberOfRounds} rounds`);
+    } else if (mode === "rewards") {
+      // Rewards mode: USDC → SOL, apply rewards defaults
+      setFromMint?.(USDC_MINT_ADDRESS);
+      setToMint?.(SOL_MINT_ADDRESS);
+      setAmount?.(DEFAULT_REWARDS_CONFIG.amount);
+      setNumberOfSwaps?.(DEFAULT_REWARDS_CONFIG.numberOfSwaps);
+      log?.(`Mode: Rewards | USDC → SOL | ${DEFAULT_REWARDS_CONFIG.amount} USDC × ${DEFAULT_REWARDS_CONFIG.numberOfSwaps} swaps`);
+    }
+  };
 
   if (inline) {
     const [open, setOpen] = useState(true);
@@ -119,12 +186,14 @@ export function StatusBar({
               />
               <SwapModeModule
                 swapMode={swapMode}
-                onSwapModeChange={onSwapModeChange}
+                onSwapModeChange={handleModeChangeWithDefaults}
                 palette={modeTheme}
                 isSwapper={isSwapper}
                 progress={progress}
                 ratio={ratio}
                 compact
+                onStart={onStart}
+                onStop={onStop}
               />
               <SwapInfoModule
                 currentVault={currentVault}
@@ -166,12 +235,14 @@ export function StatusBar({
             />
             <SwapModeModule
               swapMode={swapMode}
-              onSwapModeChange={onSwapModeChange}
+              onSwapModeChange={handleModeChangeWithDefaults}
               palette={modeTheme}
               isSwapper={isSwapper}
               progress={progress}
               ratio={ratio}
               compact
+              onStart={onStart}
+              onStop={onStop}
             />
             <SwapInfoModule
               currentVault={currentVault}
@@ -315,6 +386,8 @@ function SwapModeModule({
   progress,
   ratio,
   compact,
+  onStart,
+  onStop,
 }: {
   swapMode: SwapMode;
   onSwapModeChange: (mode: SwapMode) => void;
@@ -323,6 +396,8 @@ function SwapModeModule({
   progress: { current: number; total: number; status: "idle" | "running" };
   ratio: number;
   compact?: boolean;
+  onStart?: () => void;
+  onStop?: () => void;
 }) {
   const modes: SwapMode[] = ["normal", "boost", "rewards"];
   const handleCycle = () => {
@@ -341,13 +416,39 @@ function SwapModeModule({
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-[11px] uppercase tracking-[0.1em] text-text-muted">Swap mode</p>
-        <button
-          type="button"
-          onClick={handleCycle}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 text-text-secondary hover:text-white hover:border-white/30 transition-all duration-200"
-        >
-          Mode
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Play/Stop buttons */}
+          {onStart && onStop && (
+            progress.status === "idle" ? (
+              <button
+                type="button"
+                onClick={onStart}
+                className="text-[11px] px-2 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all duration-200 shadow-[0_0_8px_rgba(52,211,153,0.2)]"
+                title="Start swap with current mode defaults"
+              >
+                ▶ Play
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onStop}
+                className="text-[11px] px-2 py-1 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-200 shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+                title="Stop swap"
+              >
+                ■ Stop
+              </button>
+            )
+          )}
+          {/* Mode cycle button */}
+          <button
+            type="button"
+            onClick={handleCycle}
+            className="text-[11px] px-2 py-1 rounded-lg border border-white/10 text-text-secondary hover:text-white hover:border-white/30 transition-all duration-200"
+            title="Cycle mode (applies defaults)"
+          >
+            Mode
+          </button>
+        </div>
       </div>
       <div className="mt-1 flex items-center justify-between gap-2">
         <div className="flex flex-col">

@@ -3,6 +3,8 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useSwapperContext } from "@/contexts/SwapperContext";
 import { cn } from "@/lib/utils";
 import { TOKEN_NAMES } from "@/lib/vaults";
+import type { SwapMode } from "@/types/swapModes";
+import { DEFAULT_BOOST_CONFIG, DEFAULT_REWARDS_CONFIG } from "@/types/swapModes";
 
 import { CompactHeader } from "./components/CompactHeader";
 import { SwapInterface } from "./components/SwapInterface";
@@ -20,6 +22,8 @@ const TOKEN_OPTIONS = Object.keys(TOKEN_NAMES);
 const MIN_REWARDS_MODE_USD = 10; // Minimum USD value required for rewards mode
 const DEFAULT_MAX_WIDTH = 420; // Default maximum width for compact swapper container
 const SOL_MINT_ADDRESS = "So11111111111111111111111111111111111111112";
+const USDC_MINT_ADDRESS = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const WPOND_MINT_ADDRESS = "3JgFwoYV74f6LwWjQWnr3YDPFnmBdwQfNyubv99jqUoq";
 
 /**
  * Default price estimates for USD calculations
@@ -84,6 +88,43 @@ export function CompactSwapper({
     ctx.setFromMint(ctx.toMint);
     ctx.setToMint(temp);
     ctx.log("Switched route FROM<->TO");
+  }, [ctx]);
+
+  /**
+   * Handle mode change with automatic defaults application
+   * - Normal mode: SOL → wPOND, clear amounts
+   * - Boost mode: USDC → SOL, apply boost defaults
+   * - Rewards mode: USDC → SOL, apply rewards defaults
+   */
+  const handleModeChange = useCallback((mode: SwapMode) => {
+    // Set the mode
+    ctx.setSwapMode(mode);
+
+    if (mode === "normal") {
+      // Normal mode: SOL → wPOND, set default amount
+      ctx.setFromMint(SOL_MINT_ADDRESS);
+      ctx.setToMint(WPOND_MINT_ADDRESS);
+      ctx.setAmount("0.01");
+      ctx.setMaxAmount("");
+      ctx.log("Mode: Normal | SOL → wPOND | 0.01 SOL");
+    } else if (mode === "boost") {
+      // Boost mode: USDC → SOL, apply boost defaults
+      ctx.setFromMint(USDC_MINT_ADDRESS);
+      ctx.setToMint(SOL_MINT_ADDRESS);
+      ctx.setAmount(DEFAULT_BOOST_CONFIG.minAmount);
+      ctx.setMaxAmount(DEFAULT_BOOST_CONFIG.maxAmount);
+      ctx.setSwapsPerRound(DEFAULT_BOOST_CONFIG.swapsPerRound);
+      ctx.setNumberOfRounds(DEFAULT_BOOST_CONFIG.numberOfRounds);
+      ctx.setSwapDelayMs(DEFAULT_BOOST_CONFIG.delayMs);
+      ctx.log(`Mode: Boost | USDC → SOL | ${DEFAULT_BOOST_CONFIG.swapsPerRound} swaps × ${DEFAULT_BOOST_CONFIG.numberOfRounds} rounds`);
+    } else if (mode === "rewards") {
+      // Rewards mode: USDC → SOL, apply rewards defaults
+      ctx.setFromMint(USDC_MINT_ADDRESS);
+      ctx.setToMint(SOL_MINT_ADDRESS);
+      ctx.setAmount(DEFAULT_REWARDS_CONFIG.amount);
+      ctx.setNumberOfSwaps(DEFAULT_REWARDS_CONFIG.numberOfSwaps);
+      ctx.log(`Mode: Rewards | USDC → SOL | ${DEFAULT_REWARDS_CONFIG.amount} USDC × ${DEFAULT_REWARDS_CONFIG.numberOfSwaps} swaps`);
+    }
   }, [ctx]);
 
   /**
@@ -215,7 +256,7 @@ export function CompactSwapper({
           {/* Mode Selector */}
           <ModeSelectorV2
             mode={ctx.swapMode}
-            onModeChange={ctx.setSwapMode}
+            onModeChange={handleModeChange}
             disabled={ctx.running}
           />
 

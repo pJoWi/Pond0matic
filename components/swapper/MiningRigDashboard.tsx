@@ -59,6 +59,10 @@ interface MiningRigDashboardProps {
   proSwapsSol: number;
   proSwapsBx: number;
 
+  // Vault Stats
+  vaultTotalSol: number;
+  vaultTransactionCount: number;
+
   // Navigation
   onOpenSwapper: () => void;
 
@@ -98,6 +102,8 @@ export function MiningRigDashboard({
   isPro,
   proSwapsSol,
   proSwapsBx,
+  vaultTotalSol,
+  vaultTransactionCount,
   onOpenSwapper,
   wallet,
   isLoading,
@@ -288,6 +294,31 @@ export function MiningRigDashboard({
             <div className="text-2xl font-bold text-purple-400">{luckPoints}</div>
           </div>
         </div>
+
+        {/* Vault Stats (On-chain data) */}
+        {vaultTransactionCount > 0 && (
+          <div className="bg-gradient-to-br from-emerald-500/10 to-teal-600/5 border border-emerald-500/30 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-2xl">🏦</div>
+              <div>
+                <h3 className="text-lg font-bold text-emerald-400">Hashrate Booster Vault</h3>
+                <p className="text-xs text-gray-400">SOL sent to vault (forwarded to Treasury)</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-cyber-black/50 border border-ember-gold/30 rounded-lg p-4 text-center">
+                <div className="text-xs text-gray-500 mb-1">Total SOL Sent</div>
+                <div className="text-2xl font-bold text-ember-gold">{vaultTotalSol.toFixed(4)} SOL</div>
+                <div className="text-[10px] text-gray-600 mt-1">On-chain verified</div>
+              </div>
+              <div className="bg-cyber-black/50 border border-cyan-500/30 rounded-lg p-4 text-center">
+                <div className="text-xs text-gray-500 mb-1">Transaction Count</div>
+                <div className="text-2xl font-bold text-cyan-400">{vaultTransactionCount}</div>
+                <div className="text-[10px] text-gray-600 mt-1">Boost transactions</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mining Stats from API */}
         {miningSessionsCount > 0 && (

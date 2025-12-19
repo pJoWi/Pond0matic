@@ -31,6 +31,19 @@ interface TopNavigationProps {
     total: number;
     status: "idle" | "running";
   };
+  // Swap control handlers
+  onStart?: () => void;
+  onStop?: () => void;
+  // Context setters for applying defaults
+  setFromMint?: (mint: string) => void;
+  setToMint?: (mint: string) => void;
+  setAmount?: (amount: string) => void;
+  setMaxAmount?: (amount: string) => void;
+  setSwapsPerRound?: (count: number) => void;
+  setNumberOfRounds?: (rounds: number) => void;
+  setSwapDelayMs?: (ms: number) => void;
+  setNumberOfSwaps?: (swaps: number) => void;
+  log?: (message: string) => void;
 }
 
 export function TopNavigation({
@@ -54,6 +67,17 @@ export function TopNavigation({
   currentDashboard,
   onDashboardChange,
   swapProgress,
+  onStart,
+  onStop,
+  setFromMint,
+  setToMint,
+  setAmount,
+  setMaxAmount,
+  setSwapsPerRound,
+  setNumberOfRounds,
+  setSwapDelayMs,
+  setNumberOfSwaps,
+  log,
 }: TopNavigationProps) {
   const pathname = usePathname();
   const [editingRpc, setEditingRpc] = useState(false);
@@ -225,6 +249,17 @@ export function TopNavigation({
             onDashboardChange={onDashboardChange}
             swapProgress={swapProgress}
             inline
+            onStart={onStart}
+            onStop={onStop}
+            setFromMint={setFromMint}
+            setToMint={setToMint}
+            setAmount={setAmount}
+            setMaxAmount={setMaxAmount}
+            setSwapsPerRound={setSwapsPerRound}
+            setNumberOfRounds={setNumberOfRounds}
+            setSwapDelayMs={setSwapDelayMs}
+            setNumberOfSwaps={setNumberOfSwaps}
+            log={log}
           />
         </div>
       </div>

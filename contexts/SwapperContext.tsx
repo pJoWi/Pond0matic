@@ -72,6 +72,9 @@ interface SwapperContextValue {
   drifted: number;
   maxClaimEstimateUsd: number;
   driftedUsd: number;
+  // Vault stats
+  vaultTotalSol: number;
+  vaultTransactionCount: number;
   setRigHealth: (health: number) => void;
   setRigPower: (power: number) => void;
   setRigTemp: (temp: number) => void;
@@ -197,14 +200,14 @@ export function SwapperProvider({
   const [platformFeeBps, setPlatformFeeBps] = React.useState(initialPlatformFeeBps);
   const [slippageBps, setSlippageBps] = React.useState(initialSlippageBps);
   const [autoDelayMs, setAutoDelayMs] = React.useState(3000);
-  const [swapDelayMs, setSwapDelayMs] = React.useState(2000); // Default 2 seconds between swaps
+  const [swapDelayMs, setSwapDelayMs] = React.useState(Number(process.env.NEXT_PUBLIC_DEFAULT_SWAP_DELAY_MS) || 6000);
 
   // Swap Mode State
   const [swapMode, setSwapMode] = React.useState<SwapMode>("normal");
   const [referralLink, setReferralLink] = React.useState("");
-  const [swapsPerRound, setSwapsPerRound] = React.useState(5);
-  const [numberOfRounds, setNumberOfRounds] = React.useState(1);
-  const [numberOfSwaps, setNumberOfSwaps] = React.useState(5);
+  const [swapsPerRound, setSwapsPerRound] = React.useState(Number(process.env.NEXT_PUBLIC_DEFAULT_SWAPS_PER_ROUND) || 18);
+  const [numberOfRounds, setNumberOfRounds] = React.useState(Number(process.env.NEXT_PUBLIC_DEFAULT_ROUNDS) || 3);
+  const [numberOfSwaps, setNumberOfSwaps] = React.useState(Number(process.env.NEXT_PUBLIC_DEFAULT_REWARDS_SWAPS) || 5);
 
   // Swap Runtime State
   const [running, setRunning] = React.useState(false);
@@ -287,6 +290,9 @@ export function SwapperProvider({
       drifted: miningRigHook.drifted,
       maxClaimEstimateUsd: miningRigHook.maxClaimEstimateUsd,
       driftedUsd: miningRigHook.driftedUsd,
+      // Vault stats
+      vaultTotalSol: miningRigHook.vaultTotalSol,
+      vaultTransactionCount: miningRigHook.vaultTransactionCount,
       setRigHealth: miningRigHook.setRigHealth,
       setRigPower: miningRigHook.setRigPower,
       setRigTemp: miningRigHook.setRigTemp,
