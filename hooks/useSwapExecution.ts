@@ -11,13 +11,24 @@ import { fetchTokenBalance, SOL_MINT } from "@/lib/tokenBalance";
 import { extractReferralCode, buildJupiterSwapRequest, getFeeRoutingDescription } from "@/lib/referral";
 
 // Jupiter API endpoints
-const JUP_QUOTE = "https://lite-api.jup.ag/swap/v1/quote";
-const JUP_SWAP = "https://lite-api.jup.ag/swap/v1/swap";
+const JUP_QUOTE = "https://api.jup.ag/swap/v1/quote";
+const JUP_SWAP = "https://api.jup.ag/swap/v1/swap";
 
 // Transaction settings
 const TRANSACTION_CONFIRMATION_TIMEOUT_MS = 30000; // 30 seconds
 const VERY_SMALL_AMOUNT_THRESHOLD = 1000; // Lamports threshold for warning
 const MINIMUM_DECIMALS_FOR_WARNING = 6; // Minimum token decimals to check for small amounts
+
+/**
+ * Get Jupiter API headers with optional authentication
+ */
+function getJupiterHeaders(apiKey?: string): HeadersInit {
+  const headers: HeadersInit = {};
+  if (apiKey) {
+    headers['x-api-key'] = apiKey;
+  }
+  return headers;
+}
 
 /**
  * Hook that provides swap execution functionality
@@ -47,7 +58,9 @@ export function useSwapExecution() {
       url.searchParams.set("amount", String(raw));
       url.searchParams.set("slippageBps", "0");
       url.searchParams.set("platformFeeBps", "0");
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), {
+        headers: getJupiterHeaders(ctx.jupiterApiKey)
+      });
       if (!res.ok) return 0;
       const q = await res.json();
       const outLamports = Number(q?.outAmount || q?.otherAmountThreshold || 0);
@@ -55,7 +68,7 @@ export function useSwapExecution() {
     } catch {
       return 0;
     }
-  }, []);
+  }, [ctx.jupiterApiKey]);
 
   /**
    * Fetch real-time balance for return swap
@@ -143,7 +156,9 @@ export function useSwapExecution() {
       quoteUrl.searchParams.set("platformFeeBps", String(ctx.platformFeeBps));
 
       try {
-        const quoteRes = await fetch(quoteUrl.toString());
+        const quoteRes = await fetch(quoteUrl.toString(), {
+          headers: getJupiterHeaders(ctx.jupiterApiKey)
+        });
         if (!quoteRes.ok) {
           ctx.log("Quote failed: " + quoteRes.status);
           return;
@@ -163,9 +178,14 @@ export function useSwapExecution() {
         const feeRouting = getFeeRoutingDescription(vaultAddress, referralAddress);
         ctx.log(`💰 ${feeRouting}`);
 
+        const swapHeaders: HeadersInit = {
+          "content-type": "application/json",
+          ...getJupiterHeaders(ctx.jupiterApiKey)
+        };
+
         const swapRes = await fetch(JUP_SWAP, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: swapHeaders,
           body: JSON.stringify(body),
         });
         if (!swapRes.ok) {

@@ -10,7 +10,7 @@ const POND0X_TREASURY = "cPUtmyb7RZhCaTusCb4qnPJjVTbwpJ6SpXUCvnBDU4a";
 // RPC endpoints with fallbacks
 const RPC_ENDPOINTS = [
   process.env.NEXT_PUBLIC_DEFAULT_RPC,
-  "https://api.mainnet-beta.solana.com",
+  "https://api.mainnet.solana.com",
   "https://solana-api.projectserum.com",
 ].filter(Boolean) as string[];
 

@@ -18,6 +18,8 @@ interface TopNavigationProps {
   onDisconnect: () => Promise<void>;
   rpc: string;
   onRpcChange: (rpc: string) => void;
+  jupiterApiKey: string;
+  onJupiterApiKeyChange: (key: string) => void;
   affiliate: string;
   onAffiliateChange: (value: "pond0x" | "aquavaults") => void;
   currentVault?: string | null;
@@ -58,6 +60,8 @@ export function TopNavigation({
   onDisconnect,
   rpc,
   onRpcChange,
+  jupiterApiKey,
+  onJupiterApiKeyChange,
   affiliate,
   onAffiliateChange,
   currentVault,
@@ -239,6 +243,8 @@ export function TopNavigation({
             onConnect={onConnect}
             onDisconnect={onDisconnect}
             rpc={rpc}
+            jupiterApiKey={jupiterApiKey}
+            onJupiterApiKeyChange={onJupiterApiKeyChange}
             affiliate={affiliate}
             onAffiliateChange={onAffiliateChange}
             currentVault={currentVault}
@@ -769,6 +775,8 @@ function EmbeddedStatus({
         onConnect={onConnect}
         onDisconnect={onDisconnect}
         rpc={rpc}
+        jupiterApiKey={jupiterApiKey}
+        onJupiterApiKeyChange={onJupiterApiKeyChange}
         affiliate={affiliate}
         onAffiliateChange={onAffiliateChange}
         currentVault={currentVault}

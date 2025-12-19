@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const VAULT_ADDRESS = '4ngqDt821wV2CjxoZLCjcTAPZNt6ZqpswoqyQEztsU36';
-const DEFAULT_RPC = process.env.NEXT_PUBLIC_DEFAULT_RPC || 'https://api.mainnet-beta.solana.com';
+const DEFAULT_RPC = process.env.NEXT_PUBLIC_DEFAULT_RPC || 'https://api.mainnet.solana.com';
 
 export async function GET() {
   try {

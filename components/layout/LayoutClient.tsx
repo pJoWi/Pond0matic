@@ -134,6 +134,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         onDisconnect={ctx.disconnect}
         rpc={ctx.rpc}
         onRpcChange={ctx.setRpc}
+        jupiterApiKey={ctx.jupiterApiKey}
+        onJupiterApiKeyChange={ctx.setJupiterApiKey}
         affiliate={ctx.affiliate as "pond0x" | "aquavaults"}
         onAffiliateChange={ctx.setAffiliate}
         currentVault={ctx.currentVault}

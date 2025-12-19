@@ -18,6 +18,8 @@ interface StatusBarProps {
   onConnect: () => Promise<void> | Promise<string>;
   onDisconnect: () => Promise<void>;
   rpc: string;
+  jupiterApiKey: string;
+  onJupiterApiKeyChange: (key: string) => void;
   affiliate: string;
   onAffiliateChange: (value: "pond0x" | "aquavaults") => void;
   currentVault?: string | null;
@@ -55,6 +57,8 @@ export function StatusBar({
   onConnect,
   onDisconnect,
   rpc,
+  jupiterApiKey,
+  onJupiterApiKeyChange,
   affiliate,
   onAffiliateChange,
   currentVault,
@@ -199,6 +203,8 @@ export function StatusBar({
                 currentVault={currentVault}
                 affiliate={affiliate}
                 onAffiliateChange={onAffiliateChange}
+                jupiterApiKey={jupiterApiKey}
+                onJupiterApiKeyChange={onJupiterApiKeyChange}
                 progress={progress}
                 compact
               />
@@ -248,6 +254,8 @@ export function StatusBar({
               currentVault={currentVault}
               affiliate={affiliate}
               onAffiliateChange={onAffiliateChange}
+              jupiterApiKey={jupiterApiKey}
+              onJupiterApiKeyChange={onJupiterApiKeyChange}
               progress={progress}
               compact
             />
@@ -483,20 +491,33 @@ function SwapInfoModule({
   currentVault,
   affiliate,
   onAffiliateChange,
+  jupiterApiKey,
+  onJupiterApiKeyChange,
   progress,
   compact,
 }: {
   currentVault?: string | null;
   affiliate: string;
   onAffiliateChange: (value: "pond0x" | "aquavaults") => void;
+  jupiterApiKey: string;
+  onJupiterApiKeyChange: (key: string) => void;
   progress: { current: number; total: number; status: "idle" | "running" };
   compact?: boolean;
 }) {
+  const [showApiKey, setShowApiKey] = React.useState(false);
+
   const formatVault = () => {
     if (!currentVault) return "Not linked";
     return currentVault.length > 10
       ? `${currentVault.slice(0, 4)}...${currentVault.slice(-4)}`
       : currentVault;
+  };
+
+  const formatApiKey = () => {
+    if (!jupiterApiKey) return "Not set";
+    return jupiterApiKey.length > 10
+      ? `${jupiterApiKey.slice(0, 4)}...${jupiterApiKey.slice(-4)}`
+      : jupiterApiKey;
   };
 
   return (
@@ -530,6 +551,38 @@ function SwapInfoModule({
           <span>Fee vault</span>
           <span className="text-white font-semibold">{formatVault()}</span>
         </div>
+        <div className="flex items-center justify-between text-[12px] text-text-secondary">
+          <span>Jupiter API</span>
+          <button
+            onClick={() => setShowApiKey(!showApiKey)}
+            className="text-white font-semibold hover:text-cyan-300 transition-colors"
+            title={jupiterApiKey ? "Click to edit API key" : "Click to set API key"}
+          >
+            {formatApiKey()}
+          </button>
+        </div>
+        {showApiKey && (
+          <div className="pt-1 space-y-1">
+            <input
+              type="password"
+              value={jupiterApiKey}
+              onChange={(e) => onJupiterApiKeyChange(e.target.value)}
+              placeholder="Enter Jupiter API key..."
+              className="w-full bg-pond-deep/60 border border-cyan-500/30 rounded-lg px-2 py-1.5 text-[11px] text-white font-mono focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/40"
+            />
+            <div className="text-[9px] text-text-muted">
+              Get your free API key at{" "}
+              <a
+                href="https://portal.jup.ag"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan-400 hover:text-cyan-300 underline"
+              >
+                portal.jup.ag
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

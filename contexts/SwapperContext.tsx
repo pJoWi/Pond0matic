@@ -29,6 +29,8 @@ interface SwapperContextValue {
   disconnect: () => Promise<void>;
   rpc: string;
   setRpc: (rpc: string) => void;
+  jupiterApiKey: string;
+  setJupiterApiKey: (key: string) => void;
 
   // Balances
   solBalance: number;
@@ -189,6 +191,9 @@ export function SwapperProvider({
   // RPC State
   const [rpc, setRpc] = React.useState(initialRpc);
 
+  // Jupiter API Key State
+  const [jupiterApiKey, setJupiterApiKey] = React.useState("");
+
   // Token Selection State
   const [fromMint, setFromMint] = React.useState(initialFromMint);
   const [toMint, setToMint] = React.useState(initialToMint);
@@ -247,6 +252,8 @@ export function SwapperProvider({
       disconnect: walletHook.disconnect,
       rpc,
       setRpc,
+      jupiterApiKey,
+      setJupiterApiKey,
 
       // Balances
       solBalance: balancesHook.solBalance,
@@ -383,6 +390,7 @@ export function SwapperProvider({
     [
       walletHook,
       rpc,
+      jupiterApiKey,
       balancesHook,
       activityLogHook,
       miningRigHook,

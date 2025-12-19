@@ -33,9 +33,16 @@ export async function GET() {
     }
 
     // Fallback to Jupiter Price API v2
+    const headers: HeadersInit = {};
+    const jupiterApiKey = process.env.JUPITER_API_KEY;
+    if (jupiterApiKey) {
+      headers['x-api-key'] = jupiterApiKey;
+    }
+
     const jupResponse = await fetch(
       `https://api.jup.ag/price/v2?ids=${WPOND_MINT}`,
       {
+        headers,
         next: { revalidate: 30 },
       }
     );
