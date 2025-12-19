@@ -160,6 +160,17 @@ export function useSwapExecution() {
           headers: getJupiterHeaders(ctx.jupiterApiKey)
         });
         if (!quoteRes.ok) {
+          if (quoteRes.status === 429) {
+            const msg = "⚠️ Rate limit exceeded. Please add a Jupiter API key to continue. Get one at portal.jup.ag (Free tier: 60 req/min)";
+            ctx.log(msg);
+            ctx.errorToast(msg);
+            return;
+          } else if (quoteRes.status === 401 || quoteRes.status === 403) {
+            const msg = "⚠️ Jupiter API authentication failed. Check your API key.";
+            ctx.log(msg);
+            ctx.errorToast(msg);
+            return;
+          }
           ctx.log("Quote failed: " + quoteRes.status);
           return;
         }
@@ -189,6 +200,17 @@ export function useSwapExecution() {
           body: JSON.stringify(body),
         });
         if (!swapRes.ok) {
+          if (swapRes.status === 429) {
+            const msg = "⚠️ Rate limit exceeded. Please add a Jupiter API key to continue. Get one at portal.jup.ag (Free tier: 60 req/min)";
+            ctx.log(msg);
+            ctx.errorToast(msg);
+            return;
+          } else if (swapRes.status === 401 || swapRes.status === 403) {
+            const msg = "⚠️ Jupiter API authentication failed. Check your API key.";
+            ctx.log(msg);
+            ctx.errorToast(msg);
+            return;
+          }
           const t = await swapRes.text();
           ctx.log("Swap build failed: " + t.slice(0, 180));
           return;

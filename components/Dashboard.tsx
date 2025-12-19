@@ -76,8 +76,6 @@ export function Dashboard({ onOpenSwapper }: DashboardProps) {
             isPro={ctx.isPro}
             proSwapsSol={ctx.proSwapsSol}
             proSwapsBx={ctx.proSwapsBx}
-            vaultTotalSol={ctx.vaultTotalSol}
-            vaultTransactionCount={ctx.vaultTransactionCount}
             onOpenSwapper={onOpenSwapper}
             wallet={ctx.wallet}
             isLoading={ctx.isLoading}

@@ -87,10 +87,16 @@ export function TopNavigation({
   const [editingRpc, setEditingRpc] = useState(false);
   const [rpcDraft, setRpcDraft] = useState(rpc);
   const [rpcError, setRpcError] = useState<string | null>(null);
+  const [editingJupiterApiKey, setEditingJupiterApiKey] = useState(false);
+  const [jupiterApiKeyDraft, setJupiterApiKeyDraft] = useState(jupiterApiKey);
 
   useEffect(() => {
     setRpcDraft(rpc);
   }, [rpc]);
+
+  useEffect(() => {
+    setJupiterApiKeyDraft(jupiterApiKey);
+  }, [jupiterApiKey]);
 
   const navItems = [
     { href: "/", label: "Dashboard", tone: "lily" as const },
@@ -120,6 +126,11 @@ export function TopNavigation({
     onRpcChange(rpcDraft.trim());
     setEditingRpc(false);
     setRpcError(null);
+  };
+
+  const handleJupiterApiKeySave = () => {
+    onJupiterApiKeyChange(jupiterApiKeyDraft.trim());
+    setEditingJupiterApiKey(false);
   };
 
   return (
@@ -232,6 +243,18 @@ export function TopNavigation({
                   setEditingRpc(false);
                 }}
                 error={rpcError}
+              />
+              <JupiterApiKeyPill
+                apiKey={jupiterApiKey}
+                editing={editingJupiterApiKey}
+                onToggleEdit={() => setEditingJupiterApiKey((prev) => !prev)}
+                apiKeyDraft={jupiterApiKeyDraft}
+                onApiKeyDraftChange={setJupiterApiKeyDraft}
+                onApiKeySave={handleJupiterApiKeySave}
+                onApiKeyCancel={() => {
+                  setJupiterApiKeyDraft(jupiterApiKey);
+                  setEditingJupiterApiKey(false);
+                }}
               />
             </div>
           </div>
@@ -706,6 +729,124 @@ function RpcPill({
   );
 }
 
+function JupiterApiKeyPill({
+  apiKey,
+  editing,
+  onToggleEdit,
+  apiKeyDraft,
+  onApiKeyDraftChange,
+  onApiKeySave,
+  onApiKeyCancel,
+}: {
+  apiKey: string;
+  editing: boolean;
+  onToggleEdit: () => void;
+  apiKeyDraft: string;
+  onApiKeyDraftChange: (value: string) => void;
+  onApiKeySave: () => void;
+  onApiKeyCancel: () => void;
+}) {
+  const hasApiKey = apiKey.length > 0;
+  const maskedApiKey = hasApiKey
+    ? `${apiKey.slice(0, 4)}${"•".repeat(Math.min(apiKey.length - 8, 20))}${apiKey.slice(-4)}`
+    : "Not set";
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onToggleEdit}
+        className={cn(
+          "flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm font-semibold transition-all duration-300",
+          "border bg-pond-deep/60 shadow-md hover:bg-pond-water/45 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/60",
+          editing
+            ? "border-yellow-500/60 shadow-[0_0_18px_rgba(234,179,8,0.4)]"
+            : hasApiKey
+            ? "border-yellow-500/25"
+            : "border-red-500/40"
+        )}
+        title="Click to edit Jupiter API Key"
+      >
+        <span
+          className={cn(
+            "w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]",
+            hasApiKey ? "bg-yellow-500" : "bg-red-500"
+          )}
+        />
+        <div className="flex flex-col leading-tight">
+          <span className="text-white text-sm">Jupiter API Key</span>
+          <span className={cn(
+            "text-[11px] font-mono max-w-[200px] truncate",
+            hasApiKey ? "text-text-secondary" : "text-red-400"
+          )}>
+            {maskedApiKey}
+          </span>
+        </div>
+        <span
+          className={cn(
+            "ml-auto text-[10px] px-2 py-0.5 rounded-full border transition-all duration-300",
+            editing
+              ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400"
+              : "bg-white/10 border-white/12 text-text-secondary hover:bg-white/15 hover:border-white/20"
+          )}
+        >
+          {editing ? "Editing" : "Edit"}
+        </span>
+      </button>
+
+      {editing && (
+        <div className="absolute left-0 right-0 mt-2 rounded-lg border border-yellow-500/30 bg-gradient-to-br from-pond-water/95 via-pond-deep/90 to-pond-water/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+          <div className="p-3 space-y-3">
+            <div>
+              <label className="block text-xs text-text-muted uppercase tracking-wider mb-2">
+                Jupiter API Key
+              </label>
+              <input
+                type="password"
+                value={apiKeyDraft}
+                onChange={(e) => onApiKeyDraftChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onApiKeySave();
+                  if (e.key === "Escape") onApiKeyCancel();
+                }}
+                placeholder="Enter your Jupiter API key (optional)"
+                className="w-full bg-black/30 border-2 border-yellow-500/30 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all duration-300 placeholder:text-text-muted/50"
+                autoFocus
+              />
+              <p className="text-xs text-gray-400 mt-2">
+                Get your API key at{" "}
+                <a
+                  href="https://portal.jup.ag"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-yellow-400 hover:text-yellow-300 underline"
+                >
+                  portal.jup.ag
+                </a>
+                {" "}(Free tier: 60 req/min)
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onApiKeySave}
+                className="flex-1 px-3 py-2 bg-yellow-500/20 border-2 border-yellow-500 rounded-lg text-sm font-semibold text-yellow-400 hover:bg-yellow-500/30 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
+              >
+                Save
+              </button>
+              <button
+                onClick={onApiKeyCancel}
+                className="flex-1 px-3 py-2 bg-red-500/20 border-2 border-red-500/40 rounded-lg text-sm font-semibold text-red-400 hover:bg-red-500/30 hover:border-red-500/60 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:scale-105 active:scale-95 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BalanceBadge({ label, amount }: { label: string; amount?: number }) {
   const formatted = amount !== undefined && amount !== null ? amount.toFixed(4) : "-";
   return (
@@ -736,6 +877,8 @@ function EmbeddedStatus({
   onConnect,
   onDisconnect,
   rpc,
+  jupiterApiKey,
+  onJupiterApiKeyChange,
   affiliate,
   onAffiliateChange,
   currentVault,
@@ -752,6 +895,8 @@ function EmbeddedStatus({
   onConnect: () => Promise<void> | Promise<string>;
   onDisconnect: () => Promise<void>;
   rpc: string;
+  jupiterApiKey: string;
+  onJupiterApiKeyChange: (key: string) => void;
   affiliate: string;
   onAffiliateChange: (value: "pond0x" | "aquavaults") => void;
   currentVault?: string | null;

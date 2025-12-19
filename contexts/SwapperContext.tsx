@@ -74,9 +74,6 @@ interface SwapperContextValue {
   drifted: number;
   maxClaimEstimateUsd: number;
   driftedUsd: number;
-  // Vault stats
-  vaultTotalSol: number;
-  vaultTransactionCount: number;
   setRigHealth: (health: number) => void;
   setRigPower: (power: number) => void;
   setRigTemp: (temp: number) => void;
@@ -297,9 +294,6 @@ export function SwapperProvider({
       drifted: miningRigHook.drifted,
       maxClaimEstimateUsd: miningRigHook.maxClaimEstimateUsd,
       driftedUsd: miningRigHook.driftedUsd,
-      // Vault stats
-      vaultTotalSol: miningRigHook.vaultTotalSol,
-      vaultTransactionCount: miningRigHook.vaultTransactionCount,
       setRigHealth: miningRigHook.setRigHealth,
       setRigPower: miningRigHook.setRigPower,
       setRigTemp: miningRigHook.setRigTemp,
