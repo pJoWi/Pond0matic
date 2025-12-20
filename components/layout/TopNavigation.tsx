@@ -939,16 +939,16 @@ function EmbeddedStatus({
 
 function MoonIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+    <svg viewBox="0 0 24 24" fill="gold" className="w-4 h-4">
       <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-    </svg>
+      </svg>
   );
 }
 
 function SunIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
+    <svg viewBox="0 0 24 24" fill="gold" className="w-4 h-4">
+            <path d="M12 18a6 6 0 100-12 6 6 0 000 12z" />
       <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-7.364L16.95 5.05M7.05 16.95l-1.414 1.414m0-13.657L7.05 5.05m9.9 9.9l1.414 1.414" />
     </svg>
   );
@@ -956,7 +956,7 @@ function SunIcon() {
 
 function DropletIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+    <svg viewBox="0 0 24 24" fill="cyan" className="w-4 h-4">
       <path d="M12.66 2.58a1 1 0 00-1.32 0C9.07 4.5 5 8.73 5 12.5 5 17.19 8.58 20 12 20s7-2.81 7-7.5c0-3.77-4.07-8-6.34-9.92zM12 18c-2.14 0-5-1.2-5-5.5 0-2.41 2.33-5.53 5-8.03 2.67 2.5 5 5.62 5 8.03C17 16.8 14.14 18 12 18z" />
     </svg>
   );
@@ -964,7 +964,7 @@ function DropletIcon() {
 
 function WaveIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+    <svg viewBox="0 0 24 24" fill="currentcolor" className="w-4 h-4">
       <path d="M4.5 15c1.5 0 2.25-1 3.75-1s2.25 1 3.75 1 2.25-1 3.75-1 2.25 1 3.75 1v2c-1.5 0-2.25-1-3.75-1s-2.25 1-3.75 1-2.25-1-3.75-1-2.25 1-3.75 1V15z" />
       <path d="M4.5 9c1.5 0 2.25-1 3.75-1S10.5 9 12 9s2.25-1 3.75-1S18 9 19.5 9v2c-1.5 0-2.25-1-3.75-1S13.5 11 12 11s-2.25-1-3.75-1S6 11 4.5 11V9z" />
     </svg>

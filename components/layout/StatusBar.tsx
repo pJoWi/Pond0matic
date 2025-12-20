@@ -145,6 +145,7 @@ export function StatusBar({
       setToMint?.(SOL_MINT_ADDRESS);
       setAmount?.(DEFAULT_REWARDS_CONFIG.amount);
       setNumberOfSwaps?.(DEFAULT_REWARDS_CONFIG.numberOfSwaps);
+      setSwapDelayMs?.(DEFAULT_REWARDS_CONFIG.delayMs);
       log?.(`Mode: Rewards | USDC → SOL | ${DEFAULT_REWARDS_CONFIG.amount} USDC × ${DEFAULT_REWARDS_CONFIG.numberOfSwaps} swaps`);
     }
   };

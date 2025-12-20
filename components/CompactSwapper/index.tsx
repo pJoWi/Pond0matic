@@ -123,6 +123,7 @@ export function CompactSwapper({
       ctx.setToMint(SOL_MINT_ADDRESS);
       ctx.setAmount(DEFAULT_REWARDS_CONFIG.amount);
       ctx.setNumberOfSwaps(DEFAULT_REWARDS_CONFIG.numberOfSwaps);
+      ctx.setSwapDelayMs(DEFAULT_REWARDS_CONFIG.delayMs);
       ctx.log(`Mode: Rewards | USDC → SOL | ${DEFAULT_REWARDS_CONFIG.amount} USDC × ${DEFAULT_REWARDS_CONFIG.numberOfSwaps} swaps`);
     }
   }, [ctx]);

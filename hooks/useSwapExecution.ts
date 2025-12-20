@@ -468,6 +468,10 @@ export function useSwapExecution() {
 
         const swapInfo = totalSwaps === Infinity ? `∞` : `${currentSwap}/${totalSwaps}`;
 
+        // Get initial balance of TO token before forward swap
+        const initialBalance = await fetchTokenBalance(ctx.wallet, ctx.toMint, ctx.rpc);
+        const initialAmount = initialBalance.uiAmount || 0;
+
         // Forward swap
         ctx.log(`💱 Rewards round ${swapInfo} - Forward: ${ctx.amount} ${TOKEN_NAMES[ctx.fromMint] || "TOKEN"}`);
         await swapOnce(ctx.fromMint, ctx.toMint, ctx.amount, referralAddress);
@@ -478,14 +482,17 @@ export function useSwapExecution() {
           await new Promise((r) => setTimeout(r, ctx.swapDelayMs));
         }
 
-        // Return swap - fetch actual balance
+        // Return swap - calculate accumulated amount only
         if (runRef.current) {
-          const returnAmount = await fetchReturnSwapAmount(ctx.toMint);
+          const finalBalance = await fetchTokenBalance(ctx.wallet, ctx.toMint, ctx.rpc);
+          const finalAmount = finalBalance.uiAmount || 0;
+          const accumulatedAmount = Math.max(0, finalAmount - initialAmount);
+          const returnAmount = accumulatedAmount.toString();
 
           if (Number(returnAmount) <= 0) {
-            ctx.log(`⚠️ No ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} balance to return swap`);
+            ctx.log(`⚠️ No accumulated ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} to return swap`);
           } else {
-            ctx.log(`↩️ Rewards round ${swapInfo} - Return: ${returnAmount} ${TOKEN_NAMES[ctx.toMint] || "TOKEN"}`);
+            ctx.log(`↩️ Rewards round ${swapInfo} - Return: ${returnAmount} ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} (accumulated: ${initialAmount.toFixed(6)} → ${finalAmount.toFixed(6)})`);
             await swapOnce(ctx.toMint, ctx.fromMint, returnAmount, referralAddress);
           }
         }
