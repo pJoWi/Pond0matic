@@ -13,7 +13,7 @@ Get up and running in 5 minutes.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/pJOWI/Pond0matic.git
+git clone https://github.com/YOUR_USERNAME/Pond0matic.git
 cd Pond0matic
 ```
 
@@ -89,7 +89,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Support
 
-- Report issues: [GitHub Issues](https://github.com/YOUR_USERNAME/Pond0matic/issues)
 - Documentation: See USER_MANUAL.md for detailed instructions
 
 ---
