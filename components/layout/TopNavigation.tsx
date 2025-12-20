@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { StatusBar, type DashboardType } from "./StatusBar";
 import type { SwapMode } from "@/types/swapModes";
+import { useBalances } from "@/hooks/useBalances";
+import { TokenLogo } from "@/components/icons/tokens/TokenLogo";
 
 interface TopNavigationProps {
   theme: "dark" | "light";
@@ -36,6 +38,8 @@ interface TopNavigationProps {
   // Swap control handlers
   onStart?: () => void;
   onStop?: () => void;
+  // Dashboard data fetch handler
+  onFetchDashboardData?: () => void;
   // Context setters for applying defaults
   setFromMint?: (mint: string) => void;
   setToMint?: (mint: string) => void;
@@ -73,6 +77,7 @@ export function TopNavigation({
   swapProgress,
   onStart,
   onStop,
+  onFetchDashboardData,
   setFromMint,
   setToMint,
   setAmount,
@@ -89,6 +94,15 @@ export function TopNavigation({
   const [rpcError, setRpcError] = useState<string | null>(null);
   const [editingJupiterApiKey, setEditingJupiterApiKey] = useState(false);
   const [jupiterApiKeyDraft, setJupiterApiKeyDraft] = useState(jupiterApiKey);
+  const [solPrice, setSolPrice] = useState<number>(0);
+
+  // Fetch SOL balance
+  const { solBalance } = useBalances(
+    wallet,
+    rpc,
+    "So11111111111111111111111111111111111111112",
+    log
+  );
 
   useEffect(() => {
     setRpcDraft(rpc);
@@ -97,6 +111,29 @@ export function TopNavigation({
   useEffect(() => {
     setJupiterApiKeyDraft(jupiterApiKey);
   }, [jupiterApiKey]);
+
+  // Fetch SOL price from Jupiter Price API
+  useEffect(() => {
+    const fetchSolPrice = async () => {
+      try {
+        const response = await fetch(
+          "https://api.jup.ag/price/v2?ids=So11111111111111111111111111111111111111112"
+        );
+        const data = await response.json();
+        const price = data?.data?.So11111111111111111111111111111111111111112?.price;
+        if (price) {
+          setSolPrice(price);
+        }
+      } catch (error) {
+        console.error("Failed to fetch SOL price:", error);
+      }
+    };
+
+    fetchSolPrice();
+    // Refresh price every 30 seconds
+    const interval = setInterval(fetchSolPrice, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const navItems = [
     { href: "/", label: "Dashboard", tone: "lily" as const },
@@ -256,6 +293,17 @@ export function TopNavigation({
                   setEditingJupiterApiKey(false);
                 }}
               />
+              <FetchDataButton
+                isConnected={isConnected}
+                hasRpc={rpc.length > 0}
+                hasApiKey={jupiterApiKey.length > 0}
+                onFetch={onFetchDashboardData}
+              />
+              <SOLBalancePill
+                balance={solBalance}
+                price={solPrice}
+                isConnected={isConnected}
+              />
             </div>
           </div>
 
@@ -377,9 +425,107 @@ function LogoBadge() {
           }}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="relative flex flex-col">
+        {/* Bubble SVG Background */}
+        <div className="absolute inset-0 -left-2 -right-2 -top-1 -bottom-1 overflow-hidden pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity duration-500">
+          <svg
+            width="100%" height="100%" viewBox="0 0 30 30"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid slice"
+            role="img" aria-label="Ascending bubbles with drift"
+          >
+            <defs>
+              <radialGradient id="bubbleFill" cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stopColor="#E9FEFF" stopOpacity="0.35"/>
+                <stop offset="55%" stopColor="#7BE6FF" stopOpacity="0.18"/>
+                <stop offset="100%" stopColor="#7CFFB5" stopOpacity="0.08"/>
+              </radialGradient>
+
+              <linearGradient id="bubbleStroke" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#CFFBFF" stopOpacity="0.7"/>
+                <stop offset="100%" stopColor="#7CFFB5" stopOpacity="0.55"/>
+              </linearGradient>
+
+              <filter id="bubbleGlow" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="0.5"/>
+              </filter>
+            </defs>
+
+            <g filter="url(#bubbleGlow)">
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="-1,20; 1,-10; -1,-30" dur="3.2s" begin="0s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.55;0" dur="3.2s" begin="0s" repeatCount="indefinite"/>
+                <circle cx="6" cy="30" r="2.0" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.7"/>
+                <circle cx="5.3" cy="29.4" r="0.5" fill="#E9FEFF" opacity="0.55"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="1,22; -1,-12; 1,-32" dur="3.6s" begin="0.3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.45;0" dur="3.6s" begin="0.3s" repeatCount="indefinite"/>
+                <circle cx="9.5" cy="31" r="1.3" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.6"/>
+                <circle cx="9.1" cy="30.6" r="0.35" fill="#E9FEFF" opacity="0.45"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="-1,18; 0,-10; 1,-28" dur="2.8s" begin="0.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.6;0" dur="2.8s" begin="0.6s" repeatCount="indefinite"/>
+                <circle cx="13.5" cy="30" r="1.9" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.7"/>
+                <circle cx="12.9" cy="29.3" r="0.45" fill="#E9FEFF" opacity="0.5"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="0,24; 1,-14; -1,-34" dur="4.0s" begin="0.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.42;0" dur="4.0s" begin="0.9s" repeatCount="indefinite"/>
+                <circle cx="18.8" cy="32" r="1.1" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.55"/>
+                <circle cx="18.5" cy="31.6" r="0.28" fill="#E9FEFF" opacity="0.4"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="1,19; -1,-11; 0,-29" dur="3.1s" begin="1.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.52;0" dur="3.1s" begin="1.2s" repeatCount="indefinite"/>
+                <circle cx="22.3" cy="30" r="2.2" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.75"/>
+                <circle cx="21.5" cy="29.2" r="0.6" fill="#E9FEFF" opacity="0.55"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="-1,23; 1,-13; -1,-33" dur="3.8s" begin="1.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.45;0" dur="3.8s" begin="1.5s" repeatCount="indefinite"/>
+                <circle cx="26.2" cy="32" r="1.4" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.6"/>
+                <circle cx="25.8" cy="31.4" r="0.32" fill="#E9FEFF" opacity="0.42"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="0,25; 0,-15; 0,-35" dur="4.5s" begin="1.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.3;0" dur="4.5s" begin="1.9s" repeatCount="indefinite"/>
+                <circle cx="15.5" cy="33" r="0.8" fill="url(#bubbleFill)" stroke="url(#bubbleStroke)" strokeWidth="0.45"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="1,26; -1,-16; 1,-36" dur="5.0s" begin="2.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.25;0" dur="5.0s" begin="2.2s" repeatCount="indefinite"/>
+                <circle cx="11.5" cy="34" r="0.55" fill="#E9FEFF" opacity="0.35"/>
+              </g>
+
+              <g>
+                <animateTransform type="translate" attributeName="transform"
+                  values="-1,27; 1,-17; -1,-37" dur="5.4s" begin="2.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;0.22;0" dur="5.4s" begin="2.6s" repeatCount="indefinite"/>
+                <circle cx="20.5" cy="35" r="0.6" fill="#E9FEFF" opacity="0.3"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+
         <span
-          className="text-lg sm:text-xl font-bold tracking-wider bg-clip-text text-transparent transition-all duration-500 group-hover:tracking-[0.18em]"
+          className="relative text-lg sm:text-xl font-bold tracking-wider bg-clip-text text-transparent transition-all duration-500 group-hover:tracking-[0.18em]"
           style={{
             backgroundImage: "linear-gradient(120deg, var(--theme-primary), var(--theme-secondary), var(--pink-bright, #ffc0e3))",
             backgroundSize: "200% auto",
@@ -388,7 +534,7 @@ function LogoBadge() {
         >
           Pond0matic
         </span>
-        <span className="text-[11px] text-[color:var(--theme-text-muted)]">
+        <span className="relative text-[11px] text-[color:var(--theme-text-muted)]">
           Dashboard / Swapper / Flywheel
         </span>
       </div>
@@ -642,7 +788,26 @@ function RpcPill({
   onRpcCancel: () => void;
   error: string | null;
 }) {
-  const truncatedRpc = rpc.length > 32 ? `${rpc.slice(0, 32)}...` : rpc;
+  const hasValidRpc = rpc.length > 0 && !error;
+
+  // Extract part after '=' if it exists (for API key display), otherwise show "Set"
+  const getRpcDisplay = () => {
+    if (!hasValidRpc) return "Not set";
+
+    const equalsIndex = rpc.lastIndexOf('=');
+    if (equalsIndex !== -1 && equalsIndex < rpc.length - 1) {
+      const apiKeyPart = rpc.slice(equalsIndex + 1);
+      if (apiKeyPart.length > 8) {
+        return `${apiKeyPart.slice(0, 4)}${"•".repeat(Math.min(apiKeyPart.length - 8, 20))}${apiKeyPart.slice(-4)}`;
+      }
+      return apiKeyPart;
+    }
+
+    return "Set";
+  };
+
+  const maskedRpc = getRpcDisplay();
+
   return (
     <div className="relative">
       <button
@@ -650,26 +815,50 @@ function RpcPill({
         onClick={onToggleEdit}
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm font-semibold transition-all duration-300",
-          "border bg-pond-deep/60 shadow-md hover:bg-pond-water/45 focus:outline-none focus-visible:ring-2 focus-visible:ring-pond-bright/60",
+          "border bg-pond-deep/60 shadow-md hover:bg-pond-water/45 focus:outline-none focus-visible:ring-2",
+          hasValidRpc
+            ? "focus-visible:ring-lily-bright/60"
+            : "focus-visible:ring-red-500/60",
           editing
-            ? "border-pond-bright/60 shadow-[0_0_18px_rgba(74,143,184,0.4)]"
-            : "border-pond-bright/25"
+            ? hasValidRpc
+              ? "border-lily-green/60 shadow-[0_0_18px_rgba(107,157,120,0.4)]"
+              : "border-red-500/60 shadow-[0_0_18px_rgba(239,68,68,0.4)]"
+            : hasValidRpc
+            ? "border-lily-green/25"
+            : "border-red-500/40"
         )}
         title="Click to edit RPC"
       >
-        <span className="w-2 h-2 rounded-full bg-pond-bright shadow-[0_0_8px_var(--glow-blue)]" />
+        <span
+          className={cn(
+            "w-2 h-2 rounded-full shadow-lg transition-all duration-300",
+            hasValidRpc
+              ? "bg-emerald-400 shadow-emerald-400/50"
+              : "bg-red-500 shadow-red-500/50"
+          )}
+          style={{
+            boxShadow: hasValidRpc
+              ? "0 0 8px rgba(52, 211, 153, 0.6)"
+              : "0 0 8px rgba(239, 68, 68, 0.6)"
+          }}
+        />
         <div className="flex flex-col leading-tight">
           <span className="text-white text-sm">RPC Endpoint</span>
-          <span className="text-[11px] text-text-secondary font-mono max-w-[200px] truncate">
-            {truncatedRpc}
+          <span className={cn(
+            "text-[11px] font-mono max-w-[200px] truncate",
+            hasValidRpc ? "text-text-secondary" : "text-red-400"
+          )}>
+            {maskedRpc}
           </span>
         </div>
         <span
           className={cn(
             "ml-auto text-[10px] px-2 py-0.5 rounded-full border transition-all duration-300",
             editing
-              ? "bg-pond-bright/20 border-pond-bright/40 text-pond-bright"
-              : "bg-white/10 border-white/12 text-text-secondary hover:bg-white/15 hover:border-white/20"
+              ? hasValidRpc
+                ? "bg-lily-green/20 border-lily-green/40 text-lily-bright"
+                : "bg-red-500/20 border-red-500/40 text-red-400"
+              : "bg-pond-deep/40 border-lily-green/20 text-lily-green hover:bg-lily-green/15 hover:border-lily-green/40 hover:text-lily-bright"
           )}
         >
           {editing ? "Editing" : "Edit"}
@@ -758,20 +947,32 @@ function JupiterApiKeyPill({
         onClick={onToggleEdit}
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm font-semibold transition-all duration-300",
-          "border bg-pond-deep/60 shadow-md hover:bg-pond-water/45 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/60",
+          "border bg-pond-deep/60 shadow-md hover:bg-pond-water/45 focus:outline-none focus-visible:ring-2",
+          hasApiKey
+            ? "focus-visible:ring-lily-bright/60"
+            : "focus-visible:ring-red-500/60",
           editing
-            ? "border-yellow-500/60 shadow-[0_0_18px_rgba(234,179,8,0.4)]"
+            ? hasApiKey
+              ? "border-lily-green/60 shadow-[0_0_18px_rgba(107,157,120,0.4)]"
+              : "border-red-500/60 shadow-[0_0_18px_rgba(239,68,68,0.4)]"
             : hasApiKey
-            ? "border-yellow-500/25"
+            ? "border-lily-green/25"
             : "border-red-500/40"
         )}
         title="Click to edit Jupiter API Key"
       >
         <span
           className={cn(
-            "w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]",
-            hasApiKey ? "bg-yellow-500" : "bg-red-500"
+            "w-2 h-2 rounded-full shadow-lg transition-all duration-300",
+            hasApiKey
+              ? "bg-emerald-400 shadow-emerald-400/50"
+              : "bg-red-500 shadow-red-500/50"
           )}
+          style={{
+            boxShadow: hasApiKey
+              ? "0 0 8px rgba(52, 211, 153, 0.6)"
+              : "0 0 8px rgba(239, 68, 68, 0.6)"
+          }}
         />
         <div className="flex flex-col leading-tight">
           <span className="text-white text-sm">Jupiter API Key</span>
@@ -786,8 +987,10 @@ function JupiterApiKeyPill({
           className={cn(
             "ml-auto text-[10px] px-2 py-0.5 rounded-full border transition-all duration-300",
             editing
-              ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400"
-              : "bg-white/10 border-white/12 text-text-secondary hover:bg-white/15 hover:border-white/20"
+              ? hasApiKey
+                ? "bg-lily-green/20 border-lily-green/40 text-lily-bright"
+                : "bg-red-500/20 border-red-500/40 text-red-400"
+              : "bg-pond-deep/40 border-lily-green/20 text-lily-green hover:bg-lily-green/15 hover:border-lily-green/40 hover:text-lily-bright"
           )}
         >
           {editing ? "Editing" : "Edit"}
@@ -795,7 +998,7 @@ function JupiterApiKeyPill({
       </button>
 
       {editing && (
-        <div className="absolute left-0 right-0 mt-2 rounded-lg border border-yellow-500/30 bg-gradient-to-br from-pond-water/95 via-pond-deep/90 to-pond-water/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
+        <div className="absolute left-0 right-0 mt-2 rounded-lg border border-lily-green/30 bg-gradient-to-br from-pond-water/95 via-pond-deep/90 to-pond-water/95 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.4)] z-50 overflow-hidden animate-in slide-in-from-top-2 duration-200">
           <div className="p-3 space-y-3">
             <div>
               <label className="block text-xs text-text-muted uppercase tracking-wider mb-2">
@@ -810,7 +1013,7 @@ function JupiterApiKeyPill({
                   if (e.key === "Escape") onApiKeyCancel();
                 }}
                 placeholder="Enter your Jupiter API key (optional)"
-                className="w-full bg-black/30 border-2 border-yellow-500/30 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/50 transition-all duration-300 placeholder:text-text-muted/50"
+                className="w-full bg-black/30 border-2 border-lily-green/30 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-lily-bright focus:ring-2 focus:ring-lily-green/50 transition-all duration-300 placeholder:text-text-muted/50"
                 autoFocus
               />
               <p className="text-xs text-gray-400 mt-2">
@@ -819,7 +1022,7 @@ function JupiterApiKeyPill({
                   href="https://portal.jup.ag"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-yellow-400 hover:text-yellow-300 underline"
+                  className="text-lily-bright hover:text-lily-green underline"
                 >
                   portal.jup.ag
                 </a>
@@ -829,7 +1032,7 @@ function JupiterApiKeyPill({
             <div className="flex items-center gap-2">
               <button
                 onClick={onApiKeySave}
-                className="flex-1 px-3 py-2 bg-yellow-500/20 border-2 border-yellow-500 rounded-lg text-sm font-semibold text-yellow-400 hover:bg-yellow-500/30 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] hover:scale-105 active:scale-95 transition-all duration-300"
+                className="flex-1 px-3 py-2 bg-lily-green/20 border-2 border-lily-green rounded-lg text-sm font-semibold text-lily-bright hover:bg-lily-green/30 hover:border-lily-bright hover:shadow-[0_0_15px_var(--glow-green)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 Save
               </button>
@@ -843,6 +1046,85 @@ function JupiterApiKeyPill({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function FetchDataButton({
+  isConnected,
+  hasRpc,
+  hasApiKey,
+  onFetch,
+}: {
+  isConnected: boolean;
+  hasRpc: boolean;
+  hasApiKey: boolean;
+  onFetch?: () => void;
+}) {
+  const canFetch = isConnected && hasRpc && hasApiKey;
+
+  if (!canFetch) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={onFetch}
+      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-lily-bright/60 bg-gradient-to-br from-lily-green/30 via-pond-bright/25 to-lily-green/30 shadow-md hover:shadow-[0_0_24px_rgba(107,157,120,0.45)] hover:scale-105 active:scale-95 transition-all duration-300"
+      style={{
+        boxShadow: "0 4px 12px rgba(0,0,0,0.3), 0 0 18px rgba(107,157,120,0.3)"
+      }}
+      title="Fetch dashboard data"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="text-lily-bright"
+      >
+        <path
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span className="text-sm font-semibold text-lily-bright">Fetch Data</span>
+    </button>
+  );
+}
+
+function SOLBalancePill({
+  balance,
+  price,
+  isConnected,
+}: {
+  balance: number;
+  price: number;
+  isConnected: boolean;
+}) {
+  const formattedBalance = balance.toFixed(4);
+
+  if (!isConnected) return null;
+
+  return (
+    <div
+      className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg border border-lily-green/60 bg-gradient-to-br from-lily-green/20 via-pond-bright/15 to-lily-green/20 shadow-md hover:shadow-[0_0_20px_rgba(107,157,120,0.35)] transition-all duration-300"
+      style={{
+        boxShadow: "0 4px 12px rgba(0,0,0,0.3), 0 0 16px rgba(107,157,120,0.2)"
+      }}
+    >
+      <TokenLogo
+        symbol="SOL"
+        size={28}
+        className="border-2 border-lily-bright/40 shadow-[0_0_12px_rgba(139,196,159,0.5)]"
+      />
+      <div className="flex items-center gap-1.5">
+        <span className="text-sm font-bold text-lily-bright">{formattedBalance}</span>
+        <span className="text-[10px] text-lily-green font-semibold tracking-wider">SOL</span>
+      </div>
     </div>
   );
 }

@@ -207,21 +207,7 @@ export function CompactPond0xDashboard({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {onFetchRigData && (
-              <button
-                onClick={onFetchRigData}
-                disabled={isLoading}
-                className={cn(
-                  "px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300",
-                  "bg-lily-green/20 border-2 border-lily-green text-lily-bright",
-                  "hover:bg-lily-green/30 hover:border-lily-bright hover:shadow-[0_0_20px_var(--glow-green)] hover:scale-105",
-                  "active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed",
-                  isLoading && "animate-pulse"
-                )}
-              >
-                {isLoading ? "Loading..." : "Fetch Data"}
-              </button>
-            )}
+            {/* Fetch Data button moved to TopNavigation */}
             <div className="enchantment-dot"></div>
           </div>
         </div>

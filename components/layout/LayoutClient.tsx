@@ -60,6 +60,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     stopAuto();
   };
 
+  const handleFetchDashboardData = async () => {
+    // Use the same fetch logic as the Pond0x overview button
+    await ctx.fetchRigData();
+  };
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('pond-theme') as 'dark' | 'light' | null;
     if (savedTheme) {
@@ -170,6 +175,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         }}
         onStart={handleStartSwap}
         onStop={handleStopSwap}
+        onFetchDashboardData={handleFetchDashboardData}
         setFromMint={ctx.setFromMint}
         setToMint={ctx.setToMint}
         setAmount={ctx.setAmount}
