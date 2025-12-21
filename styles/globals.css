@@ -828,25 +828,7 @@
     }
   }
 
-  /* Lily Pad Float Animation */
-  @keyframes lily-float {
-    0%, 100% {
-      transform: translate(0, 0) scale(1);
-      opacity: 0.7;
-    }
-    25% {
-      transform: translate(3px, -5px) scale(1.1);
-      opacity: 0.9;
-    }
-    50% {
-      transform: translate(-2px, -8px) scale(1.05);
-      opacity: 1;
-    }
-    75% {
-      transform: translate(2px, -4px) scale(0.95);
-      opacity: 0.85;
-    }
-  }
+  /* Lily Pad Float Animation - moved to pond-water-background.css for better organization */
 
   /* Fire Flicker Animation */
   @keyframes fire-flicker {

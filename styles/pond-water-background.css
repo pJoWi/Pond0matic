@@ -1,6 +1,8 @@
 /**
- * POND WATER BACKGROUND EFFECT
- * Animated pond/water effects with ripples, lily pads, and light caustics
+ * ENCHANTED POND WATER BACKGROUND EFFECT
+ * Magical pond with mystical elements, animated lily pads, and ethereal effects
+ * Features: Floating lily pads with V-notches, magical sparkles, fireflies,
+ * iridescent shimmer, mystical fog, enchanted ripples, and water caustics
  * Theme-aware design that works with pond0x theme system
  */
 
@@ -14,16 +16,18 @@
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
-  opacity: 0.75;
+  opacity: 0.8;
   transition: opacity 0.5s ease;
-  filter: saturate(1.2) brightness(1.1);
+  filter: saturate(1.25) brightness(1.05);
   background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(26, 58, 82, 0.3) 0%,
-    rgba(13, 31, 45, 0.2) 40%,
-    rgba(10, 20, 25, 0.25) 70%,
+    rgba(26, 58, 82, 0.35) 0%,
+    rgba(13, 31, 45, 0.22) 40%,
+    rgba(10, 20, 25, 0.28) 70%,
     transparent 100%
   );
+  will-change: opacity;
+  contain: layout style paint;
 }
 
 .pond-water-container.water-off {
@@ -40,26 +44,32 @@
   inset: 0;
   background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(26, 58, 82, 0.2) 0%,
-    rgba(13, 31, 45, 0.3) 40%,
-    rgba(10, 20, 25, 0.35) 70%,
-    rgba(5, 10, 15, 0.2) 100%
+    rgba(26, 58, 82, 0.22) 0%,
+    rgba(13, 31, 45, 0.32) 40%,
+    rgba(10, 20, 25, 0.38) 70%,
+    rgba(5, 10, 15, 0.22) 100%
   );
-  animation: water-breathe 6s ease-in-out infinite;
+  animation: water-breathe 8s ease-in-out infinite;
+  will-change: transform, opacity;
+  contain: layout style paint;
 }
 
 @keyframes water-breathe {
   0%, 100% {
     transform: scale(1) rotate(0deg);
-    opacity: 0.7;
+    opacity: 0.75;
   }
-  33% {
-    transform: scale(1.03) rotate(0.5deg);
+  25% {
+    transform: scale(1.015) rotate(0.3deg);
+    opacity: 0.82;
+  }
+  50% {
+    transform: scale(1.025) rotate(-0.2deg);
+    opacity: 0.88;
+  }
+  75% {
+    transform: scale(1.018) rotate(0.25deg);
     opacity: 0.85;
-  }
-  66% {
-    transform: scale(1.06) rotate(-0.5deg);
-    opacity: 0.95;
   }
 }
 
@@ -70,12 +80,13 @@
 .pond-ripple {
   position: absolute;
   border-radius: 50%;
-  border: 2px solid rgba(74, 143, 184, 0.4);
+  border: 2px solid rgba(74, 143, 184, 0.45);
   box-shadow:
-    0 0 10px rgba(153, 74, 184, 0.3),
-    inset 0 0 20px rgba(74, 143, 184, 0.2);
-  animation: ripple-expand 6s ease-out infinite;
+    0 0 12px rgba(139, 196, 159, 0.35),
+    inset 0 0 24px rgba(74, 143, 184, 0.25);
   pointer-events: none;
+  will-change: transform, opacity;
+  contain: layout style paint;
 }
 
 .pond-ripple-1 {
@@ -83,7 +94,7 @@
   left: 15%;
   width: 100px;
   height: 100px;
-  animation-delay: 0s;
+  animation: ripple-expand-1 8s ease-out infinite;
 }
 
 .pond-ripple-2 {
@@ -91,7 +102,7 @@
   left: 70%;
   width: 150px;
   height: 150px;
-  animation-delay: 2.5s;
+  animation: ripple-expand-2 9.5s ease-out infinite;
 }
 
 .pond-ripple-3 {
@@ -99,7 +110,7 @@
   left: 50%;
   width: 120px;
   height: 120px;
-  animation-delay: 5s;
+  animation: ripple-expand-3 7.5s ease-out infinite;
 }
 
 .pond-ripple-4 {
@@ -107,7 +118,7 @@
   left: 25%;
   width: 90px;
   height: 90px;
-  animation-delay: 1.5s;
+  animation: ripple-expand-4 8.5s ease-out infinite;
 }
 
 .pond-ripple-5 {
@@ -115,140 +126,419 @@
   left: 80%;
   width: 110px;
   height: 110px;
-  animation-delay: 4s;
+  animation: ripple-expand-5 9s ease-out infinite;
 }
 
-@keyframes ripple-expand {
+/* Enhanced ripple animations with natural timing */
+@keyframes ripple-expand-1 {
   0% {
     transform: translate(-50%, -50%) scale(0.3);
     opacity: 0;
+    border-width: 2.8px;
+  }
+  12% {
+    opacity: 0.85;
+    border-width: 2.4px;
+  }
+  35% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0.62;
+    border-width: 1.6px;
+  }
+  58% {
+    transform: translate(-50%, -50%) scale(2.8);
+    opacity: 0.32;
+    border-width: 0.9px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+    border-width: 0.4px;
+  }
+}
+
+@keyframes ripple-expand-2 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.25);
+    opacity: 0;
     border-width: 3px;
   }
-  10% {
-    opacity: 0.8;
-    border-width: 2.5px;
+  14% {
+    opacity: 0.88;
+    border-width: 2.6px;
   }
-  30% {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 0.6;
+  38% {
+    transform: translate(-50%, -50%) scale(1.7);
+    opacity: 0.65;
+    border-width: 1.7px;
   }
-  50% {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 0.3;
+  62% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0.35;
     border-width: 1px;
   }
   100% {
-    transform: translate(-50%, -50%) scale(3.5);
+    transform: translate(-50%, -50%) scale(4.2);
     opacity: 0;
     border-width: 0.5px;
   }
 }
 
+@keyframes ripple-expand-3 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+    border-width: 2.6px;
+  }
+  10% {
+    opacity: 0.8;
+    border-width: 2.3px;
+  }
+  32% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.6;
+    border-width: 1.5px;
+  }
+  55% {
+    transform: translate(-50%, -50%) scale(2.6);
+    opacity: 0.3;
+    border-width: 0.8px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.8);
+    opacity: 0;
+    border-width: 0.3px;
+  }
+}
+
+@keyframes ripple-expand-4 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.28);
+    opacity: 0;
+    border-width: 2.9px;
+  }
+  13% {
+    opacity: 0.82;
+    border-width: 2.5px;
+  }
+  36% {
+    transform: translate(-50%, -50%) scale(1.65);
+    opacity: 0.58;
+    border-width: 1.65px;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(2.9);
+    opacity: 0.28;
+    border-width: 0.95px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4.1);
+    opacity: 0;
+    border-width: 0.45px;
+  }
+}
+
+@keyframes ripple-expand-5 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.32);
+    opacity: 0;
+    border-width: 2.7px;
+  }
+  11% {
+    opacity: 0.86;
+    border-width: 2.4px;
+  }
+  34% {
+    transform: translate(-50%, -50%) scale(1.55);
+    opacity: 0.64;
+    border-width: 1.55px;
+  }
+  56% {
+    transform: translate(-50%, -50%) scale(2.7);
+    opacity: 0.34;
+    border-width: 0.85px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.9);
+    opacity: 0;
+    border-width: 0.35px;
+  }
+}
+
 /* ============================================
-   LILY PADS (Floating elements)
+   LILY PADS (Authentic V-notched water lilies)
    ============================================ */
 
 .lily-pad {
   position: absolute;
-  width: 60px;
-  height: 60px;
-  border-radius: 50% 50% 50% 0%;
+  width: 85px;
+  height: 95px;
+  border-radius: 50%;
   background: radial-gradient(
-    circle at 30% 30%,
-    var(--lily-bright, #8bc49f) 0%,
-    var(--lily-green, #4a7c59) 50%,
-    var(--lily-green, #4a7c59) 100%
+    circle at 70% 50%,
+    var(--lily-bright, #357e45) 0%,
+    var(--lily-mid, #4e7e6f) 45%,
+    var(--lily-dark, #10664c) 90%,
+    var(--lily-darker, #14291f) 100%
   );
-  opacity: 0.15;
-  animation: lily-float 12s ease-in-out infinite;
+  clip-path: polygon(
+    50% 50%,
+    48% 5%, 46% 2%, 42% 0%, 38% 0%, 34% 0%, 30% 1%, 26% 2%,
+    22% 3%, 18% 5%, 14% 7%, 10% 10%, 7% 13%, 5% 17%, 3% 21%,
+    2% 25%, 1% 29%, 0% 33%, 0% 37%, 0% 41%, 1% 45%, 2% 49%,
+    3% 53%, 5% 57%, 7% 61%, 10% 65%, 13% 68%, 17% 71%, 21% 74%,
+    25% 76%, 29% 78%, 33% 79%, 37% 80%, 41% 80%, 45% 80%, 49% 79%,
+    53% 79%, 57% 80%, 61% 80%, 65% 80%, 69% 79%, 73% 78%, 77% 76%,
+    81% 74%, 85% 71%, 89% 68%, 92% 65%, 95% 61%, 97% 57%, 98% 53%,
+    99% 49%, 100% 45%, 100% 41%, 100% 37%, 100% 33%, 99% 29%, 98% 25%,
+    97% 21%, 95% 17%, 92% 13%, 89% 10%, 85% 7%, 81% 5%, 77% 3%,
+    73% 2%, 69% 1%, 65% 0%, 61% 0%, 57% 0%, 54% 0%, 52% 2%, 50% 5%
+  );
   box-shadow:
-    inset -5px -5px 15px rgba(0, 0, 0, 0.3),
-    inset 5px 5px 10px rgba(139, 196, 159, 0.2),
-    0 4px 8px rgba(0, 0, 0, 0.2);
-  transform-origin: center;
+    0 3px 10px rgba(0, 0, 0, 0.4),
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 4px rgba(74, 110, 84, 0.25),
+    inset 2px -2px 6px rgba(42, 66, 52, 0.4),
+    inset -4px -6px 10px rgba(29, 46, 38, 0.6);
+  opacity: 0.85;
+  will-change: transform, opacity;
+  contain: layout style paint;
+  z-index: 3;
 }
 
+/* Veins - radiating pattern from center */
 .lily-pad::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  height: 80%;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle at 40% 40%,
-    rgba(37, 102, 60, 0.3) 0%,
-    transparent 60%
-  );
-  transform: translate(-50%, -50%);
-  animation: lily-shimmer 3s ease-in-out infinite;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(20, 45, 30, 0.35) 0%, transparent 60%),
+    conic-gradient(
+      from 50deg at 50% 50%,
+      transparent 0deg,
+      rgba(20, 45, 30, 0.4) 3deg,
+      transparent 6deg,
+      transparent 42deg,
+      rgba(20, 45, 30, 0.38) 45deg,
+      transparent 48deg,
+      transparent 87deg,
+      rgba(20, 45, 30, 0.4) 90deg,
+      transparent 93deg,
+      transparent 132deg,
+      rgba(20, 45, 30, 0.36) 135deg,
+      transparent 138deg,
+      transparent 177deg,
+      rgba(20, 45, 30, 0.4) 180deg,
+      transparent 183deg,
+      transparent 222deg,
+      rgba(20, 45, 30, 0.38) 225deg,
+      transparent 228deg,
+      transparent 267deg,
+      rgba(20, 45, 30, 0.4) 270deg,
+      transparent 273deg,
+      transparent 312deg,
+      rgba(20, 45, 30, 0.36) 315deg,
+      transparent 318deg,
+      transparent 360deg
+    );
+  opacity: 0.5;
+  animation: lily-shimmer 4s ease-in-out infinite;
 }
 
+/* Light glint on lily pad */
+.lily-pad::after {
+  content: '';
+  position: absolute;
+  top: 18%;
+  left: 28%;
+  width: 20px;
+  height: 12px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(146, 196, 139, 0.2) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  animation: lily-glint 5s ease-in-out infinite;
+}
+
+/* Individual lily pad positioning */
 .lily-pad-1 {
-  top: 15%;
-  left: 20%;
-  transform: rotate(45deg);
-  animation-delay: 0s;
+  top: 18%;
+  left: 12%;
+  animation: lily-float-1 12s ease-in-out infinite;
 }
 
 .lily-pad-2 {
-  top: 65%;
-  left: 75%;
-  transform: rotate(-30deg) scale(1.2);
-  animation-delay: 3s;
+  top: 45%;
+  left: 68%;
+  transform: scale(0.85) rotate(45deg);
+  animation: lily-float-2 14s ease-in-out infinite;
 }
 
 .lily-pad-3 {
-  top: 80%;
-  left: 30%;
-  transform: rotate(60deg) scale(0.8);
-  animation-delay: 6s;
+  top: 72%;
+  left: 25%;
+  transform: scale(1.1) rotate(120deg);
+  animation: lily-float-3 13s ease-in-out infinite;
 }
 
 .lily-pad-4 {
-  top: 25%;
-  left: 85%;
-  transform: rotate(-15deg) scale(0.9);
-  animation-delay: 9s;
+  top: 28%;
+  left: 82%;
+  transform: scale(0.9) rotate(-30deg);
+  animation: lily-float-4 15s ease-in-out infinite;
 }
 
 .lily-pad-5 {
-  top: 50%;
-  left: 10%;
-  transform: rotate(120deg) scale(1.1);
-  animation-delay: 4.5s;
+  top: 60%;
+  left: 50%;
+  transform: scale(0.95) rotate(75deg);
+  animation: lily-float-5 11s ease-in-out infinite;
 }
 
-@keyframes lily-float {
+.lily-pad-6 {
+  top: 85%;
+  left: 75%;
+  transform: scale(1.05) rotate(-60deg);
+  animation: lily-float-6 13.5s ease-in-out infinite;
+}
+
+.lily-pad-7 {
+  top: 10%;
+  left: 45%;
+  transform: scale(0.88) rotate(15deg);
+  animation: lily-float-7 12.5s ease-in-out infinite;
+}
+
+/* Floating animations - each lily pad has unique movement */
+@keyframes lily-float-1 {
   0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-    opacity: 0.2;
-    filter: brightness(1);
+    transform: translate(0, 0) rotate(0deg) scale(1);
   }
   25% {
-    transform: translateY(-12px) translateX(6px) rotate(3deg) scale(1.05);
-    opacity: 0.3;
-    filter: brightness(1.1);
+    transform: translate(8px, -5px) rotate(3deg) scale(1.02);
   }
   50% {
-    transform: translateY(-8px) translateX(-5px) rotate(-2deg) scale(1.02);
-    opacity: 0.18;
+    transform: translate(-5px, 8px) rotate(-2deg) scale(0.98);
   }
   75% {
-    transform: translateY(-10px) translateX(5px) rotate(3deg);
-    opacity: 0.22;
+    transform: translate(6px, 3px) rotate(2deg) scale(1.01);
   }
 }
 
+@keyframes lily-float-2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(45deg) scale(0.85);
+  }
+  30% {
+    transform: translate(-7px, 6px) rotate(48deg) scale(0.87);
+  }
+  60% {
+    transform: translate(9px, -4px) rotate(42deg) scale(0.83);
+  }
+  85% {
+    transform: translate(-4px, 7px) rotate(46deg) scale(0.86);
+  }
+}
+
+@keyframes lily-float-3 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(120deg) scale(1.1);
+  }
+  20% {
+    transform: translate(6px, 8px) rotate(123deg) scale(1.12);
+  }
+  55% {
+    transform: translate(-8px, -6px) rotate(117deg) scale(1.08);
+  }
+  80% {
+    transform: translate(7px, -3px) rotate(121deg) scale(1.11);
+  }
+}
+
+@keyframes lily-float-4 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-30deg) scale(0.9);
+  }
+  35% {
+    transform: translate(-9px, -5px) rotate(-33deg) scale(0.92);
+  }
+  65% {
+    transform: translate(7px, 9px) rotate(-27deg) scale(0.88);
+  }
+  90% {
+    transform: translate(-6px, 4px) rotate(-31deg) scale(0.91);
+  }
+}
+
+@keyframes lily-float-5 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(75deg) scale(0.95);
+  }
+  28% {
+    transform: translate(10px, -6px) rotate(78deg) scale(0.97);
+  }
+  58% {
+    transform: translate(-6px, 7px) rotate(72deg) scale(0.93);
+  }
+  82% {
+    transform: translate(8px, -4px) rotate(76deg) scale(0.96);
+  }
+}
+
+@keyframes lily-float-6 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-60deg) scale(1.05);
+  }
+  22% {
+    transform: translate(-8px, 9px) rotate(-57deg) scale(1.07);
+  }
+  52% {
+    transform: translate(9px, -7px) rotate(-63deg) scale(1.03);
+  }
+  78% {
+    transform: translate(-5px, 6px) rotate(-59deg) scale(1.06);
+  }
+}
+
+@keyframes lily-float-7 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(15deg) scale(0.88);
+  }
+  32% {
+    transform: translate(7px, 8px) rotate(18deg) scale(0.9);
+  }
+  62% {
+    transform: translate(-9px, -5px) rotate(12deg) scale(0.86);
+  }
+  88% {
+    transform: translate(6px, -7px) rotate(16deg) scale(0.89);
+  }
+}
+
+/* Shimmer animation for veins */
 @keyframes lily-shimmer {
   0%, 100% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Glint animation for light reflection */
+@keyframes lily-glint {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
   }
   50% {
     opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: scale(1.4);
   }
 }
 
@@ -259,30 +549,37 @@
 .water-caustics {
   position: absolute;
   inset: 0;
-  opacity: 0.08;
+  opacity: 0.1;
   background-image:
-    radial-gradient(circle at 20% 30%, var(--pond-bright, rgba(9, 69, 104, 0.4)) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, var(--lily-light, rgba(107, 157, 120, 0.3)) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, var(--pond-light, rgba(45, 95, 127, 0.4)) 0%, transparent 50%),
-    radial-gradient(circle at 60% 20%, var(--lily-bright, rgba(139, 196, 159, 0.3)) 0%, transparent 50%);
-  background-size: 400% 400%, 350% 350%, 450% 450%, 500% 500%;
-  background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%;
-  animation: caustics-move 20s ease-in-out infinite;
+    radial-gradient(ellipse at 20% 30%, var(--pond-bright, rgba(9, 69, 104, 0.5)) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 70%, var(--lily-light, rgba(107, 157, 120, 0.4)) 0%, transparent 48%),
+    radial-gradient(ellipse at 40% 80%, var(--pond-light, rgba(45, 95, 127, 0.45)) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 20%, var(--lily-bright, rgba(139, 196, 159, 0.38)) 0%, transparent 47%),
+    radial-gradient(ellipse at 90% 40%, var(--pond-water, rgba(26, 58, 82, 0.35)) 0%, transparent 52%);
+  background-size: 380% 380%, 420% 420%, 450% 450%, 390% 390%, 410% 410%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%, 30% 60%;
+  animation: caustics-move 25s ease-in-out infinite;
   mix-blend-mode: screen;
+  will-change: background-position;
+  contain: layout style paint;
 }
 
 @keyframes caustics-move {
   0%, 100% {
-    background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%;
+    background-position: 0% 0%, 100% 100%, 50% 50%, 75% 25%, 30% 60%;
+    opacity: 0.1;
   }
   25% {
-    background-position: 50% 25%, 75% 50%, 25% 75%, 100% 0%;
+    background-position: 50% 25%, 75% 50%, 25% 75%, 100% 0%, 60% 30%;
+    opacity: 0.12;
   }
   50% {
-    background-position: 100% 50%, 50% 25%, 0% 100%, 50% 75%;
+    background-position: 100% 50%, 50% 25%, 0% 100%, 50% 75%, 20% 80%;
+    opacity: 0.14;
   }
   75% {
-    background-position: 75% 75%, 25% 0%, 75% 25%, 25% 100%;
+    background-position: 75% 75%, 25% 0%, 75% 25%, 25% 100%, 80% 40%;
+    opacity: 0.11;
   }
 }
 
@@ -292,83 +589,240 @@
 
 .water-particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(139, 196, 159, 0.8) 0%, rgba(74, 143, 184, 0.4) 100%);
+  background: radial-gradient(circle, rgba(139, 196, 149, 0.9) 0%, rgba(74, 143, 184, 0.5) 100%);
   opacity: 0;
-  animation: particle-drift 12s ease-in-out infinite;
   box-shadow:
-    0 0 8px rgba(139, 196, 159, 0.6),
-    0 0 12px rgba(74, 143, 184, 0.4);
+    0 0 6px rgba(139, 173, 196, 0.7),
+    0 0 10px rgba(74, 143, 184, 0.5);
   filter: blur(0.5px);
+  will-change: transform, opacity;
+  contain: layout style paint;
 }
 
 .water-particle-1 {
   top: 10%;
   left: 25%;
-  animation-delay: 0s;
+  animation: particle-drift-1 15s ease-in-out infinite;
 }
 
 .water-particle-2 {
   top: 70%;
   left: 60%;
-  animation-delay: 3s;
+  width: 4px;
+  height: 4px;
+  animation: particle-drift-2 18s ease-in-out infinite;
 }
 
 .water-particle-3 {
   top: 40%;
   left: 85%;
-  animation-delay: 6s;
+  animation: particle-drift-3 16s ease-in-out infinite;
 }
 
 .water-particle-4 {
   top: 85%;
   left: 15%;
-  animation-delay: 9s;
+  width: 3.5px;
+  height: 3.5px;
+  animation: particle-drift-4 17s ease-in-out infinite;
 }
 
 .water-particle-5 {
   top: 25%;
   left: 50%;
-  animation-delay: 12s;
+  animation: particle-drift-5 19s ease-in-out infinite;
 }
 
 .water-particle-6 {
   top: 55%;
   left: 35%;
-  animation-delay: 2s;
+  width: 3.5px;
+  height: 3.5px;
+  animation: particle-drift-6 14s ease-in-out infinite;
 }
 
 .water-particle-7 {
   top: 90%;
   left: 70%;
-  animation-delay: 5s;
+  animation: particle-drift-7 16.5s ease-in-out infinite;
 }
 
 .water-particle-8 {
   top: 15%;
   left: 90%;
-  animation-delay: 8s;
+  width: 4px;
+  height: 4px;
+  animation: particle-drift-8 15.5s ease-in-out infinite;
 }
 
-@keyframes particle-drift {
+/* Individual particle drift animations for natural variation */
+@keyframes particle-drift-1 {
   0% {
-    transform: translateY(0) translateX(0);
+    transform: translate(0, 0) scale(0.8);
     opacity: 0;
   }
-  10% {
-    opacity: 0.5;
+  12% {
+    opacity: 0.6;
   }
   50% {
-    transform: translateY(-50px) translateX(20px);
-    opacity: 0.3;
+    transform: translate(25px, -80px) scale(1.1);
+    opacity: 0.4;
   }
-  90% {
+  88% {
     opacity: 0.5;
   }
   100% {
-    transform: translateY(-100px) translateX(-15px);
+    transform: translate(-18px, -140px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-2 {
+  0% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  48% {
+    transform: translate(-30px, -75px) scale(1.15);
+    opacity: 0.35;
+  }
+  90% {
+    opacity: 0.48;
+  }
+  100% {
+    transform: translate(20px, -135px) scale(0.85);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-3 {
+  0% {
+    transform: translate(0, 0) scale(0.85);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.62;
+  }
+  52% {
+    transform: translate(18px, -85px) scale(1.08);
+    opacity: 0.38;
+  }
+  86% {
+    opacity: 0.52;
+  }
+  100% {
+    transform: translate(-25px, -145px) scale(0.92);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-4 {
+  0% {
+    transform: translate(0, 0) scale(0.95);
+    opacity: 0;
+  }
+  11% {
+    opacity: 0.58;
+  }
+  49% {
+    transform: translate(-22px, -78px) scale(1.12);
+    opacity: 0.42;
+  }
+  89% {
+    opacity: 0.54;
+  }
+  100% {
+    transform: translate(28px, -138px) scale(0.88);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-5 {
+  0% {
+    transform: translate(0, 0) scale(0.88);
+    opacity: 0;
+  }
+  13% {
+    opacity: 0.64;
+  }
+  51% {
+    transform: translate(32px, -82px) scale(1.06);
+    opacity: 0.36;
+  }
+  87% {
+    opacity: 0.56;
+  }
+  100% {
+    transform: translate(-15px, -142px) scale(0.94);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-6 {
+  0% {
+    transform: translate(0, 0) scale(0.92);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  47% {
+    transform: translate(-28px, -72px) scale(1.14);
+    opacity: 0.4;
+  }
+  85% {
+    opacity: 0.58;
+  }
+  100% {
+    transform: translate(22px, -132px) scale(0.86);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-7 {
+  0% {
+    transform: translate(0, 0) scale(0.86);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.57;
+  }
+  53% {
+    transform: translate(26px, -76px) scale(1.1);
+    opacity: 0.37;
+  }
+  84% {
+    opacity: 0.53;
+  }
+  100% {
+    transform: translate(-20px, -136px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-drift-8 {
+  0% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0;
+  }
+  17% {
+    opacity: 0.61;
+  }
+  54% {
+    transform: translate(-24px, -84px) scale(1.13);
+    opacity: 0.39;
+  }
+  83% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(30px, -144px) scale(0.87);
     opacity: 0;
   }
 }
@@ -385,71 +839,30 @@
   height: 40%;
   background: linear-gradient(
     to bottom,
-    var(--pond-light, rgba(45, 95, 127, 0.15)) 0%,
+    var(--pond-light, rgba(45, 95, 127, 0.18)) 0%,
     transparent 100%
   );
-  opacity: 0.3;
-  animation: reflection-shimmer 6s ease-in-out infinite;
+  opacity: 0.35;
+  animation: reflection-shimmer 9s ease-in-out infinite;
+  will-change: opacity, transform;
+  contain: layout style paint;
 }
 
 @keyframes reflection-shimmer {
   0%, 100% {
-    opacity: 0.2;
+    opacity: 0.28;
     transform: scaleY(1);
   }
-  50% {
-    opacity: 0.4;
-    transform: scaleY(1.05);
+  33% {
+    opacity: 0.38;
+    transform: scaleY(1.03);
+  }
+  66% {
+    opacity: 0.32;
+    transform: scaleY(1.02);
   }
 }
 
-/* ============================================
-   WAVE LINES (Horizontal water waves)
-   ============================================ */
-
-.wave-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--pond-light, rgba(45, 95, 127, 0.3)) 50%,
-    transparent 100%
-  );
-  opacity: 0.2;
-  animation: wave-drift 10s linear infinite;
-}
-
-.wave-line-1 {
-  top: 30%;
-  animation-delay: 0s;
-}
-
-.wave-line-2 {
-  top: 55%;
-  animation-delay: 3s;
-}
-
-.wave-line-3 {
-  top: 75%;
-  animation-delay: 6s;
-}
-
-@keyframes wave-drift {
-  0% {
-    transform: translateX(-100%) scaleX(0.8);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.2;
-  }
-  100% {
-    transform: translateX(100%) scaleX(1.2);
-    opacity: 0;
-  }
-}
 
 /* ============================================
    DEPTH GRADIENT (Overall pond depth feel)
@@ -461,11 +874,619 @@
   background: radial-gradient(
     ellipse at 50% 20%,
     transparent 0%,
-    rgba(13, 31, 45, 0.1) 40%,
-    rgba(10, 20, 25, 0.2) 70%,
-    rgba(10, 20, 25, 0.3) 100%
+    rgba(13, 31, 45, 0.12) 40%,
+    rgba(10, 20, 25, 0.22) 70%,
+    rgba(10, 20, 25, 0.32) 100%
   );
   pointer-events: none;
+  contain: layout style paint;
+}
+
+/* ============================================
+   MAGICAL & ENCHANTED ELEMENTS
+   ============================================ */
+
+/* Magical Sparkles - Floating fairy dust */
+.magic-sparkle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(240, 128, 255, 0.9) 0%,
+    rgba(250, 166, 180, 0.6) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  box-shadow:
+    0 0 4px rgba(255, 128, 249, 0.8),
+    0 0 8px rgba(255, 192, 224, 0.6),
+    0 0 12px rgba(194, 139, 196, 0.4);
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+.magic-sparkle-1 {
+  top: 12%;
+  left: 18%;
+  animation: sparkle-float-1 8s ease-in-out infinite;
+}
+
+.magic-sparkle-2 {
+  top: 35%;
+  left: 72%;
+  width: 2.5px;
+  height: 2.5px;
+  animation: sparkle-float-2 9s ease-in-out infinite;
+}
+
+.magic-sparkle-3 {
+  top: 58%;
+  left: 25%;
+  width: 3.5px;
+  height: 3.5px;
+  animation: sparkle-float-3 7.5s ease-in-out infinite;
+}
+
+.magic-sparkle-4 {
+  top: 78%;
+  left: 85%;
+  animation: sparkle-float-4 8.5s ease-in-out infinite;
+}
+
+.magic-sparkle-5 {
+  top: 22%;
+  left: 45%;
+  width: 2px;
+  height: 2px;
+  animation: sparkle-float-5 9.5s ease-in-out infinite;
+}
+
+.magic-sparkle-6 {
+  top: 65%;
+  left: 55%;
+  width: 3px;
+  height: 3px;
+  animation: sparkle-float-6 8.2s ease-in-out infinite;
+}
+
+.magic-sparkle-7 {
+  top: 42%;
+  left: 8%;
+  width: 2.8px;
+  height: 2.8px;
+  animation: sparkle-float-7 7.8s ease-in-out infinite;
+}
+
+.magic-sparkle-8 {
+  top: 88%;
+  left: 62%;
+  animation: sparkle-float-8 9.2s ease-in-out infinite;
+}
+
+/* Sparkle floating animations with twinkle effect */
+@keyframes sparkle-float-1 {
+  0% {
+    transform: translate(0, 0) scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  25% {
+    transform: translate(15px, -30px) scale(1.2) rotate(90deg);
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-10px, -55px) scale(0.8) rotate(180deg);
+    opacity: 0.9;
+  }
+  65% {
+    opacity: 0.5;
+  }
+  85% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(8px, -75px) scale(0.6) rotate(270deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-2 {
+  0% {
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  28% {
+    transform: translate(-18px, -28px) scale(1.1) rotate(80deg);
+    opacity: 0.5;
+  }
+  42% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(12px, -52px) scale(0.9) rotate(160deg);
+    opacity: 0.6;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  88% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-8px, -72px) scale(0.7) rotate(240deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-3 {
+  0% {
+    transform: translate(0, 0) scale(0.7) rotate(0deg);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.7;
+  }
+  30% {
+    transform: translate(20px, -32px) scale(1.3) rotate(100deg);
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.4;
+  }
+  60% {
+    transform: translate(-14px, -58px) scale(0.85) rotate(200deg);
+    opacity: 0.85;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(10px, -80px) scale(0.5) rotate(300deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-4 {
+  0% {
+    transform: translate(0, 0) scale(0.55) rotate(0deg);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.85;
+  }
+  32% {
+    transform: translate(-16px, -35px) scale(1.15) rotate(85deg);
+    opacity: 0.6;
+  }
+  48% {
+    opacity: 0.95;
+  }
+  62% {
+    transform: translate(16px, -60px) scale(0.75) rotate(170deg);
+    opacity: 0.5;
+  }
+  78% {
+    opacity: 0.75;
+  }
+  92% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-10px, -78px) scale(0.65) rotate(260deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-5 {
+  0% {
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.75;
+  }
+  35% {
+    transform: translate(22px, -26px) scale(1.25) rotate(95deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+  65% {
+    transform: translate(-12px, -48px) scale(0.95) rotate(190deg);
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  95% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(14px, -68px) scale(0.55) rotate(285deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-6 {
+  0% {
+    transform: translate(0, 0) scale(0.65) rotate(0deg);
+    opacity: 0;
+  }
+  13% {
+    opacity: 0.8;
+  }
+  27% {
+    transform: translate(-20px, -30px) scale(1.2) rotate(75deg);
+    opacity: 0.55;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  56% {
+    transform: translate(18px, -54px) scale(0.88) rotate(155deg);
+    opacity: 0.65;
+  }
+  72% {
+    opacity: 0.85;
+  }
+  86% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-12px, -74px) scale(0.6) rotate(235deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-7 {
+  0% {
+    transform: translate(0, 0) scale(0.58) rotate(0deg);
+    opacity: 0;
+  }
+  17% {
+    opacity: 0.82;
+  }
+  33% {
+    transform: translate(17px, -33px) scale(1.18) rotate(88deg);
+    opacity: 0.7;
+  }
+  47% {
+    opacity: 1;
+  }
+  63% {
+    transform: translate(-15px, -56px) scale(0.82) rotate(176deg);
+    opacity: 0.58;
+  }
+  77% {
+    opacity: 0.78;
+  }
+  91% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(11px, -76px) scale(0.62) rotate(264deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-float-8 {
+  0% {
+    transform: translate(0, 0) scale(0.62) rotate(0deg);
+    opacity: 0;
+  }
+  19% {
+    opacity: 0.88;
+  }
+  36% {
+    transform: translate(-19px, -29px) scale(1.22) rotate(92deg);
+    opacity: 0.62;
+  }
+  52% {
+    opacity: 0.92;
+  }
+  68% {
+    transform: translate(14px, -51px) scale(0.86) rotate(184deg);
+    opacity: 0.68;
+  }
+  82% {
+    opacity: 0.82;
+  }
+  94% {
+    opacity: 0.58;
+  }
+  100% {
+    transform: translate(-9px, -71px) scale(0.58) rotate(276deg);
+    opacity: 0;
+  }
+}
+
+/* Magical Fireflies - Glowing orbs */
+.magic-firefly {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(255, 139, 230) 0%,
+    rgba(230, 107, 230, 0.8) 30%,
+    rgba(200, 74, 179, 0.4) 60%,
+    transparent 100%
+  );
+  opacity: 0;
+  box-shadow:
+    0 0 8px rgba(241, 139, 255, 0.9),
+    0 0 16px rgba(220, 107, 230, 0.7),
+    0 0 24px rgba(196, 74, 200, 0.5);
+  will-change: transform, opacity;
+  contain: layout style paint;
+  animation: firefly-glow 3s ease-in-out infinite;
+}
+
+.magic-firefly-1 {
+  top: 18%;
+  left: 32%;
+  animation: firefly-drift-1 12s ease-in-out infinite, firefly-glow 2.5s ease-in-out infinite;
+}
+
+.magic-firefly-2 {
+  top: 45%;
+  left: 68%;
+  width: 6px;
+  height: 6px;
+  animation: firefly-drift-2 14s ease-in-out infinite, firefly-glow 3s ease-in-out infinite 0.5s;
+}
+
+.magic-firefly-3 {
+  top: 72%;
+  left: 15%;
+  width: 4.5px;
+  height: 4.5px;
+  animation: firefly-drift-3 13s ease-in-out infinite, firefly-glow 2.8s ease-in-out infinite 1s;
+}
+
+.magic-firefly-4 {
+  top: 28%;
+  left: 82%;
+  width: 5.5px;
+  height: 5.5px;
+  animation: firefly-drift-4 15s ease-in-out infinite, firefly-glow 3.2s ease-in-out infinite 1.5s;
+}
+
+.magic-firefly-5 {
+  top: 55%;
+  left: 42%;
+  animation: firefly-drift-5 11s ease-in-out infinite, firefly-glow 2.7s ease-in-out infinite 0.8s;
+}
+
+@keyframes firefly-drift-1 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(30px, -25px);
+  }
+  50% {
+    transform: translate(-20px, -45px);
+  }
+  75% {
+    transform: translate(25px, -30px);
+  }
+}
+
+@keyframes firefly-drift-2 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-35px, -20px);
+  }
+  45% {
+    transform: translate(15px, -50px);
+  }
+  70% {
+    transform: translate(-25px, -35px);
+  }
+}
+
+@keyframes firefly-drift-3 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(25px, -30px);
+  }
+  60% {
+    transform: translate(-30px, -55px);
+  }
+  85% {
+    transform: translate(20px, -40px);
+  }
+}
+
+@keyframes firefly-drift-4 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  22% {
+    transform: translate(-28px, -35px);
+  }
+  52% {
+    transform: translate(32px, -48px);
+  }
+  78% {
+    transform: translate(-22px, -42px);
+  }
+}
+
+@keyframes firefly-drift-5 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  28% {
+    transform: translate(28px, -22px);
+  }
+  58% {
+    transform: translate(-25px, -52px);
+  }
+  82% {
+    transform: translate(30px, -38px);
+  }
+}
+
+@keyframes firefly-glow {
+  0%, 100% {
+    opacity: 0.3;
+    box-shadow:
+      0 0 8px rgba(255, 139, 240, 0.6),
+      0 0 16px rgba(230, 107, 214, 0.4),
+      0 0 24px rgba(200, 74, 189, 0.2);
+  }
+  50% {
+    opacity: 0.95;
+    box-shadow:
+      0 0 12px rgb(255, 139, 236),
+      0 0 24px rgba(230, 107, 210, 0.9),
+      0 0 36px rgba(200, 74, 173, 0.7);
+  }
+}
+
+
+/* Mystical Fog Layer */
+.mystical-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(224, 177, 238, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 60%, rgba(139, 196, 159, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 85%, rgba(200, 230, 255, 0.07) 0%, transparent 50%);
+  opacity: 0.4;
+  animation: fog-drift 20s ease-in-out infinite;
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+@keyframes fog-drift {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateX(30px) translateY(-10px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(-20px) translateY(5px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateX(25px) translateY(-5px);
+    opacity: 0.45;
+  }
+}
+
+/* Iridescent Shimmer Overlay */
+.iridescent-shimmer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 192, 203, 0.08) 25%,
+      rgba(139, 196, 255, 0.1) 50%,
+      rgba(200, 255, 200, 0.08) 75%,
+      transparent 100%
+    );
+  background-size: 200% 200%;
+  opacity: 0.3;
+  animation: iridescent-flow 15s linear infinite;
+  mix-blend-mode: screen;
+  will-change: background-position;
+  contain: layout style paint;
+}
+
+@keyframes iridescent-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+/* Enchanted Ripple Effect */
+.enchanted-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(139, 255, 196, 0.6);
+  box-shadow:
+    0 0 15px rgba(139, 255, 196, 0.5),
+    inset 0 0 20px rgba(139, 255, 196, 0.3);
+  opacity: 0;
+  animation: enchanted-ripple-expand 10s ease-out infinite;
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+.enchanted-ripple-1 {
+  top: 30%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  animation-delay: 0s;
+}
+
+.enchanted-ripple-2 {
+  top: 70%;
+  left: 30%;
+  width: 100px;
+  height: 100px;
+  animation-delay: 5s;
+}
+
+@keyframes enchanted-ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+    border-width: 3px;
+  }
+  8% {
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.7;
+    border-width: 2px;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(2.8);
+    opacity: 0.4;
+    border-width: 1px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4.5);
+    opacity: 0;
+    border-width: 0.3px;
+  }
 }
 
 /* ============================================
@@ -474,20 +1495,63 @@
 
 @media (max-width: 580px) {
   .pond-water-container {
-    opacity: 0.4;
+    opacity: 0.5;
   }
 
   .lily-pad {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
   }
 
   .water-caustics {
-    opacity: 0.05;
+    opacity: 0.06;
   }
 
   .pond-ripple {
-    opacity: 0.5;
+    opacity: 0.6;
+  }
+
+  .water-particle {
+    width: 2.5px;
+    height: 2.5px;
+  }
+
+  /* Simplify animations on mobile for better performance */
+  .water-caustics {
+    animation-duration: 30s;
+  }
+
+  .lily-pad::after {
+    display: none; /* Remove glint effect on mobile */
+  }
+
+  /* Reduce magical elements on mobile for performance */
+  .magic-sparkle {
+    width: 2px;
+    height: 2px;
+  }
+
+  .magic-firefly {
+    width: 4px;
+    height: 4px;
+  }
+
+  .mystical-fog {
+    opacity: 0.2;
+  }
+
+  .iridescent-shimmer {
+    opacity: 0.2;
+    animation-duration: 20s;
+  }
+
+  /* Hide some magical elements on very small screens for performance */
+  .magic-sparkle-7,
+  .magic-sparkle-8,
+  .magic-firefly-4,
+  .magic-firefly-5,
+  .enchanted-ripple-2 {
+    display: none;
   }
 }
 
@@ -497,32 +1561,46 @@
 
 /* Light mode - softer, brighter water */
 [data-theme="pond0x-light"] .pond-water-container {
-   background: radial-gradient(
+  background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(34, 117, 165, 0.527) 0%,
-    rgba(139, 196, 159, 0.082) 40%,
-    rgba(177, 221, 238, 0.171) 70%,
+    rgba(34, 117, 165, 0.42) 0%,
+    rgba(139, 196, 159, 0.12) 40%,
+    rgba(159, 214, 236, 0.2) 70%,
     transparent 100%
   );
+  filter: saturate(1.3) brightness(1.15);
 }
 
 [data-theme="pond0x-light"] .pond-water-surface {
   background: radial-gradient(
     ellipse at 50% 50%,
-    rgba(74, 143, 184, 0.12) 0%,
-    rgba(139, 196, 159, 0.08) 40%,
-    rgba(177, 221, 238, 0.05) 70%,
+    rgba(51, 134, 182, 0.15) 0%,
+    rgba(139, 196, 159, 0.1) 40%,
+    rgba(177, 221, 238, 0.08) 70%,
     transparent 100%
   );
 }
 
-[data-theme="pond0x-light"] .lily-pad {
-  opacity: 0.25;
+[data-theme="pond0x-light"] .water-caustics {
+  opacity: 0.15;
+  mix-blend-mode: overlay;
 }
 
-[data-theme="pond0x-light"] .water-caustics {
-  opacity: 0.12;
-  mix-blend-mode: overlay;
+[data-theme="pond0x-light"] .lily-pad {
+  background: radial-gradient(
+    circle at 35% 30%,
+    #e6a8e1 0%,
+    #c48bbf 45%,
+    #9d6b99 90%
+  );
+  opacity: 0.9;
+}
+
+[data-theme="pond0x-light"] .pond-ripple {
+  border-color: rgba(74, 143, 184, 0.5);
+  box-shadow:
+    0 0 14px rgba(139, 196, 159, 0.4),
+    inset 0 0 26px rgba(74, 143, 184, 0.3);
 }
 
 /* Performance optimization - reduce motion */

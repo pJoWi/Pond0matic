@@ -6,16 +6,20 @@ interface PondWaterBackgroundProps {
 }
 
 /**
- * PondWaterBackground - Animated water/pond effect background
+ * PondWaterBackground - Enchanted Magical Pond Background
  * Features:
  * - Animated water surface with breathing effect
  * - Multiple ripple layers for depth
- * - Floating lily pads with shimmer
+ * - Floating lily pads with V-notches, shimmer, and glint effects
  * - Underwater light caustics
  * - Drifting water particles
- * - Surface reflections and wave lines
+ * - Surface reflections
+ * - Magical sparkles (fairy dust)
+ * - Glowing fireflies
+ * - Mystical fog and iridescent shimmer
+ * - Enchanted ripples
  *
- * Performance optimized with CSS animations
+ * Performance optimized with GPU-accelerated CSS animations
  */
 export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
   return (
@@ -26,6 +30,12 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       {/* Depth gradient for pond feel */}
       <div className="pond-depth-gradient" />
 
+      {/* Mystical fog layer */}
+      <div className="mystical-fog" />
+
+      {/* Iridescent shimmer overlay */}
+      <div className="iridescent-shimmer" />
+
       {/* Animated ripples (5 layers) */}
       <div className="pond-ripple pond-ripple-1" />
       <div className="pond-ripple pond-ripple-2" />
@@ -33,10 +43,18 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       <div className="pond-ripple pond-ripple-4" />
       <div className="pond-ripple pond-ripple-5" />
 
+      {/* Enchanted magical ripples */}
+      {/* <div className="enchanted-ripple enchanted-ripple-1" />
+      <div className="enchanted-ripple enchanted-ripple-2" /> */}
+
       {/* Floating lily pads */}
       <div className="lily-pad lily-pad-1" />
       <div className="lily-pad lily-pad-2" />
       <div className="lily-pad lily-pad-3" />
+      <div className="lily-pad lily-pad-4" />
+      <div className="lily-pad lily-pad-5" />
+      <div className="lily-pad lily-pad-6" />
+      <div className="lily-pad lily-pad-7" />
 
       {/* Underwater light caustics */}
       <div className="water-caustics" />
@@ -51,15 +69,25 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       <div className="water-particle water-particle-7" />
       <div className="water-particle water-particle-8" />
 
+      {/* Magical sparkles - fairy dust */}
+      <div className="magic-sparkle magic-sparkle-1" />
+      <div className="magic-sparkle magic-sparkle-2" />
+      <div className="magic-sparkle magic-sparkle-3" />
+      <div className="magic-sparkle magic-sparkle-4" />
+      <div className="magic-sparkle magic-sparkle-5" />
+      <div className="magic-sparkle magic-sparkle-6" />
+      <div className="magic-sparkle magic-sparkle-7" />
+      <div className="magic-sparkle magic-sparkle-8" />
+
+      {/* Magical fireflies - glowing orbs */}
+      <div className="magic-firefly magic-firefly-1" />
+      <div className="magic-firefly magic-firefly-2" />
+      <div className="magic-firefly magic-firefly-3" />
+      <div className="magic-firefly magic-firefly-4" />
+      <div className="magic-firefly magic-firefly-5" />
+
       {/* Surface reflection shimmer */}
       <div className="pond-surface-reflection" />
-
-      {/* Horizontal wave lines */}
-      <div className="wave-line wave-line-1" />
-      <div className="wave-line wave-line-2" />
-      <div className="wave-line wave-line-3" />
-
-
     </div>
   );
 }
