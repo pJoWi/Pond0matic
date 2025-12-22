@@ -10,14 +10,12 @@ interface PondWaterBackgroundProps {
  * Features:
  * - Animated water surface with breathing effect
  * - Multiple ripple layers for depth
- * - Floating lily pads with V-notches, shimmer, and glint effects
  * - Underwater light caustics
  * - Drifting water particles
  * - Surface reflections
  * - Magical sparkles (fairy dust)
  * - Glowing fireflies
  * - Mystical fog and iridescent shimmer
- * - Enchanted ripples
  *
  * Performance optimized with GPU-accelerated CSS animations
  */
@@ -42,19 +40,6 @@ export function PondWaterBackground({ enabled }: PondWaterBackgroundProps) {
       <div className="pond-ripple pond-ripple-3" />
       <div className="pond-ripple pond-ripple-4" />
       <div className="pond-ripple pond-ripple-5" />
-
-      {/* Enchanted magical ripples */}
-      {/* <div className="enchanted-ripple enchanted-ripple-1" />
-      <div className="enchanted-ripple enchanted-ripple-2" /> */}
-
-      {/* Floating lily pads */}
-      <div className="lily-pad lily-pad-1" />
-      <div className="lily-pad lily-pad-2" />
-      <div className="lily-pad lily-pad-3" />
-      <div className="lily-pad lily-pad-4" />
-      <div className="lily-pad lily-pad-5" />
-      <div className="lily-pad lily-pad-6" />
-      <div className="lily-pad lily-pad-7" />
 
       {/* Underwater light caustics */}
       <div className="water-caustics" />

@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import { TokenLogo } from "@/components/icons/tokens";
 import { TokenPriceSkeleton } from "@/components/ui/TokenPriceSkeleton";
+import { BubbleAnimation } from "@/components/ui/BubbleAnimation";
 
 const BADGE_EMOJIS: Record<string, string> = {
   pork: "🐽",
@@ -21,7 +22,7 @@ const BADGE_EMOJIS: Record<string, string> = {
   crown: "👑",
   explorer: "🧭",
   guardian: "🛡️",
-  puzzle: "🧩"
+  puzzle: "🧩",
 };
 
 const getBadgeEmoji = (badgeName: string): string => {
@@ -169,48 +170,37 @@ export function CompactPond0xDashboard({
   };
 
   const renderHeader = () => (
-    <div className="relative bg-gradient-to-br from-pond-water/50 via-pond-deep/40 to-pond-water/50 backdrop-blur-xl border-2 border-lily-green/40 rounded-2xl p-6 overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+    <div className="relative bg-gradient-to-br from-black/30 via-pond-deep/30 to-black/30 backdrop-blur-xl border-2 border-pond-bright/40 rounded-2xl p-6 overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
       {/* Pond Water Animation */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-teal-500/10 to-cyan-500/20 animate-[wave_8s_ease-in-out_infinite]"></div>
-        <div className="absolute inset-0 bg-gradient-to-tl from-teal-400/10 via-blue-400/5 to-blue-500/10 animate-[wave_6s_ease-in-out_infinite_reverse]"></div>
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Pond Water SVG Bubbles */}
+        <BubbleAnimation
+          bubbleCount={6}
+          colorScheme="mixed"
+          density="sparse"
+
+        />
       </div>
-
-      {/* Pond Water Bubbles & Droplets */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Rising bubbles */}
-        <div className="absolute bottom-[10%] left-[15%] w-3 h-3 bg-blue-400/90 rounded-full animate-[bubble-rise_6s_ease-in-out_infinite] shadow-[0_0_12px_rgba(34,211,238,0.4)]"></div>
-        <div className="absolute bottom-[5%] right-[25%] w-2 h-2 bg-cyan-400/50 rounded-full animate-[bubble-rise_8s_ease-in-out_infinite_1s] shadow-[0_0_10px_rgba(45,212,191,0.5)]"></div>
-        <div className="absolute bottom-[15%] left-[60%] w-2.5 h-2.5 bg-cyan-300/80 rounded-full animate-[bubble-rise_7s_ease-in-out_infinite_2s] shadow-[0_0_15px_rgba(147,197,253,0.4)]"></div>
-        <div className="absolute bottom-[8%] right-[50%] w-1.5 h-1.5 bg-teal-300/60 rounded-full animate-[bubble-rise_9s_ease-in-out_infinite_3s] shadow-[0_0_8px_rgba(103,232,249,0.5)]"></div>
-
-        {/* Floating lily sparkles */}
-        <div className="absolute top-[30%] left-[25%] w-1.5 h-1.5 bg-cyan-400/70 rounded-full animate-[lily-float_5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(52,211,153,0.6)]"></div>
-        <div className="absolute top-[50%] right-[35%] w-2 h-2 bg-teal-300/90 rounded-full animate-[lily-float_6s_ease-in-out_infinite_1.5s] shadow-[0_0_12px_rgba(94,234,212,0.5)]"></div>
-        <div className="absolute bottom-[40%] left-[70%] w-1 h-1 bg-cyan-500/50 rounded-full animate-[lily-float_7s_ease-in-out_infinite_2.5s] shadow-[0_0_8px_rgba(6,182,212,0.5)]"></div>
-      </div>
-
       <div className="relative z-10">
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 rounded-full bg-lily-green/20 border-2 border-lily-bright flex items-center justify-center shadow-[0_0_20px_var(--glow-green)] animate-pulse">
+            <div className="relative w-14 h-14 rounded-full bg-lily-green/20 border-2 border-gold flex items-center justify-center shadow-[0_0_20px_var(--glow-green)] animate-pulse">
               <img className="w-10 h-10 rounded-full" alt="Pond" src="/tokens/solana/wpond.png" />
               <div className="absolute -right-1 -bottom-1 text-lg bg-black/30 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
                 👑
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-lily-bright via-gold-light to-lily-bright bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-lily-bright via-gold to-lily-bright bg-clip-text text-transparent">
                 POND0X OVERVIEW
               </h2>
               <p className="text-sm text-text-secondary">Mining Dashboard</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Fetch Data button moved to TopNavigation */}
-            <div className="enchantment-dot"></div>
-          </div>
+
         </div>
+
         {badges && (
           <div className="flex items-center justify-center gap-2 mt-4">
             {badges.split(", ").map((badge) => {
@@ -218,36 +208,39 @@ export function CompactPond0xDashboard({
               return (
                 <span
                   key={badge}
-                  className="px-3 py-1 bg-gold/20 border border-gold-light/40 rounded-lg text-xs text-gold-light font-semibold flex items-center gap-1.5 shadow-[0_0_10px_var(--glow-gold)]"
+                  className="px-3 py-1 bg-black/100 border border-gold-light/40 rounded-lg text-xs text-gold-light font-semibold flex items-center gap-1.5 shadow-[0_0_10px_var(--glow-gold)]"
                 >
                   {emoji && <span className="text-base">{emoji}</span>}
                   <span>{badge}</span>
                 </span>
               );
             })}
+
             {isPro && (
               <span className="px-3 py-1 bg-purple-500/20 border border-purple-500/40 rounded-lg text-xs text-purple-300 font-semibold shadow-[0_0_10px_rgba(168,85,247,0.3)]">
                 ⭐ PRO
               </span>
             )}
           </div>
+
         )}
       </div>
+
     </div>
   );
 
   const renderTokenPrices = () => (
-    <div>
-       <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-full bg-lily-green/20 border-0 border-lily-bright flex items-center justify-center shadow-[0_0_20px_var(--glow-green)]">
-              <img className="w-8 h-8 rounded-full" alt="Pond" src="./leaf1.png" />
-              <div className="absolute -right-1 -bottom-0 text-lg bg-black/30 backdrop-blur-sm rounded-full w-5 h-5 flex items-center justify-center">
-                🪙
-              </div>
-            </div>
-      <h3 className="text-lg font-bold text-lily-bright mb-5 flex items-center gap-3">
+    <div className="mt-6">
+      <div className="flex items-center gap-4 mb-4">
+        <div className="relative w-10 h-10 rounded-full bg-lily-green/20 border-1 border-lily-bright flex items-center justify-center shadow-[0_0_20px_var(--glow-gold)]">
+          <img className="w-8 h-8 rounded-full" alt="Pond" src="./leaf1.png" />
+          <div className="absolute -right-2 -bottom-1 text-lg bg-black/30 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
+            🪙
+          </div>
+        </div>
+        <h3 className="text-lg font-bold text-gold mb-3 flex items-center gap-3">
           <span>Token Prices</span>
-      </h3>
+        </h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {loadingPrices ? (
@@ -260,32 +253,8 @@ export function CompactPond0xDashboard({
           </>
         ) : (
           <>
-            <div className={cn("relative bg-pond-water/40 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]","border-lily-green/40 hover:border-lily-bright hover:shadow-[0_0_20px_var(--glow-green)]","hover:scale-105")}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-white uppercase tracking-wide">$wPOND</span>
-                <div className="relative w-10 h-10">
-                  <img className="w-full h-full rounded-full" alt="Pond" src="/tokens/solana/wpond.png" />
-                  <div className="absolute -right-1 -bottom-1 text-base bg-black/20 backdrop-blur-sm rounded-full w-5 h-5 flex items-center justify-center">⚡</div>
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-gold mb-1">{formatPrice(wpondPrice)}</div>
-              <div className="text-xs text-text-secondary opacity-70">POND COIN - WARPED</div>
-            </div>
 
-            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]","border-lily-green/40 hover:border-pond-bright hover:shadow-[0_0_20px_var(--glow-blue)]","hover:scale-105")}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-white uppercase tracking-wide">$PNDC</span>
-                <div className="relative w-10 h-10">
-                  <img className="w-full h-full rounded-full" alt="Pond" src="/tokens/solana/pndc.png" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-lily-bright mb-1">{formatPrice(pndcPrice)}</div>
-              <div className="text-xs text-text-secondary opacity-70">POND COIN</div>
-            </div>
-
-            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]","border-lily-green/40 hover:border-pink-bright hover:shadow-[0_0_20px_var(--glow-pink)]","hover:scale-105")}
+            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]", "border-lily-green/40 hover:border-pink-bright hover:shadow-[0_0_20px_var(--glow-pink)]", "hover:scale-105")}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-white uppercase tracking-wide">$PORK</span>
@@ -297,7 +266,19 @@ export function CompactPond0xDashboard({
               <div className="text-xs text-text-secondary opacity-70">PORK</div>
             </div>
 
-            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]","border-lily-green/40 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]","hover:scale-105")}
+            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]", "border-lily-green/40 hover:border-pond-bright hover:shadow-[0_0_20px_var(--glow-blue)]", "hover:scale-105")}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-white uppercase tracking-wide">$PNDC</span>
+                <div className="relative w-10 h-10">
+                  <img className="w-full h-full rounded-full" alt="Pond" src="/tokens/solana/pndc.png" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-lily-bright mb-1">{formatPrice(pndcPrice)}</div>
+              <div className="text-xs text-text-secondary opacity-70">POND COIN</div>
+            </div>
+
+            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]", "border-lily-green/40 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]", "hover:scale-105")}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-white uppercase tracking-wide">$SOL</span>
@@ -305,11 +286,24 @@ export function CompactPond0xDashboard({
                   <img className="w-full h-full rounded-full" alt="Solana" src="/tokens/solana/sol.png" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-purple-400 mb-1">{formatPrice(solPrice)}</div>
+              <div className="text-2xl font-bold text-purple-500 mb-1">{formatPrice(solPrice)}</div>
               <div className="text-xs text-text-secondary opacity-70">SOLANA</div>
             </div>
 
-            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]","border-lily-green/40 hover:border-green-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]","hover:scale-105")}
+            <div className={cn("relative bg-pond-water/40 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]", "border-lily-green/40 hover:border-lily-bright hover:shadow-[0_0_20px_var(--glow-green)]", "hover:scale-105")}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-white uppercase tracking-wide">$wPOND</span>
+                <div className="relative w-10 h-10">
+                  <img className="w-full h-full rounded-full" alt="Pond" src="/tokens/solana/wpond.png" />
+                  <div className="absolute -right-1 -bottom-1 text-base bg-black/20 backdrop-blur-sm rounded-full w-5 h-5 flex items-center justify-center">⚡</div>
+                </div>
+              </div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-lily-bright via-gold to-lily-bright bg-clip-text text-transparent mb-1">{formatPrice(wpondPrice)}</div>
+              <div className="text-xs text-text-secondary opacity-70">POND COIN - WARPED</div>
+            </div>
+
+            <div className={cn("relative bg-pond-water/30 backdrop-blur-xl border-2 rounded-xl p-4 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)]", "border-lily-green/40 hover:border-green-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]", "hover:scale-105")}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-white uppercase tracking-wide">$pondSOL</span>
@@ -328,23 +322,23 @@ export function CompactPond0xDashboard({
 
   const renderMiningStats = () => (
     <div>
-       <div className="flex items-center gap-4">
-            <div className="relative w-10 h-10 rounded-full bg-lily-green/20 border-0 border-lily-bright flex items-center justify-center shadow-[0_0_20px_var(--glow-green)]">
-              <img className="w-8 h-8 rounded-full" alt="Pond" src="./leaf1.png" />
-              <div className="absolute -right-1 -bottom-0 text-lg bg-black/30 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
-                ⛏️
-              </div>
-            </div>
-      <h3 className="text-lg font-bold text-lily-bright mb-5 flex items-center gap-2">
+      <div className="flex items-center gap-4 mb-2">
+        <div className="relative w-10 h-10 rounded-full bg-lily-green/20 border-0 border-lily-bright flex items-center justify-center shadow-[0_0_20px_var(--glow-gold)]">
+          <img className="w-8 h-8 rounded-full" alt="Pond" src="./leaf1.png" />
+          <div className="absolute -right-2 -bottom-1 text-lg bg-black/30 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center">
+            ⛏️
+          </div>
+        </div>
+        <h3 className="text-lg font-bold text-gold mb-3 flex items-center gap-2">
           <span>Mining Rig & Swap Stats</span>
-      </h3>
+        </h3>
       </div>
 
       <div className="relative bg-pond-water/30 backdrop-blur-xl border-2 border-lily-green/20 rounded-2xl p-6 overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-pond-deep/30 to-pond-deep/20 backdrop-blur-lg rounded-lg p-4 border border-lily-green/20 hover:border-lily-bright/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-green)]">
+          <div className="bg-gradient-to-br from-pond-deep/60 to-pond-deep/60 backdrop-blur-lg rounded-lg p-4 border border-lily-green/20 hover:border-lily-bright/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-green)]">
             <div className="text-xs text-text-muted uppercase tracking-wide mb-1 flex items-center gap-1">
-              <span className="text-sx">⚕️</span>
+              <span className="text-sx">❤️</span>
               Mining Rig Health
             </div>
             <div className="flex items-center gap-2 mb-2">
@@ -358,7 +352,7 @@ export function CompactPond0xDashboard({
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-pond-deep/30 to-pond-deep/20 backdrop-blur-lg rounded-lg p-4 border border-gold/20 hover:border-gold-light/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-gold)]">
+          <div className="bg-gradient-to-br from-pond-deep/60 to-pond-deep/60 backdrop-blur-lg rounded-lg p-4 border border-gold/20 hover:border-gold-light/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-gold)]">
             <div className="text-xs text-text-muted uppercase tracking-wide mb-1">⭐ Pro Status</div>
             <div className="text-2xl font-bold">
               {isPro ? (
@@ -372,7 +366,7 @@ export function CompactPond0xDashboard({
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-pond-deep/30 to-pond-deep/20 backdrop-blur-lg rounded-lg p-4 border border-pond-light/20 hover:border-pond-bright/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-blue)]">
+          <div className="bg-gradient-to-br from-pond-deep/60 to-pond-deep/60 backdrop-blur-lg rounded-lg p-4 border border-pond-light/20 hover:border-pond-bright/50 transition-all duration-300 hover:shadow-[0_0_15px_var(--glow-blue)]">
             <div className="text-xs text-text-muted uppercase tracking-wide mb-1">⛏️ Mining Sessions</div>
             <div className="text-2xl font-bold text-pond-bright">{miningSessionsCount}</div>
             <div className="text-xs text-text-secondary mt-1">Total sessions completed</div>

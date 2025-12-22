@@ -191,7 +191,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <PondWaterBackground enabled={waterEffect} />
 
       {/* Main Content - with proper spacing for fixed header + status bar */}
-      <main className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-56 pb-8 min-h-screen">
+      <main className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-72 pb-8 min-h-screen">
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

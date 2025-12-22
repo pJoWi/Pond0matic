@@ -385,7 +385,7 @@ function UtilityBar({
   rpcError: string | null;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-1.5 shadow-[0_6px_18px_rgba(0,0,0,0.35)]">
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-black/10 bg-black/20 px-3 py-1.5 shadow-[0_6px_18px_rgba(0,0,0,0.35)]">
       <ConnectionPill
         wallet={wallet}
         isConnected={isConnected}
