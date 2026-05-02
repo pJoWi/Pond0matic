@@ -95,6 +95,7 @@ export function TopNavigation({
   const [editingJupiterApiKey, setEditingJupiterApiKey] = useState(false);
   const [jupiterApiKeyDraft, setJupiterApiKeyDraft] = useState(jupiterApiKey);
   const [solPrice, setSolPrice] = useState<number>(0);
+  const [isConnectionBarVisible, setIsConnectionBarVisible] = useState(true);
 
   // Fetch SOL balance
   const { solBalance } = useBalances(
@@ -138,7 +139,6 @@ export function TopNavigation({
   const navItems = [
     { href: "/", label: "Dashboard", tone: "lily" as const },
     { href: "/swapper", label: "Swapper", tone: "wave" as const },
-    { href: "/flywheel", label: "Flywheel", tone: "spark" as const },
   ];
 
   const validateRpcUrl = (value: string) => {
@@ -236,119 +236,278 @@ export function TopNavigation({
             <ToggleButton
               active={theme === "dark"}
               activeLabel="Dark"
-              inactiveLabel="Light"
-              icon={theme === "dark" ? <MoonIcon /> : <SunIcon />}
+              inactiveLabel="Dark"
+              icon={<MoonIcon />}
               onClick={onThemeToggle}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              title="Dark mode"
               tone="lily"
             />
             <ToggleButton
               active={waterEffect}
               activeLabel="Water"
-              inactiveLabel="Static"
-              icon={waterEffect ? <DropletIcon /> : <WaveIcon />}
+              inactiveLabel="Water"
+              icon={<DropletIcon />}
               onClick={onWaterToggle}
-              title={`${waterEffect ? "Disable" : "Enable"} pond water animation`}
+              title="Pond water animation"
               tone="wave"
             />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-black/25 backdrop-blur-xl shadow-[0_10px_24px_rgba(0,0,0,0.35)] p-2 space-y-2">
-          <div className="relative rounded-xl border border-pond-bright/25 bg-gradient-to-r from-pond-water/35 via-pond-deep/45 to-pond-water/35 p-2 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-              <ConnectionPill
-                wallet={wallet}
-                isConnected={isConnected}
-                connecting={connecting}
-                onConnect={onConnect}
-                onDisconnect={onDisconnect}
-              />
-              <RpcPill
-                rpc={rpc}
-                editing={editingRpc}
-                onToggleEdit={() => setEditingRpc((prev) => !prev)}
-                rpcDraft={rpcDraft}
-                onRpcDraftChange={(value) => {
-                  setRpcDraft(value);
-                  if (rpcError) setRpcError(null);
-                }}
-                onRpcSave={handleRpcSave}
-                onRpcCancel={() => {
-                  setRpcDraft(rpc);
-                  setRpcError(null);
-                  setEditingRpc(false);
-                }}
-                error={rpcError}
-              />
-              <JupiterApiKeyPill
-                apiKey={jupiterApiKey}
-                editing={editingJupiterApiKey}
-                onToggleEdit={() => setEditingJupiterApiKey((prev) => !prev)}
-                apiKeyDraft={jupiterApiKeyDraft}
-                onApiKeyDraftChange={setJupiterApiKeyDraft}
-                onApiKeySave={handleJupiterApiKeySave}
-                onApiKeyCancel={() => {
-                  setJupiterApiKeyDraft(jupiterApiKey);
-                  setEditingJupiterApiKey(false);
-                }}
-              />
-              <FetchDataButton
-                isConnected={isConnected}
-                hasRpc={rpc.length > 0}
-                hasApiKey={jupiterApiKey.length > 0}
-                onFetch={onFetchDashboardData}
-              />
-              <SOLBalancePill
-                balance={solBalance}
-                price={solPrice}
-                isConnected={isConnected}
-              />
-            </div>
-          </div>
+<div className="border-t border-white/5">
+            {/* Compact Navigation Bar */}
+            <div className="flex items-center px-4 py-2.5 gap-3">
+              {/* Left: Connection & Status */}
+              <div className="flex items-center gap-2">
+                {/* Connected Pill with Wallet Address */}
+                <button
+                  onClick={isConnected ? onDisconnect : onConnect}
+                  disabled={connecting}
+                  className={cn(
+                    "group flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 min-w-[140px] justify-center",
+                    "bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-md",
+                    isConnected
+                      ? "border-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.25),0_0_40px_rgba(16,185,129,0.1),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                      : "border-slate-600/30 hover:border-slate-500/50 hover:shadow-[0_0_12px_rgba(148,163,184,0.15)]"
+                  )}
+                >
+                  <span className={cn("relative flex w-2 h-2")}>
+                    <span className={cn(
+                      "absolute inline-flex h-full w-full rounded-full opacity-75",
+                      isConnected ? "bg-emerald-400 animate-ping-slow" : "bg-slate-600"
+                    )}></span>
+                    <span className={cn(
+                      "relative inline-flex rounded-full h-2 w-2",
+                      isConnected ? "bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,1)]" : "bg-slate-600"
+                    )}></span>
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-200 tracking-tight">
+                    {isConnected ? wallet.slice(0, 4) + "..." + wallet.slice(-4) : "Connect"}
+                  </span>
+                </button>
 
-          <StatusBar
-            wallet={wallet}
-            isConnected={isConnected}
-            connecting={connecting}
-            onConnect={onConnect}
-            onDisconnect={onDisconnect}
-            rpc={rpc}
-            jupiterApiKey={jupiterApiKey}
-            onJupiterApiKeyChange={onJupiterApiKeyChange}
-            affiliate={affiliate}
-            onAffiliateChange={onAffiliateChange}
-            currentVault={currentVault}
-            swapMode={swapMode}
-            onSwapModeChange={onSwapModeChange}
-            isSwapper={isSwapper}
-            currentDashboard={currentDashboard}
-            onDashboardChange={onDashboardChange}
-            swapProgress={swapProgress}
-            inline
-            onStart={onStart}
-            onStop={onStop}
-            setFromMint={setFromMint}
-            setToMint={setToMint}
-            setAmount={setAmount}
-            setMaxAmount={setMaxAmount}
-            setSwapsPerRound={setSwapsPerRound}
-            setNumberOfRounds={setNumberOfRounds}
-            setSwapDelayMs={setSwapDelayMs}
-            setNumberOfSwaps={setNumberOfSwaps}
-            log={log}
-          />
-        </div>
+                {/* RPC - Clickable to Edit */}
+                <div className="relative">
+                  <button
+                    onClick={() => setEditingRpc(!editingRpc)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 min-w-[140px] justify-center",
+                      "bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-md",
+                      "hover:border-cyan-400/50 hover:shadow-[0_0_12px_rgba(34,211,238,0.15)]",
+                      rpc.length > 0
+                        ? "border-cyan-400/30 shadow-[0_0_20px_rgba(34,211,238,0.25),0_0_40px_rgba(34,211,238,0.1),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                        : "border-slate-600/30"
+                    )}
+                  >
+                    <span className={cn("relative flex w-2 h-2")}>
+                      <span className={cn(
+                        "absolute inline-flex h-full w-full rounded-full opacity-75",
+                        rpc.length > 0 ? "bg-cyan-400 animate-ping-slow" : "bg-slate-600"
+                      )}></span>
+                      <span className={cn(
+                        "relative inline-flex rounded-full h-2 w-2",
+                        rpc.length > 0 ? "bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]" : "bg-slate-600"
+                      )}></span>
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-200 tracking-tight">
+                      {rpc.length > 0 ? (
+                        <>
+                          {rpc.includes('helius') ? 'Helius' :
+                           rpc.includes('alchemy') ? 'Alchemy' :
+                           rpc.includes('quicknode') ? 'QuickNode' :
+                           rpc.slice(0, 8) + '...' + rpc.slice(-6)}
+                        </>
+                      ) : 'RPC'}
+                    </span>
+                  </button>
+
+                  {/* RPC Edit Panel */}
+                  {editingRpc && (
+                    <div className="absolute top-full left-0 mt-2 z-50 w-96">
+                      <div className="rounded-lg border border-cyan-400/40 bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-cyan-300">Configure RPC Endpoint</span>
+                          <button
+                            onClick={() => setEditingRpc(false)}
+                            className="text-slate-400 hover:text-white text-sm transition-colors"
+                          >✕</button>
+                        </div>
+                        <input
+                          type="text"
+                          value={rpcDraft}
+                          onChange={(e) => {
+                            setRpcDraft(e.target.value);
+                            if (rpcError) setRpcError(null);
+                          }}
+                          placeholder="https://mainnet.helius-rpc.com/?api-key=..."
+                          className="w-full px-3 py-2 text-[11px] font-mono rounded-md border border-cyan-400/30 bg-slate-950/50 text-cyan-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/30"
+                        />
+                        {rpcError && <p className="text-[10px] text-red-400">{rpcError}</p>}
+                        <p className="text-[9px] text-slate-400 leading-relaxed">Helius, Alchemy, or QuickNode recommended</p>
+                        <button
+                          onClick={handleRpcSave}
+                          className="w-full px-3 py-2 text-[11px] font-semibold rounded-md bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 hover:bg-cyan-500/30 transition-all"
+                        >
+                          Save RPC Endpoint
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Jupiter API - Clickable to Edit */}
+                <div className="relative">
+                  <button
+                    onClick={() => setEditingJupiterApiKey(!editingJupiterApiKey)}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300",
+                      "bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-md",
+                      "hover:border-teal-400/50",
+                      jupiterApiKey.length > 0
+                        ? "border-teal-400/30 shadow-[0_0_12px_rgba(20,184,166,0.1)]"
+                        : "border-slate-600/30"
+                    )}
+                  >
+                    <span className={cn(
+                      "relative flex w-2 h-2"
+                    )}>
+                      <span className={cn(
+                        "absolute inline-flex h-full w-full rounded-full opacity-75",
+                        jupiterApiKey.length > 0 ? "bg-teal-400 animate-ping-slow" : "bg-slate-600"
+                      )}></span>
+                      <span className={cn(
+                        "relative inline-flex rounded-full h-2 w-2",
+                        jupiterApiKey.length > 0 ? "bg-teal-400 shadow-[0_0_8px_rgba(20,184,166,1)]" : "bg-slate-600"
+                      )}></span>
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-200 tracking-tight">
+                      {jupiterApiKey.length > 0 ? jupiterApiKey.slice(0, 4) + '...' + jupiterApiKey.slice(-4) : 'Jupiter API'}
+                    </span>
+                  </button>
+
+                  {/* API Edit Panel */}
+                  {editingJupiterApiKey && (
+                    <div className="absolute top-full left-0 mt-2 z-50 w-96">
+                      <div className="rounded-lg border border-teal-400/40 bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-teal-300">Configure Jupiter API</span>
+                          <button
+                            onClick={() => setEditingJupiterApiKey(false)}
+                            className="text-slate-400 hover:text-white text-sm transition-colors"
+                          >✕</button>
+                        </div>
+                        <input
+                          type="password"
+                          value={jupiterApiKeyDraft}
+                          onChange={(e) => setJupiterApiKeyDraft(e.target.value)}
+                          placeholder="Enter Jupiter API key"
+                          className="w-full px-3 py-2 text-[11px] font-mono rounded-md border border-teal-400/30 bg-slate-950/50 text-teal-100 placeholder-slate-500 focus:outline-none focus:border-teal-400/60 focus:ring-1 focus:ring-teal-400/30"
+                        />
+                        <p className="text-[9px] text-slate-400 leading-relaxed">Get yours at <span className="text-teal-400">jup.ag/api-keys</span></p>
+                        <button
+                          onClick={handleJupiterApiKeySave}
+                          className="w-full px-3 py-2 text-[11px] font-semibold rounded-md bg-teal-500/20 border border-teal-400/40 text-teal-300 hover:bg-teal-500/30 transition-all"
+                        >
+                          Save API Key
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* SOL Balance with Token Logo */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-600/30 bg-gradient-to-br from-slate-900/80 to-slate-800/60 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                  <span className="menu-icon text-slate-400 text-xs leading-none">☰</span>
+                  <div className="flex items-center gap-1.5">
+                    <TokenLogo symbol="SOL" size={14} />
+                    <span className="text-xs font-bold text-white tracking-tight">{solBalance.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Fetch Data Button - Shows when connected + RPC + API */}
+                {isConnected && rpc.length > 0 && jupiterApiKey.length > 0 && onFetchDashboardData && (
+                  <button
+                    onClick={onFetchDashboardData}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-400/40 bg-gradient-to-br from-emerald-900/30 to-emerald-800/20 backdrop-blur-md hover:from-emerald-900/40 hover:to-emerald-800/30 transition-all duration-300 shadow-[0_0_12px_rgba(16,185,129,0.1),inset_0_1px_0_rgba(255,255,255,0.05)]"
+                  >
+                    <span className="text-[10px] font-semibold text-emerald-300 tracking-tight">Fetch Data</span>
+                  </button>
+                )}
+              </div>
+
+            </div>
+
+            <StatusBar
+              wallet={wallet}
+              isConnected={isConnected}
+              connecting={connecting}
+              onConnect={onConnect}
+              onDisconnect={onDisconnect}
+              rpc={rpc}
+              jupiterApiKey={jupiterApiKey}
+              onJupiterApiKeyChange={onJupiterApiKeyChange}
+              affiliate={affiliate}
+              onAffiliateChange={onAffiliateChange}
+              currentVault={currentVault}
+              swapMode={swapMode}
+              onSwapModeChange={onSwapModeChange}
+              isSwapper={isSwapper}
+              currentDashboard={currentDashboard}
+              onDashboardChange={onDashboardChange}
+              swapProgress={swapProgress}
+              inline
+              onStart={onStart}
+              onStop={onStop}
+              setFromMint={setFromMint}
+              setToMint={setToMint}
+              setAmount={setAmount}
+              setMaxAmount={setMaxAmount}
+              setSwapsPerRound={setSwapsPerRound}
+              setNumberOfRounds={setNumberOfRounds}
+              setSwapDelayMs={setSwapDelayMs}
+              setNumberOfSwaps={setNumberOfSwaps}
+              log={log}
+            />
+          </div>
       </div>
 
       <style jsx>{`
         @keyframes shimmer {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
+          0% {
+            opacity: 0.3;
+            background-position: -200% 0;
+          }
+          50% {
+            opacity: 0.6;
+            background-position: 0% 0;
+          }
+          100% {
+            opacity: 0.3;
+            background-position: 200% 0;
+          }
         }
         @keyframes gradient-shift {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
+        }
+        @keyframes ping-slow {
+          0% {
+            transform: scale(1);
+            opacity: 0.75;
+          }
+          75%, 100% {
+            transform: scale(2);
+            opacity: 0;
+          }
+        }
+        .animate-ping-slow {
+          animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .menu-icon,
+        .heart-icon,
+        .chevron-icon {
+          font-style: normal;
+          user-select: none;
         }
       `}</style>
     </header>
@@ -535,7 +694,7 @@ function LogoBadge() {
           Pond0matic
         </span>
         <span className="relative text-[11px] text-[color:var(--theme-text-muted)]">
-          Dashboard / Swapper / Flywheel
+          Dashboard / Swapper / AI Terminal
         </span>
       </div>
     </Link>
@@ -554,25 +713,28 @@ interface NavButtonProps {
 function NavButton({ href, active, label, tone }: NavButtonProps) {
   const tones: Record<
     NavTone,
-    { from: string; to: string; border: string; glow: string }
+    { from: string; to: string; border: string; glow: string; waterBase: string }
   > = {
     lily: {
       from: "var(--theme-primary)",
       to: "var(--theme-secondary)",
       border: "rgba(139, 196, 159, 0.55)",
       glow: "rgba(139, 196, 159, 0.28)",
+      waterBase: "rgba(107, 157, 120, 0.15)",
     },
     wave: {
       from: "var(--pond-bright, #4a8fb8)",
       to: "var(--pond-light, #2d5f7f)",
       border: "rgba(74, 143, 184, 0.6)",
       glow: "rgba(74, 143, 184, 0.25)",
+      waterBase: "rgba(74, 143, 184, 0.12)",
     },
     spark: {
       from: "var(--gold-light, #f0c674)",
       to: "var(--pink-bright, #ffc0e3)",
       border: "rgba(240, 198, 116, 0.6)",
       glow: "rgba(255, 192, 227, 0.26)",
+      waterBase: "rgba(240, 198, 116, 0.1)",
     },
   };
 
@@ -581,6 +743,7 @@ function NavButton({ href, active, label, tone }: NavButtonProps) {
     "--tone-to": tones[tone].to,
     "--tone-border": tones[tone].border,
     "--tone-glow": tones[tone].glow,
+    "--tone-water": tones[tone].waterBase,
   } as CSSProperties;
 
   return (
@@ -590,39 +753,74 @@ function NavButton({ href, active, label, tone }: NavButtonProps) {
         "group relative px-3 py-1.5 rounded-xl font-medium text-sm transition-all duration-300",
         "flex items-center gap-1.5 overflow-hidden",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--tone-border)] focus-visible:ring-offset-[rgba(13,31,45,0.8)]",
-        active ? "text-white" : "text-[color:var(--theme-text-muted)] hover:text-white"
+        active ? "text-white shadow-lg" : "text-[color:var(--theme-text-muted)] hover:text-white"
       )}
       style={{
         ...vars,
         border: active ? "1px solid var(--tone-border)" : "1px solid transparent",
-        background: active
-          ? "linear-gradient(135deg, var(--tone-from), var(--tone-to))"
-          : "rgba(255,255,255,0.02)",
+        background: "transparent",
         boxShadow: active
-          ? "0 8px 26px var(--tone-glow), inset 0 1px 0 rgba(255,255,255,0.08)"
-          : "0 0 0 1px rgba(255,255,255,0.02)",
+          ? "0 8px 26px var(--tone-glow), 0 0 40px var(--tone-glow)"
+          : "none",
       }}
       aria-current={active ? "page" : undefined}
     >
+      {/* Pondwater ripple effect */}
+      <span
+        className={cn(
+          "absolute inset-0 rounded-xl transition-all duration-500 pointer-events-none",
+          active ? "opacity-50" : "opacity-0 group-hover:opacity-30"
+        )}
+        style={{
+          background: "radial-gradient(circle at center, var(--tone-from) 0%, transparent 70%)",
+          filter: "blur(12px)",
+        }}
+      />
+
+      {/* Water shimmer effect */}
+      <span
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+        style={{
+          background: "linear-gradient(110deg, transparent 30%, var(--tone-glow) 50%, transparent 70%)",
+          backgroundSize: "200% 100%",
+          animation: "shimmer 3s ease-in-out infinite",
+        }}
+      />
+
+      {/* Flowing gradient background */}
       <span
         className={cn(
           "absolute inset-0 rounded-xl transition-opacity duration-300 pointer-events-none",
-          active ? "opacity-40" : "opacity-0 group-hover:opacity-20"
+          active ? "opacity-60" : "opacity-0 group-hover:opacity-40"
         )}
         style={{
           background: "linear-gradient(135deg, var(--tone-from), var(--tone-to))",
-          filter: "blur(10px)",
+          filter: "blur(15px)",
         }}
       />
-      <span className="relative flex items-center gap-2">
-        <span className="relative z-10">{label}</span>
+
+      {/* Content */}
+      <span className="relative flex items-center gap-2 z-10">
+        {/* Bubble indicator for active state */}
+        {active && (
+          <span
+            className="w-1.5 h-1.5 rounded-full animate-pulse"
+            style={{
+              background: "var(--tone-from)",
+              boxShadow: `0 0 8px var(--tone-from)`,
+            }}
+          />
+        )}
+        <span className="relative">{label}</span>
       </span>
+
+      {/* Enhanced border glow for active */}
       {active && (
         <span
           className="absolute inset-0 rounded-xl pointer-events-none"
           style={{
             boxShadow:
-              "0 0 0 1px var(--tone-border), inset 0 0 0 1px rgba(255,255,255,0.08)",
+              "0 0 0 1px var(--tone-border), inset 0 0 0 1px rgba(255,255,255,0.12), 0 0 20px var(--tone-glow)",
           }}
         />
       )}
@@ -1250,5 +1448,267 @@ function WaveIcon() {
       <path d="M4.5 15c1.5 0 2.25-1 3.75-1s2.25 1 3.75 1 2.25-1 3.75-1 2.25 1 3.75 1v2c-1.5 0-2.25-1-3.75-1s-2.25 1-3.75 1-2.25-1-3.75-1-2.25 1-3.75 1V15z" />
       <path d="M4.5 9c1.5 0 2.25-1 3.75-1S10.5 9 12 9s2.25-1 3.75-1S18 9 19.5 9v2c-1.5 0-2.25-1-3.75-1S13.5 11 12 11s-2.25-1-3.75-1S6 11 4.5 11V9z" />
     </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+    </svg>
+  );
+}
+
+function CompactConnectionPill({
+  wallet,
+  isConnected,
+  connecting,
+  onConnect,
+  onDisconnect,
+}: {
+  wallet: string;
+  isConnected: boolean;
+  connecting: boolean;
+  onConnect: () => Promise<void> | Promise<string>;
+  onDisconnect: () => Promise<void>;
+}) {
+  const formatAddress = (addr: string) => {
+    if (!addr) return "Not connected";
+    return addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
+  };
+
+  return (
+    <div className={cn(
+      "flex items-center gap-2.5 px-3.5 py-2 rounded-lg border transition-all duration-300",
+      "bg-gradient-to-r from-slate-900/60 to-slate-800/60 backdrop-blur-sm",
+      isConnected
+        ? "border-emerald-500/40 shadow-[0_0_16px_rgba(16,185,129,0.25)]"
+        : "border-slate-600/40"
+    )}>
+      <div className={cn(
+        "w-2 h-2 rounded-full transition-all duration-300",
+        isConnected ? "bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.7)] animate-pulse" : "bg-slate-600"
+      )} />
+      <span className="text-[11px] font-semibold text-slate-200">Connected</span>
+      <span className="font-mono text-[11px] text-cyan-300 tracking-tight font-medium">
+        {formatAddress(wallet)}
+      </span>
+      <button
+        onClick={isConnected ? onDisconnect : onConnect}
+        disabled={connecting}
+        className={cn(
+          "ml-auto p-1 rounded-md transition-all duration-300",
+          isConnected
+            ? "text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300"
+            : "text-slate-500 hover:bg-slate-700/50"
+        )}
+        title={isConnected ? "Disconnect wallet" : "Connect wallet"}
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isConnected ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          )}
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function CompactRpcPill({
+  rpc,
+  editing,
+  onToggleEdit,
+  rpcDraft,
+  onRpcDraftChange,
+  onRpcSave,
+  onRpcCancel,
+  error,
+}: {
+  rpc: string;
+  editing: boolean;
+  onToggleEdit: () => void;
+  rpcDraft: string;
+  onRpcDraftChange: (value: string) => void;
+  onRpcSave: () => void;
+  onRpcCancel: () => void;
+  error: string | null;
+}) {
+  const hasValidRpc = rpc.length > 0 && !error;
+
+  const getRpcDisplay = () => {
+    if (!hasValidRpc) return "Not set";
+    const equalsIndex = rpc.lastIndexOf('=');
+    if (equalsIndex !== -1 && equalsIndex < rpc.length - 1) {
+      const apiKeyPart = rpc.slice(equalsIndex + 1);
+      if (apiKeyPart.length > 8) {
+        return `${apiKeyPart.slice(0, 4)}${"•".repeat(Math.min(apiKeyPart.length - 8, 6))}${apiKeyPart.slice(-4)}`;
+      }
+      return apiKeyPart;
+    }
+    return "Set";
+  };
+
+  return (
+    <div className="relative">
+      <div className={cn(
+        "flex items-center gap-2.5 px-3.5 py-2 rounded-lg border transition-all duration-300",
+        "bg-gradient-to-r from-slate-900/60 to-slate-800/60 backdrop-blur-sm",
+        hasValidRpc
+          ? "border-cyan-500/40 shadow-[0_0_14px_rgba(34,211,238,0.2)]"
+          : "border-slate-600/40"
+      )}>
+        <div className={cn(
+          "w-2 h-2 rounded-full transition-all duration-300",
+          hasValidRpc ? "bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" : "bg-slate-600"
+        )} />
+        <span className="text-[11px] font-semibold text-slate-200">RPC</span>
+        <span className="font-mono text-[10px] text-cyan-300 tracking-tight">
+          {getRpcDisplay()}
+        </span>
+        <button
+          onClick={onToggleEdit}
+          className="ml-auto text-[10px] px-2 py-1 rounded-md border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 transition-all"
+        >
+          {editing ? "✕" : "Edit"}
+        </button>
+      </div>
+
+      {/* Slide-out overlapping input section */}
+      <div
+        className={cn(
+          "absolute top-full left-0 right-0 mt-2 z-50 overflow-hidden transition-all duration-300 ease-out origin-top",
+          editing ? "max-h-32 opacity-100 scale-y-100" : "max-h-0 opacity-0 scale-y-0"
+        )}
+      >
+        <div className="rounded-lg border border-cyan-500/40 bg-slate-900/95 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-3 space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={rpcDraft}
+              onChange={(e) => onRpcDraftChange(e.target.value)}
+              placeholder="https://mainnet.helius-rpc.com/?api-key=..."
+              className="font-mono flex-1 px-3 py-2 text-[11px] rounded-md border border-cyan-500/30 bg-slate-950/50 text-cyan-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+            />
+            <button
+              onClick={onRpcSave}
+              className="px-3 py-2 text-[11px] font-medium rounded-md bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30 transition-all whitespace-nowrap"
+            >
+              Set
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-400 leading-tight">
+            Helius, Alchemy, or QuickNode recommended
+          </p>
+          {error && <p className="text-[10px] text-red-400 font-medium">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CompactJupiterApiKeyPill({
+  apiKey,
+  editing,
+  onToggleEdit,
+  apiKeyDraft,
+  onApiKeyDraftChange,
+  onApiKeySave,
+  onApiKeyCancel,
+}: {
+  apiKey: string;
+  editing: boolean;
+  onToggleEdit: () => void;
+  apiKeyDraft: string;
+  onApiKeyDraftChange: (value: string) => void;
+  onApiKeySave: () => void;
+  onApiKeyCancel: () => void;
+}) {
+  const hasApiKey = apiKey.length > 0;
+  const maskedApiKey = hasApiKey
+    ? `${apiKey.slice(0, 4)}${"•".repeat(Math.min(apiKey.length - 8, 6))}${apiKey.slice(-4)}`
+    : "Not set";
+
+  return (
+    <div className="relative">
+      <div className={cn(
+        "flex items-center gap-2.5 px-3.5 py-2 rounded-lg border transition-all duration-300",
+        "bg-gradient-to-r from-slate-900/60 to-slate-800/60 backdrop-blur-sm",
+        hasApiKey
+          ? "border-teal-500/40 shadow-[0_0_14px_rgba(20,184,166,0.2)]"
+          : "border-slate-600/40"
+      )}>
+        <div className={cn(
+          "w-2 h-2 rounded-full transition-all duration-300",
+          hasApiKey ? "bg-teal-400 shadow-[0_0_8px_rgba(20,184,166,0.6)]" : "bg-slate-600"
+        )} />
+        <span className="text-[11px] font-semibold text-slate-200">API</span>
+        <span className="font-mono text-[10px] text-teal-300 tracking-tight">
+          {maskedApiKey}
+        </span>
+        <button
+          onClick={onToggleEdit}
+          className="ml-auto text-[10px] px-2 py-1 rounded-md border border-teal-500/30 text-teal-400 hover:bg-teal-500/10 transition-all"
+        >
+          {editing ? "✕" : "Edit"}
+        </button>
+      </div>
+
+      {/* Slide-out overlapping input section */}
+      <div
+        className={cn(
+          "absolute top-full left-0 right-0 mt-2 z-50 overflow-hidden transition-all duration-300 ease-out origin-top",
+          editing ? "max-h-32 opacity-100 scale-y-100" : "max-h-0 opacity-0 scale-y-0"
+        )}
+      >
+        <div className="rounded-lg border border-teal-500/40 bg-slate-900/95 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-3 space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="password"
+              value={apiKeyDraft}
+              onChange={(e) => onApiKeyDraftChange(e.target.value)}
+              placeholder="Enter Jupiter API key"
+              className="font-mono flex-1 px-3 py-2 text-[11px] rounded-md border border-teal-500/30 bg-slate-950/50 text-teal-100 placeholder-slate-500 focus:outline-none focus:border-teal-400/60 focus:ring-1 focus:ring-teal-400/30 transition-all"
+            />
+            <button
+              onClick={onApiKeySave}
+              className="px-3 py-2 text-[11px] font-medium rounded-md bg-teal-500/20 border border-teal-500/40 text-teal-300 hover:bg-teal-500/30 transition-all whitespace-nowrap"
+            >
+              Set
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-400 leading-tight">
+            Get yours at <span className="text-teal-400">jup.ag/api-keys</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CompactSOLBalance({
+  balance,
+  price,
+  isConnected,
+}: {
+  balance: number;
+  price: number;
+  isConnected: boolean;
+}) {
+  if (!isConnected) return null;
+
+  const formattedBalance = balance.toFixed(4);
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-lily-green/40 bg-gradient-to-br from-lily-green/20 to-pond-bright/15 text-sm">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
+        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M3 10h18M7 15h.01M11 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+      <span className="text-white/90 font-bold">{formattedBalance}</span>
+      <span className="text-white/60 text-xs font-semibold">SOL</span>
+    </div>
   );
 }

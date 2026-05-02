@@ -1,4 +1,6 @@
 export { TokenLogo } from './TokenLogo';
+export { default as TokenIcon } from './TokenIcon';
+export type { TokenInfo } from './TokenIcon';
 
 export interface TokenMetadata {
   symbol: string;

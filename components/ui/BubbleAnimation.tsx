@@ -101,9 +101,17 @@ export function BubbleAnimation({
   speedMultiplier = 1,
 }: BubbleAnimationProps) {
   const colors = colorScheme === "mixed" ? MIXED_COLORS : COLOR_SCHEMES[colorScheme];
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  // Only render bubbles after component mounts to avoid hydration mismatch
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Generate bubble configurations
   const bubbles = React.useMemo(() => {
+    if (!isMounted) return [];
+
     const densityConfig = {
       sparse: { minSize: 3, maxSize: 5, minBottom: 1, maxBottom: 15 },
       normal: { minSize: 3, maxSize: 6, minBottom: 1, maxBottom: 20 },
@@ -133,7 +141,7 @@ export function BubbleAnimation({
     }
 
     return result;
-  }, [bubbleCount, colors, density, speedMultiplier]);
+  }, [isMounted, bubbleCount, colors, density, speedMultiplier]);
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
