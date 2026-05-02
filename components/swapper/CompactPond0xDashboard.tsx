@@ -15,7 +15,7 @@
  * - Visible pond-water bubble animation in background
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -28,39 +28,9 @@ import {
 import { TokenLogo, TokenIcon } from "@/components/icons/tokens";
 import { TokenPriceSkeleton } from "@/components/ui/TokenPriceSkeleton";
 import { BubbleAnimation } from "@/components/ui/BubbleAnimation";
-
-const BADGE_EMOJIS: Record<string, string> = {
-  pork: "🐽",
-  chef: "👨‍🍳",
-  points: "✨",
-  swap: "🤝",
-  diamond: "💎",
-  crown: "👑",
-  explorer: "🧭",
-  guardian: "🛡️",
-  puzzle: "🧩",
-};
-
-const getBadgeEmoji = (badgeName: string): string => {
-  const lowerBadge = badgeName.toLowerCase().trim();
-  return BADGE_EMOJIS[lowerBadge] || "";
-};
-
-// Token icon URLs using wsrv.nl CDN for optimized loading
-const TOKEN_ICONS: Record<string, string> = {
-  // Solana Tokens
-  SOL: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FSo11111111111111111111111111111111111111112%2Flogo.png",
-  wPOND: "/tokens/solana/wpond.png", // TODO: Replace with Arweave URL
-  pondSOL: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Futfs.io%2Ff%2FVWaBLnv7vdzqTQiuedZgiubmqRneVQZ0h4klCYXtA1KaocwD",
-  hSOL: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Fraw.githubusercontent.com%2Figneous-labs%2Flst-offchain-metadata%2Fmaster%2FhSOL%2FhSOL.png",
-  USDT: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FEs9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB%2Flogo.svg",
-  USDC: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsolana-labs%2Ftoken-list%2Fmain%2Fassets%2Fmainnet%2FEPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v%2Flogo.png",
-  ZEC: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Farweave.net%2FQSYqnmB7NYlB7n1R6rz935Y07dlRK0tIuKe2mof5Sho",
-  // Ethereum Tokens
-  ETH: "/tokens/ethereum/eth.png", // TODO: Replace with Arweave URL
-  PNDC: "https://wsrv.nl/?w=48&h=48&url=https%3A%2F%2Ftokens.debridge.finance%2F0xa1ce54b7a0543a9d569676a3ebf988f4704d8f7cd30206d078848ee5a4dfc29d.png",
-  PORK: "/tokens/ethereum/pork.png", // TODO: Replace with Arweave URL
-};
+import { TOKEN_ICONS } from "@/lib/tokenIcons";
+import { getBadgeEmoji } from "@/lib/badges";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 
 interface CompactPond0xDashboardProps {
   proSwapsSol: number;
@@ -100,15 +70,15 @@ function WaterRipple({ delay = 0 }: { delay?: number }) {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/20 animate-ripple"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/20 animate-pond-ripple"
         style={{ animationDelay: `${delay}ms` }}
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/15 animate-ripple"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/15 animate-pond-ripple"
         style={{ animationDelay: `${delay + 600}ms` }}
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/10 animate-ripple"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/10 animate-pond-ripple"
         style={{ animationDelay: `${delay + 1200}ms` }}
       />
     </div>
@@ -135,7 +105,7 @@ function DewdropGlow({ color = "teal", size = "sm" }: { color?: string; size?: '
 
   return (
     <div className={cn(
-      "rounded-full animate-pulse-soft",
+      "rounded-full animate-pond-pulse-soft",
       sizeClasses[size],
       colorClasses[color as keyof typeof colorClasses] || colorClasses.teal
     )} />
@@ -150,8 +120,8 @@ function LiveIndicator() {
   return (
     <div className="flex items-center gap-2">
       <div className="relative">
-        <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse-soft shadow-[0_0_10px_rgba(74,222,128,0.6)]" />
-        <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400/40 rounded-full animate-ping-slow" />
+        <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pond-pulse-soft shadow-[0_0_10px_rgba(74,222,128,0.6)]" />
+        <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400/40 rounded-full animate-pond-ping-slow" />
       </div>
       <span className="text-[10px] font-medium tracking-wide text-emerald-300/90">Live</span>
     </div>
@@ -192,7 +162,7 @@ function LilyPadCard({ title, value, subtitle, loading, status = 'neutral', icon
         "relative backdrop-blur-xl border-2 transition-all duration-500 overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
         "rounded-[2rem_3rem_2.5rem_2rem]", // Organic lily pad shape
         "hover:shadow-[0_12px_48px_rgba(45,212,191,0.2)]",
-        "animate-float",
+        "animate-pond-float",
         statusColors[status]
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -261,18 +231,19 @@ export function CompactPond0xDashboard({
   failed = 0,
   drifted = 0,
 }: CompactPond0xDashboardProps) {
-  const [wpondPrice, setWpondPrice] = useState(0);
-  const [pndcPrice, setPndcPrice] = useState(0);
-  const [porkPrice, setPorkPrice] = useState(0);
-  const [solPrice, setSolPrice] = useState(0);
-  const [ethPrice, setEthPrice] = useState(0);
-  const [pondSolPrice, setPondSolPrice] = useState(0);
-  const [loadingPrices, setLoadingPrices] = useState(true);
+  const {
+    wpondPrice,
+    pndcPrice,
+    porkPrice,
+    solPrice,
+    ethPrice,
+    pondSolPrice,
+    loading: loadingPrices,
+  } = useTokenPrices();
 
-  // Wallet connection state
+  // Wallet connection state (mock — replaced by real WalletBar in next phase step)
   const [isWalletExpanded, setIsWalletExpanded] = useState(false);
 
-  // Mock wallet data (replace with real wallet connection later)
   const mockWalletData = {
     connected: true,
     address: "7xKXtg2CW87d97TXJSDpbD5jBk",
@@ -284,87 +255,6 @@ export function CompactPond0xDashboard({
       { symbol: 'USDC', amount: 1000.0, usdValue: 1000.0, icon: TOKEN_ICONS.USDC },
     ]
   };
-
-  /**
-   * Fetch token prices from various APIs
-   * - Internal APIs for wPOND, PNDC, PORK
-   * - CoinGecko for SOL and ETH prices
-   * - DexScreener for pondSOL
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [wpondRes, pndcRes, porkRes] = await Promise.all([
-          fetch('/api/wpond-price'),
-          fetch('/api/pndc-stats'),
-          fetch('/api/pork-stats'),
-        ]);
-
-        const safeJson = async (res: Response) => {
-          if (!res.ok) return null;
-          try { return await res.json(); } catch { return null; }
-        };
-
-        const [wpondData, pndcData, porkData] = await Promise.all([
-          safeJson(wpondRes), safeJson(pndcRes), safeJson(porkRes)
-        ]);
-
-        setWpondPrice(wpondData?.price || 0);
-        setPndcPrice(pndcData?.price || 0);
-        setPorkPrice(porkData?.price || 0);
-
-        // Fetch SOL and ETH prices from CoinGecko in a single request
-        try {
-          const cryptoPriceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana,ethereum&vs_currencies=usd');
-          const cryptoPriceData = await safeJson(cryptoPriceRes);
-          setSolPrice(cryptoPriceData?.solana?.usd || 0);
-          setEthPrice(cryptoPriceData?.ethereum?.usd || 0);
-        } catch {
-          // Fallback: try individual sources
-          try {
-            const solPriceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-            const solPriceData = await safeJson(solPriceRes);
-            setSolPrice(solPriceData?.solana?.usd || 0);
-          } catch {
-            // DexScreener fallback for SOL
-            try {
-              const dexRes = await fetch('https://api.dexscreener.com/latest/dex/tokens/So11111111111111111111111111111111111111112');
-              const dexData = await safeJson(dexRes);
-              const solPair = dexData?.pairs?.[0];
-              setSolPrice(parseFloat(solPair?.priceUsd || '0'));
-            } catch {
-              // Silent fail - SOL price will show as 0
-            }
-          }
-
-          try {
-            const ethPriceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-            const ethPriceData = await safeJson(ethPriceRes);
-            setEthPrice(ethPriceData?.ethereum?.usd || 0);
-          } catch {
-            // Silent fail - ETH price will show as 0
-          }
-        }
-
-        // Fetch pondSOL price from DexScreener (if mint address is available)
-        const PONDSOL_MINT = 'pondSoL1111111111111111111111111111111111111'; // Replace with actual mint
-        try {
-          const pondSolRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${PONDSOL_MINT}`);
-          const pondSolData = await safeJson(pondSolRes);
-          const pondSolPair = pondSolData?.pairs?.[0];
-          setPondSolPrice(parseFloat(pondSolPair?.priceUsd || '0'));
-        } catch {
-          setPondSolPrice(0);
-        }
-      } finally {
-        setLoadingPrices(false);
-      }
-    };
-
-    fetchData();
-    const interval = setInterval(fetchData, 30000); // Update every 30 seconds
-    return () => clearInterval(interval);
-  }, []);
 
   /**
    * Format price based on magnitude for optimal readability
@@ -447,8 +337,8 @@ export function CompactPond0xDashboard({
                 {connected && (
                   <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-950/60 border border-emerald-400/50 rounded-full backdrop-blur-sm shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
                     <div className="relative">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse-soft shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
-                      <div className="absolute inset-0 w-2 h-2 bg-emerald-400/40 rounded-full animate-ping-slow" />
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pond-pulse-soft shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
+                      <div className="absolute inset-0 w-2 h-2 bg-emerald-400/40 rounded-full animate-pond-ping-slow" />
                     </div>
                     <span className="text-[11px] font-semibold tracking-wide text-emerald-300">Connected</span>
                   </div>
@@ -644,18 +534,18 @@ export function CompactPond0xDashboard({
 
         {/* Underwater light rays */}
         <div className="absolute inset-0 overflow-hidden opacity-15 z-0">
-          <div className="absolute top-0 left-1/4 w-32 h-full bg-gradient-to-b from-cyan-300/40 to-transparent rotate-12 blur-2xl animate-sway" />
-          <div className="absolute top-0 right-1/3 w-24 h-full bg-gradient-to-b from-teal-300/30 to-transparent -rotate-6 blur-2xl animate-sway-delayed" />
+          <div className="absolute top-0 left-1/4 w-32 h-full bg-gradient-to-b from-cyan-300/40 to-transparent rotate-12 blur-2xl animate-pond-sway" />
+          <div className="absolute top-0 right-1/3 w-24 h-full bg-gradient-to-b from-teal-300/30 to-transparent -rotate-6 blur-2xl animate-pond-sway-delayed" />
         </div>
 
         {/* Gentle water surface shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-teal-300/10 animate-shimmer-slow z-0" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-teal-300/10 animate-pond-shimmer-slow z-0" />
 
         <div className="relative z-10 p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-5">
               {/* Logo with lily pad inspired glow */}
-              <div className="relative animate-float">
+              <div className="relative animate-pond-float">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400/30 via-teal-400/25 to-cyan-400/30 border-2 border-emerald-400/50 flex items-center justify-center shadow-[0_0_40px_rgba(74,222,128,0.5)] backdrop-blur-sm">
                   <TokenIcon
                     info={{
@@ -669,7 +559,7 @@ export function CompactPond0xDashboard({
                   />
                 </div>
                 {isPro && (
-                  <div className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center border-2 border-slate-950 text-sm shadow-[0_0_20px_rgba(251,191,36,0.7)] animate-pulse-soft">
+                  <div className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center border-2 border-slate-950 text-sm shadow-[0_0_20px_rgba(251,191,36,0.7)] animate-pond-pulse-soft">
                     ✨
                   </div>
                 )}
@@ -704,7 +594,7 @@ export function CompactPond0xDashboard({
                 return (
                   <div
                     key={badge}
-                    className="px-4 py-2 bg-teal-950/70 backdrop-blur-xl border border-amber-400/50 rounded-full font-medium text-xs text-amber-200 flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-amber-400/70 hover:shadow-[0_6px_30px_rgba(251,191,36,0.3)] transition-all animate-float"
+                    className="px-4 py-2 bg-teal-950/70 backdrop-blur-xl border border-amber-400/50 rounded-full font-medium text-xs text-amber-200 flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-amber-400/70 hover:shadow-[0_6px_30px_rgba(251,191,36,0.3)] transition-all animate-pond-float"
                   >
                     {emoji && <span className="text-base">{emoji}</span>}
                     <span className="tracking-wide">{badge}</span>
@@ -713,7 +603,7 @@ export function CompactPond0xDashboard({
               })}
 
               {isPro && (
-                <div className="px-4 py-2 bg-gradient-to-r from-amber-900/60 to-yellow-900/60 backdrop-blur-xl border border-amber-400/60 rounded-full font-semibold text-xs text-amber-100 flex items-center gap-2 shadow-[0_4px_24px_rgba(0,0,0,0.5)] animate-float">
+                <div className="px-4 py-2 bg-gradient-to-r from-amber-900/60 to-yellow-900/60 backdrop-blur-xl border border-amber-400/60 rounded-full font-semibold text-xs text-amber-100 flex items-center gap-2 shadow-[0_4px_24px_rgba(0,0,0,0.5)] animate-pond-float">
                   <span className="text-base">✨</span>
                   <span className="tracking-wide">PRO MEMBER</span>
                 </div>
@@ -815,7 +705,7 @@ export function CompactPond0xDashboard({
       chainColor: string;
       chainIcon: string;
     }) => (
-      <div className="relative bg-slate-950/85 backdrop-blur-2xl border-2 border-teal-400/30 overflow-hidden rounded-[2.5rem_3rem_2rem_2.5rem] shadow-[0_12px_48px_rgba(0,0,0,0.5)] animate-float">
+      <div className="relative bg-slate-950/85 backdrop-blur-2xl border-2 border-teal-400/30 overflow-hidden rounded-[2.5rem_3rem_2rem_2.5rem] shadow-[0_12px_48px_rgba(0,0,0,0.5)] animate-pond-float">
         {/* Dark overlay for glass morphism */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/30 to-black/40" />
 
@@ -913,7 +803,7 @@ export function CompactPond0xDashboard({
             <div className={cn(
               "relative backdrop-blur-2xl border-2 p-8 overflow-hidden transition-all duration-500 shadow-[0_16px_56px_rgba(0,0,0,0.5)]",
               "rounded-[3rem_2rem_3rem_2.5rem]",
-              "animate-float",
+              "animate-pond-float",
               healthStatus === 'positive' && 'bg-emerald-950/85 border-emerald-400/50',
               healthStatus === 'warning' && 'bg-amber-950/85 border-amber-400/50',
               healthStatus === 'negative' && 'bg-rose-950/85 border-pink-400/50'
@@ -983,7 +873,7 @@ export function CompactPond0xDashboard({
                     style={{ width: `${rigHealth}%` }}
                   >
                     {/* Gentle shimmer effect like water surface */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer-slow" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pond-shimmer-slow" />
                   </div>
                 </div>
 
@@ -996,7 +886,7 @@ export function CompactPond0xDashboard({
           </div>
 
           {/* Pro Status - lotus flower inspired */}
-          <div className="relative bg-amber-950/85 backdrop-blur-2xl border-2 border-amber-400/40 p-8 rounded-[2rem_3rem_2.5rem_2rem] overflow-hidden transition-all duration-500 hover:border-amber-400/60 hover:shadow-[0_16px_56px_rgba(251,191,36,0.3)] animate-float shadow-[0_12px_48px_rgba(0,0,0,0.5)]">
+          <div className="relative bg-amber-950/85 backdrop-blur-2xl border-2 border-amber-400/40 p-8 rounded-[2rem_3rem_2.5rem_2rem] overflow-hidden transition-all duration-500 hover:border-amber-400/60 hover:shadow-[0_16px_56px_rgba(251,191,36,0.3)] animate-pond-float shadow-[0_12px_48px_rgba(0,0,0,0.5)]">
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-black/40" />
 
@@ -1013,7 +903,7 @@ export function CompactPond0xDashboard({
               <div className="flex-1 flex items-center justify-center">
                 {isPro ? (
                   <div className="text-center">
-                    <div className="text-5xl mb-3 animate-pulse-soft filter drop-shadow-[0_4px_20px_rgba(251,191,36,0.8)]">✨</div>
+                    <div className="text-5xl mb-3 animate-pond-pulse-soft filter drop-shadow-[0_4px_20px_rgba(251,191,36,0.8)]">✨</div>
                     <div className="text-2xl font-bold text-amber-300 tracking-wide mb-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
                       PRO
                     </div>
@@ -1114,152 +1004,7 @@ export function CompactPond0xDashboard({
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Global pond-water theme styles */}
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Comfortaa:wght@400;600;700&display=swap');
-
-        * {
-          font-family: 'Quicksand', 'Comfortaa', sans-serif;
-        }
-
-        /* Organic water ripple animation */
-        @keyframes ripple {
-          0% {
-            transform: translate(-50%, -50%) scale(0.5);
-            opacity: 0.6;
-          }
-          100% {
-            transform: translate(-50%, -50%) scale(2);
-            opacity: 0;
-          }
-        }
-
-        .animate-ripple {
-          animation: ripple 3s ease-out infinite;
-        }
-
-        /* Gentle floating animation like lily pads */
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          25% {
-            transform: translateY(-8px) rotate(0.5deg);
-          }
-          50% {
-            transform: translateY(-4px) rotate(-0.5deg);
-          }
-          75% {
-            transform: translateY(-6px) rotate(0.3deg);
-          }
-        }
-
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
-        }
-
-        /* Soft pulse for bioluminescent effects */
-        @keyframes pulse-soft {
-          0%, 100% {
-            opacity: 0.8;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.1);
-          }
-        }
-
-        .animate-pulse-soft {
-          animation: pulse-soft 3s ease-in-out infinite;
-        }
-
-        /* Slow ping for live indicators */
-        @keyframes ping-slow {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-
-        .animate-ping-slow {
-          animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-
-        /* Gentle shimmer like water surface */
-        @keyframes shimmer-slow {
-          0% {
-            transform: translateX(-100%) translateY(-100%);
-            opacity: 0;
-          }
-          50% {
-            opacity: 0.3;
-          }
-          100% {
-            transform: translateX(100%) translateY(100%);
-            opacity: 0;
-          }
-        }
-
-        .animate-shimmer-slow {
-          animation: shimmer-slow 8s ease-in-out infinite;
-        }
-
-        /* Swaying motion like underwater plants */
-        @keyframes sway {
-          0%, 100% {
-            transform: translateX(0) rotate(0deg);
-          }
-          25% {
-            transform: translateX(10px) rotate(2deg);
-          }
-          75% {
-            transform: translateX(-10px) rotate(-2deg);
-          }
-        }
-
-        .animate-sway {
-          animation: sway 6s ease-in-out infinite;
-        }
-
-        .animate-sway-delayed {
-          animation: sway 7s ease-in-out infinite;
-          animation-delay: -2s;
-        }
-
-        /* Bubble rising animation */
-        @keyframes bubble-rise {
-          0% {
-            transform: translateY(0) translateX(0) scale(0.8);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.7;
-          }
-          50% {
-            opacity: 0.9;
-            transform: translateY(-50vh) translateX(20px) scale(1);
-          }
-          100% {
-            transform: translateY(-100vh) translateX(-10px) scale(0.6);
-            opacity: 0;
-          }
-        }
-
-        /* Smooth backdrop blur support */
-        @supports (backdrop-filter: blur(12px)) {
-          .backdrop-blur-xl {
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-          }
-          .backdrop-blur-2xl {
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-          }
-        }
-      `}</style>
-
+    <div className="pond-dashboard relative min-h-screen">
       {/* Serene pond background with depth gradient */}
       <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#0a2f2f] via-[#0c3d3d] to-[#156565]" />
 
@@ -1275,9 +1020,9 @@ export function CompactPond0xDashboard({
 
       {/* Organic light spots creating underwater atmosphere */}
       <div className="fixed inset-0 -z-10 opacity-15 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-400 rounded-full blur-[120px] animate-pulse-soft" />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-emerald-400 rounded-full blur-[100px] animate-pulse-soft" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-cyan-400 rounded-full blur-[80px] animate-pulse-soft" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-400 rounded-full blur-[120px] animate-pond-pulse-soft" />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-emerald-400 rounded-full blur-[100px] animate-pond-pulse-soft" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-cyan-400 rounded-full blur-[80px] animate-pond-pulse-soft" style={{ animationDelay: '4s' }} />
       </div>
 
       {/* Content with proper spacing */}
