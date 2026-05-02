@@ -32,8 +32,9 @@ import { WaterRipple } from "@/components/ui/WaterRipple";
 import { DewdropGlow } from "@/components/ui/DewdropGlow";
 import { LiveIndicator } from "@/components/ui/LiveIndicator";
 import { LilyPadCard } from "@/components/ui/LilyPadCard";
+import { DashboardHeader } from "@/components/swapper/sections/DashboardHeader";
+import { TokenPricesPanel } from "@/components/swapper/sections/TokenPricesPanel";
 import { TOKEN_ICONS } from "@/lib/tokenIcons";
-import { getBadgeEmoji } from "@/lib/badges";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
 
 interface CompactPond0xDashboardProps {
@@ -78,15 +79,8 @@ export function CompactPond0xDashboard({
   failed = 0,
   drifted = 0,
 }: CompactPond0xDashboardProps) {
-  const {
-    wpondPrice,
-    pndcPrice,
-    porkPrice,
-    solPrice,
-    ethPrice,
-    pondSolPrice,
-    loading: loadingPrices,
-  } = useTokenPrices();
+  const pricesObj = useTokenPrices();
+  const { wpondPrice, solPrice, pondSolPrice } = pricesObj;
 
   // Wallet connection state (mock — replaced by real WalletBar in next phase step)
   const [isWalletExpanded, setIsWalletExpanded] = useState(false);
@@ -101,15 +95,6 @@ export function CompactPond0xDashboard({
       { symbol: 'pondSOL', amount: 5.2, usdValue: 5.2 * pondSolPrice, icon: TOKEN_ICONS.pondSOL },
       { symbol: 'USDC', amount: 1000.0, usdValue: 1000.0, icon: TOKEN_ICONS.USDC },
     ]
-  };
-
-  /**
-   * Format price based on magnitude for optimal readability
-   */
-  const formatPrice = (price: number) => {
-    if (price >= 1) return `$${price.toFixed(4)}`;
-    if (price >= 0.01) return `$${price.toFixed(6)}`;
-    return `$${price.toFixed(8)}`;
   };
 
   /**
@@ -364,269 +349,13 @@ export function CompactPond0xDashboard({
    * Serene pond-themed header with organic shapes and glows
    */
   const renderHeader = () => (
-    <div className="space-y-6">
-      {/* Main Header Card */}
-      <div className="relative bg-gradient-to-br from-slate-950/90 via-teal-950/85 to-cyan-950/90 backdrop-blur-2xl rounded-[3rem_2rem_3rem_2.5rem] border-2 border-teal-400/30 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
-        {/* Dark overlay for depth */}
-        <div className="absolute inset-0 bg-black/30" />
-
-        {/* Enhanced bubble animation for pond atmosphere */}
-        <div className="absolute inset-0 pointer-events-none opacity-40 z-0">
-          <BubbleAnimation
-            bubbleCount={12}
-            colorScheme="mixed"
-            density="normal"
-          />
-        </div>
-
-        {/* Underwater light rays */}
-        <div className="absolute inset-0 overflow-hidden opacity-15 z-0">
-          <div className="absolute top-0 left-1/4 w-32 h-full bg-gradient-to-b from-cyan-300/40 to-transparent rotate-12 blur-2xl animate-pond-sway" />
-          <div className="absolute top-0 right-1/3 w-24 h-full bg-gradient-to-b from-teal-300/30 to-transparent -rotate-6 blur-2xl animate-pond-sway-delayed" />
-        </div>
-
-        {/* Gentle water surface shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-teal-300/10 animate-pond-shimmer-slow z-0" />
-
-        <div className="relative z-10 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-5">
-              {/* Logo with lily pad inspired glow */}
-              <div className="relative animate-pond-float">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400/30 via-teal-400/25 to-cyan-400/30 border-2 border-emerald-400/50 flex items-center justify-center shadow-[0_0_40px_rgba(74,222,128,0.5)] backdrop-blur-sm">
-                  <TokenIcon
-                    info={{
-                      symbol: 'wPOND',
-                      icon: '/tokens/solana/wpond.png',
-                      name: 'wPOND',
-                    }}
-                    width={64}
-                    height={64}
-                    enableUnknownTokenWarning={false}
-                  />
-                </div>
-                {isPro && (
-                  <div className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center border-2 border-slate-950 text-sm shadow-[0_0_20px_rgba(251,191,36,0.7)] animate-pond-pulse-soft">
-                    ✨
-                  </div>
-                )}
-                {/* Dewdrop accents around logo */}
-                <div className="absolute -top-2 left-4">
-                  <DewdropGlow color="teal" size="sm" />
-                </div>
-                <div className="absolute -bottom-1 -right-2">
-                  <DewdropGlow color="green" size="sm" />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-4 mb-2">
-                  <h1 className="text-4xl font-bold tracking-wide text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]">
-                    POND0X
-                  </h1>
-                  <LiveIndicator />
-                </div>
-                <p className="text-sm font-medium text-teal-200/90 tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-                  Ecosystem Dashboard
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Badge collection - lotus petal inspired */}
-          {badges && (
-            <div className="flex flex-wrap items-center gap-3">
-              {badges.split(", ").map((badge) => {
-                const emoji = getBadgeEmoji(badge);
-                return (
-                  <div
-                    key={badge}
-                    className="px-4 py-2 bg-teal-950/70 backdrop-blur-xl border border-amber-400/50 rounded-full font-medium text-xs text-amber-200 flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-amber-400/70 hover:shadow-[0_6px_30px_rgba(251,191,36,0.3)] transition-all animate-pond-float"
-                  >
-                    {emoji && <span className="text-base">{emoji}</span>}
-                    <span className="tracking-wide">{badge}</span>
-                  </div>
-                );
-              })}
-
-              {isPro && (
-                <div className="px-4 py-2 bg-gradient-to-r from-amber-900/60 to-yellow-900/60 backdrop-blur-xl border border-amber-400/60 rounded-full font-semibold text-xs text-amber-100 flex items-center gap-2 shadow-[0_4px_24px_rgba(0,0,0,0.5)] animate-pond-float">
-                  <span className="text-base">✨</span>
-                  <span className="tracking-wide">PRO MEMBER</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Wallet Connection Bar - Integrated below header */}
-      {renderWalletBar()}
-    </div>
+    <DashboardHeader badges={badges} isPro={isPro} walletSlot={renderWalletBar()} />
   );
 
   /**
    * Token prices displayed on lily pad cards with organic layout
    */
-  const renderTokenPrices = () => {
-    const solanaTokens = [
-      { symbol: 'SOL', price: solPrice, icon: TOKEN_ICONS.SOL, featured: true },
-      { symbol: 'wPOND', price: wpondPrice, icon: TOKEN_ICONS.wPOND, featured: true },
-      { symbol: 'pondSOL', price: pondSolPrice, icon: TOKEN_ICONS.pondSOL, featured: false },
-    ];
-
-    const ethereumTokens = [
-      { symbol: 'ETH', price: ethPrice, icon: TOKEN_ICONS.ETH, featured: true },
-      { symbol: 'PNDC', price: pndcPrice, icon: TOKEN_ICONS.PNDC, featured: true },
-      { symbol: 'PORK', price: porkPrice, icon: TOKEN_ICONS.PORK, featured: false },
-    ];
-
-    /**
-     * Token row with gentle hover effects and water ripples
-     */
-    const TokenRow = ({ token }: { token: typeof solanaTokens[0] }) => {
-      const [isHovered, setIsHovered] = useState(false);
-
-      return (
-        <div
-          className="group relative flex items-center justify-between px-5 py-4 border-b border-teal-400/10 hover:bg-teal-400/10 transition-all duration-300 rounded-2xl"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {/* Gentle glow on hover */}
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity rounded-full blur-sm" />
-
-          {isHovered && (
-            <div className="absolute inset-0 pointer-events-none">
-              <WaterRipple delay={0} />
-            </div>
-          )}
-
-          <div className="flex items-center gap-3 flex-1 min-w-0 relative z-10">
-            <div className="relative flex-shrink-0 w-11 h-11 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full ring-2 ring-teal-400/40 group-hover:ring-emerald-400/60 transition-all" />
-              <TokenIcon
-                info={{
-                  symbol: token.symbol,
-                  icon: token.icon,
-                  name: token.symbol,
-                }}
-                width={44}
-                height={44}
-                enableUnknownTokenWarning={false}
-              />
-            </div>
-            <span className={cn(
-              "font-semibold text-base tracking-wide drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]",
-              token.featured ? "text-cyan-100" : "text-teal-200"
-            )}>
-              {token.symbol}
-            </span>
-          </div>
-
-          <div className={cn(
-            "text-lg font-semibold tabular-nums tracking-tight relative z-10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]",
-            token.price > 0 ? "text-emerald-300" : "text-teal-500"
-          )}>
-            {loadingPrices ? (
-              <span className="animate-pulse">---</span>
-            ) : (
-              formatPrice(token.price)
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    /**
-     * Chain section with dark water surface aesthetic and strong backdrop blur
-     */
-    const ChainSection = ({
-      title,
-      tokens,
-      chainColor,
-      chainIcon
-    }: {
-      title: string;
-      tokens: typeof solanaTokens;
-      chainColor: string;
-      chainIcon: string;
-    }) => (
-      <div className="relative bg-slate-950/85 backdrop-blur-2xl border-2 border-teal-400/30 overflow-hidden rounded-[2.5rem_3rem_2rem_2.5rem] shadow-[0_12px_48px_rgba(0,0,0,0.5)] animate-pond-float">
-        {/* Dark overlay for glass morphism */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/30 to-black/40" />
-
-        {/* Water surface shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-cyan-300/5 opacity-30" />
-
-        {/* Gentle wave pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(74,222,128,0.2)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(45,212,191,0.2)_0%,transparent_50%)]" />
-        </div>
-
-        {/* Header - lotus petal inspired */}
-        <div className={cn("relative px-6 py-4 border-b-2 z-10", chainColor, "bg-gradient-to-r from-teal-950/60 to-transparent backdrop-blur-sm")}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl filter drop-shadow-[0_2px_12px_rgba(74,222,128,0.6)]">{chainIcon}</span>
-              <h3 className="font-semibold text-base tracking-wide text-cyan-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
-                {title}
-              </h3>
-            </div>
-            <LiveIndicator />
-          </div>
-        </div>
-
-        {/* Token list */}
-        <div className="relative p-2 z-10">
-          {loadingPrices ? (
-            <div className="px-4 py-12 text-center">
-              <div className="inline-block">
-                <div className="w-10 h-10 rounded-full border-3 border-teal-400/30 border-t-emerald-400 animate-spin" />
-              </div>
-              <p className="mt-4 text-xs font-medium text-teal-400/80 tracking-wide">
-                Loading pond data...
-              </p>
-            </div>
-          ) : tokens.length === 0 ? (
-            <div className="px-4 py-12 text-center text-teal-400/60 font-medium text-sm tracking-wide">
-              No tokens in pond
-            </div>
-          ) : (
-            tokens.map((token) => <TokenRow key={token.symbol} token={token} />)
-          )}
-        </div>
-
-      </div>
-    );
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between px-2">
-          <h2 className="font-semibold text-xl tracking-wide text-teal-100 flex items-center gap-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-            <span className="text-2xl">🪷</span>
-            <span>Market Waters</span>
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ChainSection
-            title="Solana Pond"
-            tokens={solanaTokens}
-            chainColor="border-purple-400/40"
-            chainIcon="💜"
-          />
-          <ChainSection
-            title="Ethereum Pond"
-            tokens={ethereumTokens}
-            chainColor="border-blue-400/40"
-            chainIcon="💙"
-          />
-        </div>
-      </div>
-    );
-  };
+  const renderTokenPrices = () => <TokenPricesPanel prices={pricesObj} />;
 
   /**
    * Mining statistics with lily pad cards and organic flow
