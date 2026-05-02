@@ -28,6 +28,10 @@ import {
 import { TokenLogo, TokenIcon } from "@/components/icons/tokens";
 import { TokenPriceSkeleton } from "@/components/ui/TokenPriceSkeleton";
 import { BubbleAnimation } from "@/components/ui/BubbleAnimation";
+import { WaterRipple } from "@/components/ui/WaterRipple";
+import { DewdropGlow } from "@/components/ui/DewdropGlow";
+import { LiveIndicator } from "@/components/ui/LiveIndicator";
+import { LilyPadCard } from "@/components/ui/LilyPadCard";
 import { TOKEN_ICONS } from "@/lib/tokenIcons";
 import { getBadgeEmoji } from "@/lib/badges";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
@@ -53,164 +57,7 @@ interface CompactPond0xDashboardProps {
   drifted?: number;
 }
 
-interface MetricCardProps {
-  title: string;
-  value: string | number;
-  subtitle?: string;
-  loading?: boolean;
-  status?: 'positive' | 'negative' | 'warning' | 'neutral';
-  icon?: string;
-}
-
-/**
- * WaterRipple - Animated water ripple effect component
- * Creates concentric circles that expand outward like ripples on pond water
- */
-function WaterRipple({ delay = 0 }: { delay?: number }) {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/20 animate-pond-ripple"
-        style={{ animationDelay: `${delay}ms` }}
-      />
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/15 animate-pond-ripple"
-        style={{ animationDelay: `${delay + 600}ms` }}
-      />
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full rounded-full border border-teal-400/10 animate-pond-ripple"
-        style={{ animationDelay: `${delay + 1200}ms` }}
-      />
-    </div>
-  );
-}
-
-/**
- * DewdropGlow - Decorative dewdrop accent with soft glow
- * Adds bioluminescent effect to important metrics
- */
-function DewdropGlow({ color = "teal", size = "sm" }: { color?: string; size?: 'sm' | 'md' | 'lg' }) {
-  const sizeClasses = {
-    sm: 'w-2 h-2',
-    md: 'w-3 h-3',
-    lg: 'w-4 h-4'
-  };
-
-  const colorClasses = {
-    teal: 'bg-teal-400 shadow-[0_0_12px_rgba(45,212,191,0.6)]',
-    green: 'bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.6)]',
-    pink: 'bg-pink-400 shadow-[0_0_12px_rgba(244,114,182,0.6)]',
-    amber: 'bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.6)]',
-  };
-
-  return (
-    <div className={cn(
-      "rounded-full animate-pond-pulse-soft",
-      sizeClasses[size],
-      colorClasses[color as keyof typeof colorClasses] || colorClasses.teal
-    )} />
-  );
-}
-
-/**
- * LiveIndicator - Gentle pulsing indicator for real-time data
- * Styled like a bioluminescent organism in pond water
- */
-function LiveIndicator() {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="relative">
-        <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pond-pulse-soft shadow-[0_0_10px_rgba(74,222,128,0.6)]" />
-        <div className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400/40 rounded-full animate-pond-ping-slow" />
-      </div>
-      <span className="text-[10px] font-medium tracking-wide text-emerald-300/90">Live</span>
-    </div>
-  );
-}
-
-/**
- * LilyPadCard - Organic lily pad shaped card for displaying metrics
- * Features soft rounded edges, DARK glass-morphic surface with strong blur, and hover ripple effects
- */
-function LilyPadCard({ title, value, subtitle, loading, status = 'neutral', icon }: MetricCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const statusColors = {
-    positive: 'bg-emerald-950/80 border-emerald-400/40 hover:border-emerald-400/60',
-    negative: 'bg-rose-950/80 border-pink-400/40 hover:border-pink-400/60',
-    warning: 'bg-amber-950/80 border-amber-400/40 hover:border-amber-400/60',
-    neutral: 'bg-slate-950/80 border-teal-400/30 hover:border-teal-400/50'
-  };
-
-  const valueColors = {
-    positive: 'text-emerald-300',
-    negative: 'text-pink-300',
-    warning: 'text-amber-300',
-    neutral: 'text-cyan-200'
-  };
-
-  const glowColors = {
-    positive: 'green',
-    negative: 'pink',
-    warning: 'amber',
-    neutral: 'teal'
-  };
-
-  return (
-    <div
-      className={cn(
-        "relative backdrop-blur-xl border-2 transition-all duration-500 overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
-        "rounded-[2rem_3rem_2.5rem_2rem]", // Organic lily pad shape
-        "hover:shadow-[0_12px_48px_rgba(45,212,191,0.2)]",
-        "animate-pond-float",
-        statusColors[status]
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Dark overlay for stronger glass effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/30 to-black/40" />
-
-      {/* Water surface shimmer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 opacity-30" />
-
-      {/* Gentle wave pattern */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(45,212,191,0.15)_0%,transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(74,222,128,0.15)_0%,transparent_50%)]" />
-      </div>
-
-      {/* Ripple effect on hover */}
-      {isHovered && <WaterRipple />}
-
-      <div className="relative p-5 z-10">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-[11px] font-medium tracking-wide text-teal-300/90 uppercase">
-            {title}
-          </div>
-          {icon && <span className="text-lg opacity-80">{icon}</span>}
-        </div>
-
-        <div className={cn(
-          "text-3xl font-semibold tabular-nums tracking-tight mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]",
-          valueColors[status]
-        )}>
-          {loading ? (
-            <span className="inline-block animate-pulse">--</span>
-          ) : (
-            value
-          )}
-        </div>
-
-        {subtitle && (
-          <div className="text-[10px] text-teal-400/70 tracking-wide">
-            {subtitle}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+// Subcomponents (WaterRipple, DewdropGlow, LiveIndicator, LilyPadCard) live in components/ui/.
 
 export function CompactPond0xDashboard({
   proSwapsSol,
