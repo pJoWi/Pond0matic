@@ -143,6 +143,7 @@ export function TopNavigation({
     { href: "/", label: "Dashboard", tone: "lily" as const },
     { href: "/swapper", label: "Swapper", tone: "wave" as const },
     { href: "/alerts", label: "Alerts", tone: "spark" as const, badgeCount: alertBadgeCount },
+    { href: "/portfolio", label: "Portfolio", tone: "wave" as const },
   ];
 
   const validateRpcUrl = (value: string) => {

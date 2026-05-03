@@ -9,6 +9,24 @@ import { validateSwapTransaction, validateSwapAmount } from "@/lib/transactionVa
 import { getPhantomProvider } from "@/lib/windowHelpers";
 import { fetchTokenBalance, SOL_MINT } from "@/lib/tokenBalance";
 import { extractReferralCode, buildJupiterSwapRequest, getFeeRoutingDescription } from "@/lib/referral";
+import {
+  dispatchSwapEvent,
+  makeInternalSwapId,
+  type SwapStartedEvent,
+} from "@/lib/portfolio/swapEventBus";
+
+type SwapModeTag = SwapStartedEvent["mode"];
+
+const KNOWN_MINT_SYMBOLS: Record<string, string> = {
+  "So11111111111111111111111111111111111111112": "SOL",
+  "3JgFwoYV74f6LwWjQWnr3YDPFnmBdwQfNyubv99jqUoq": "wPOND",
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC",
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "USDT",
+};
+
+function symbolForMint(mint: string): string {
+  return KNOWN_MINT_SYMBOLS[mint] || TOKEN_NAMES[mint] || mint.slice(0, 4);
+}
 
 // Jupiter API endpoints
 const JUP_QUOTE = "https://api.jup.ag/swap/v1/quote";
@@ -98,7 +116,10 @@ export function useSwapExecution() {
    * Execute a single Jupiter swap
    */
   const jupExecute = useCallback(
-    async (pairFrom: string, pairTo: string, uiAmountStr: string, referralAddress?: string) => {
+    async (pairFrom: string, pairTo: string, uiAmountStr: string, referralAddress?: string, mode: SwapModeTag = "normal") => {
+      // Track swap lifecycle through the bus so the recorder can persist a record.
+      const internalId = makeInternalSwapId();
+      let dispatchedStart = false;
       const provider = getPhantomProvider();
       if (!provider?.publicKey) {
         ctx.log("Connect wallet first.");
@@ -231,6 +252,25 @@ export function useSwapExecution() {
           ctx.log(`⚠️ Transaction warnings: ${validation.warnings.join(', ')}`);
         }
 
+        // Dispatch swap-started just before the user signs — at this point
+        // we know the input/output amounts from the quote.
+        const fromSymbol = symbolForMint(pairFrom);
+        const toSymbol = symbolForMint(pairTo);
+        const fromAmount = Number(uiAmountStr) || 0;
+        const toAmount = Number(quote?.outAmount ?? 0) / Math.pow(10, quote?.outputDecimals ?? 0) || 0;
+        dispatchSwapEvent({
+          type: "swap-started",
+          internalId,
+          mode,
+          fromMint: pairFrom,
+          fromSymbol,
+          fromAmount,
+          toMint: pairTo,
+          toSymbol,
+          toAmount,
+        });
+        dispatchedStart = true;
+
         let signature = "";
         if (provider.signAndSendTransaction) {
           const r = await provider.signAndSendTransaction(tx);
@@ -244,9 +284,11 @@ export function useSwapExecution() {
           signature = await connection.sendRawTransaction(signed.serialize());
         } else {
           ctx.log("Wallet does not support signing.");
+          dispatchSwapEvent({ type: "swap-failed", internalId, reason: "Wallet does not support signing" });
           return;
         }
 
+        dispatchSwapEvent({ type: "swap-sent", internalId, signature });
         ctx.log("Sent → " + short(signature, 6) + " | " + solscanTx(signature));
 
         // Confirm transaction with timeout
@@ -265,6 +307,7 @@ export function useSwapExecution() {
         try {
           await Promise.race([confirmPromise, timeoutPromise]);
           ctx.log("Confirmed → " + short(signature, 6));
+          dispatchSwapEvent({ type: "swap-confirmed", internalId });
           // Show success feedback
           ctx.successToast("Swap confirmed!");
           ctx.triggerQuickConfetti();
@@ -272,7 +315,10 @@ export function useSwapExecution() {
           if (timeoutError.message === "Transaction confirmation timeout") {
             ctx.log("⚠️ Confirmation timeout. Check manually: " + solscanTx(signature));
             ctx.warningToast("Confirmation timeout - check transaction manually");
+            // Treat timeout as failed for record-keeping purposes
+            dispatchSwapEvent({ type: "swap-failed", internalId, reason: "Confirmation timeout" });
           } else {
+            dispatchSwapEvent({ type: "swap-failed", internalId, reason: timeoutError?.message || String(timeoutError) });
             throw timeoutError;
           }
         }
@@ -283,6 +329,9 @@ export function useSwapExecution() {
         const errorMsg = e?.message || String(e);
         ctx.log("Execute error: " + errorMsg);
         ctx.errorToast("Swap failed: " + errorMsg.slice(0, 50));
+        if (dispatchedStart) {
+          dispatchSwapEvent({ type: "swap-failed", internalId, reason: errorMsg });
+        }
       }
     },
     [ctx, vaultMap]
@@ -292,7 +341,13 @@ export function useSwapExecution() {
    * Execute a single swap with validation
    */
   const swapOnce = useCallback(
-    async (pairFrom: string, pairTo: string, uiAmountStr: string, referralAddress?: string) => {
+    async (
+      pairFrom: string,
+      pairTo: string,
+      uiAmountStr: string,
+      referralAddress?: string,
+      mode: SwapModeTag = "normal"
+    ) => {
       if (!ctx.wallet) {
         ctx.log("Connect wallet first.");
         return;
@@ -301,7 +356,7 @@ export function useSwapExecution() {
         ctx.log("Enter a valid amount.");
         return;
       }
-      await jupExecute(pairFrom, pairTo, uiAmountStr, referralAddress);
+      await jupExecute(pairFrom, pairTo, uiAmountStr, referralAddress, mode);
     },
     [ctx, jupExecute]
   );
@@ -370,7 +425,7 @@ export function useSwapExecution() {
         ctx.setCurrentSwapIndex(totalSwapCount);
         const amt = boostRandom(Number(ctx.amount), Number(ctx.maxAmount));
         ctx.log(`💱 Swap ${i}/${swapsPerRound}: ${amt} ${TOKEN_NAMES[ctx.fromMint] || "TOKEN"} (randomized)`);
-        await swapOnce(ctx.fromMint, ctx.toMint, amt, referralAddress);
+        await swapOnce(ctx.fromMint, ctx.toMint, amt, referralAddress, "boost");
 
         if (i < swapsPerRound && runRef.current) {
           ctx.log(`⏳ Waiting ${ctx.swapDelayMs}ms before next swap...`);
@@ -396,7 +451,7 @@ export function useSwapExecution() {
           } else {
             ctx.log(`↩️ Return swap: ${returnAmt} ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} (accumulated: ${initialAmount.toFixed(6)} → ${finalAmount.toFixed(6)})`);
           }
-          await swapOnce(ctx.toMint, ctx.fromMint, returnAmt, referralAddress);
+          await swapOnce(ctx.toMint, ctx.fromMint, returnAmt, referralAddress, "boost");
         }
       }
 
@@ -474,7 +529,7 @@ export function useSwapExecution() {
 
         // Forward swap
         ctx.log(`💱 Rewards round ${swapInfo} - Forward: ${ctx.amount} ${TOKEN_NAMES[ctx.fromMint] || "TOKEN"}`);
-        await swapOnce(ctx.fromMint, ctx.toMint, ctx.amount, referralAddress);
+        await swapOnce(ctx.fromMint, ctx.toMint, ctx.amount, referralAddress, "rewards");
 
         // Wait between forward and return swap
         if (runRef.current) {
@@ -493,7 +548,7 @@ export function useSwapExecution() {
             ctx.log(`⚠️ No accumulated ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} to return swap`);
           } else {
             ctx.log(`↩️ Rewards round ${swapInfo} - Return: ${returnAmount} ${TOKEN_NAMES[ctx.toMint] || "TOKEN"} (accumulated: ${initialAmount.toFixed(6)} → ${finalAmount.toFixed(6)})`);
-            await swapOnce(ctx.toMint, ctx.fromMint, returnAmount, referralAddress);
+            await swapOnce(ctx.toMint, ctx.fromMint, returnAmount, referralAddress, "rewards");
           }
         }
 
@@ -581,7 +636,7 @@ export function useSwapExecution() {
 
     try {
       ctx.setCurrentSwapIndex(1);
-      await swapOnce(ctx.fromMint, ctx.toMint, ctx.amount, referralAddress);
+      await swapOnce(ctx.fromMint, ctx.toMint, ctx.amount, referralAddress, "normal");
       ctx.log(`Swap complete`);
       ctx.successToast("Swap complete!");
     } catch (error) {

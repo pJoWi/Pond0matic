@@ -5,10 +5,12 @@ import { CompactSwapper } from "@/components/CompactSwapper";
 import { useSwapExecution } from "@/hooks/useSwapExecution";
 import { useToast } from "@/hooks/useToast";
 import { useAlertEngine } from "@/hooks/useAlertEngine";
+import { useSwapRecorder } from "@/hooks/useSwapRecorder";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   useAlertEngine(); // Mount once: orchestrates all rig + price alerts
+  useSwapRecorder(); // Mount once: captures swap lifecycle events into the portfolio store
   const [swapperOpen, setSwapperOpen] = useState(false);
   const { info } = useToast();
   const {
@@ -92,7 +94,7 @@ export default function HomePage() {
         role="dialog"
         aria-label="Token Swapper"
         aria-modal="true"
-        aria-hidden={!swapperOpen ? "true" : "false"}
+        {...(!swapperOpen ? { "aria-hidden": true } : {})}
       >
         <button
           type="button"
