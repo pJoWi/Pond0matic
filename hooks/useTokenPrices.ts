@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useVisibilityPolling } from "./useVisibilityPolling";
 
 export interface TokenPrices {
   wpondPrice: number;
@@ -20,8 +21,6 @@ const DEFAULT_PRICES: TokenPrices = {
   pondSolPrice: 0,
   loading: true,
 };
-
-const REFRESH_INTERVAL_MS = 30_000;
 
 // pondSOL mint placeholder - replace once a real mint is sourced
 const PONDSOL_MINT = "pondSoL1111111111111111111111111111111111111";
@@ -46,6 +45,7 @@ async function safeJson(res: Response): Promise<any | null> {
  */
 export function useTokenPrices(): TokenPrices {
   const [prices, setPrices] = useState<TokenPrices>(DEFAULT_PRICES);
+  const intervalMs = useVisibilityPolling();
 
   useEffect(() => {
     let cancelled = false;
@@ -126,12 +126,12 @@ export function useTokenPrices(): TokenPrices {
     };
 
     fetchAll();
-    const interval = setInterval(fetchAll, REFRESH_INTERVAL_MS);
+    const interval = setInterval(fetchAll, intervalMs);
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, []);
+  }, [intervalMs]);
 
   return prices;
 }

@@ -4,9 +4,11 @@ import { Dashboard } from "@/components/Dashboard";
 import { CompactSwapper } from "@/components/CompactSwapper";
 import { useSwapExecution } from "@/hooks/useSwapExecution";
 import { useToast } from "@/hooks/useToast";
+import { useAlertEngine } from "@/hooks/useAlertEngine";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
+  useAlertEngine(); // Mount once: orchestrates all rig + price alerts
   const [swapperOpen, setSwapperOpen] = useState(false);
   const { info } = useToast();
   const {

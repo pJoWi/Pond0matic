@@ -7,6 +7,7 @@ import { StatusBar, type DashboardType } from "./StatusBar";
 import type { SwapMode } from "@/types/swapModes";
 import { useBalances } from "@/hooks/useBalances";
 import { TokenLogo } from "@/components/icons/tokens/TokenLogo";
+import { useAlertsBadgeCount } from "@/hooks/useAlertsBadgeCount";
 
 interface TopNavigationProps {
   theme: "dark" | "light";
@@ -105,6 +106,8 @@ export function TopNavigation({
     log
   );
 
+  const alertBadgeCount = useAlertsBadgeCount();
+
   useEffect(() => {
     setRpcDraft(rpc);
   }, [rpc]);
@@ -139,6 +142,7 @@ export function TopNavigation({
   const navItems = [
     { href: "/", label: "Dashboard", tone: "lily" as const },
     { href: "/swapper", label: "Swapper", tone: "wave" as const },
+    { href: "/alerts", label: "Alerts", tone: "spark" as const, badgeCount: alertBadgeCount },
   ];
 
   const validateRpcUrl = (value: string) => {
@@ -227,6 +231,7 @@ export function TopNavigation({
                   active={pathname === item.href}
                   label={item.label}
                   tone={item.tone}
+                  badgeCount={"badgeCount" in item ? item.badgeCount : undefined}
                 />
               ))}
             </div>
@@ -708,9 +713,10 @@ interface NavButtonProps {
   active: boolean;
   label: string;
   tone: NavTone;
+  badgeCount?: number;
 }
 
-function NavButton({ href, active, label, tone }: NavButtonProps) {
+function NavButton({ href, active, label, tone, badgeCount }: NavButtonProps) {
   const tones: Record<
     NavTone,
     { from: string; to: string; border: string; glow: string; waterBase: string }
@@ -812,6 +818,14 @@ function NavButton({ href, active, label, tone }: NavButtonProps) {
           />
         )}
         <span className="relative">{label}</span>
+        {typeof badgeCount === "number" && badgeCount > 0 && (
+          <span
+            className="ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold bg-amber-500/90 text-amber-50 shadow-[0_0_10px_rgba(251,191,36,0.7)]"
+            aria-label={`${badgeCount} recent alert${badgeCount === 1 ? "" : "s"}`}
+          >
+            {badgeCount > 99 ? "99+" : badgeCount}
+          </span>
+        )}
       </span>
 
       {/* Enhanced border glow for active */}
