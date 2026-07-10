@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pond0matic-tools": {
+      "command": "npx",
+      "args": ["tsx", "tools/mcp-server.ts"]
+    }
+  }
+}
