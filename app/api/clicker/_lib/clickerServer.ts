@@ -92,11 +92,42 @@ export async function readControl(): Promise<Partial<ControlFile> | null> {
   }
 }
 
-/** Atomic write: write to .tmp then rename over the real file. */
+/**
+ * Atomic write: write to .tmp then rename over the real file.
+ *
+ * On Windows, Python opens control.json without FILE_SHARE_DELETE, so a
+ * rename that lands inside Python's read window throws EPERM/EACCES/EBUSY.
+ * We retry the rename up to 5 times with a 50 ms delay.  If all retries
+ * fail, we fall back to a direct writeFile — write-sharing IS permitted, so
+ * the direct write succeeds where rename cannot.  A torn read on the Python
+ * side causes read_control() to return None → the clicker exits with reason
+ * "control_missing", which is the fail-safe direction (not clicking).
+ */
 export async function writeControl(control: ControlFile): Promise<void> {
   await fs.mkdir(RUNTIME_DIR, { recursive: true });
-  await fs.writeFile(CONTROL_TMP_PATH, JSON.stringify(control, null, 2), "utf8");
-  await fs.rename(CONTROL_TMP_PATH, CONTROL_PATH);
+  const json = JSON.stringify(control, null, 2);
+  await fs.writeFile(CONTROL_TMP_PATH, json, "utf8");
+
+  const TRANSIENT = new Set(["EPERM", "EACCES", "EBUSY"]);
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      await fs.rename(CONTROL_TMP_PATH, CONTROL_PATH);
+      return; // success
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code;
+      if (!TRANSIENT.has(code ?? "")) throw err; // non-transient — propagate immediately
+      lastErr = err;
+      await new Promise<void>((r) => setTimeout(r, 50));
+    }
+  }
+  // All rename attempts exhausted — fall back to direct write (fail-safe: a
+  // torn read exits the clicker; armed:false is always safely observable).
+  try {
+    await fs.writeFile(CONTROL_PATH, json, "utf8");
+  } catch {
+    throw lastErr; // surface the original rename error if fallback also fails
+  }
 }
 
 export function isProcessAlive(pid: number): boolean {

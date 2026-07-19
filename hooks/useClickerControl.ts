@@ -33,6 +33,11 @@ export interface UseClickerControlResult {
  * (heartbeat / pause / stop) and exposes actions to the panel.
  * Poll cadence (5 s visible / 10 s hidden) doubles as the heartbeat;
  * both cadences must stay below the Python side's 15 s dead-man's window.
+ *
+ * Disarm is level-triggered: stop() sets stopRequestedRef and retries up
+ * to 3 times immediately; each subsequent tick re-asserts the stop POST
+ * until the process is observed stopped, and suppresses heartbeat writes
+ * while a disarm is pending so our own heartbeat never races the disarm.
  */
 export function useClickerControl(args: UseClickerControlArgs): UseClickerControlResult {
   const { swapperRunning, miningActive, manualPause } = args;
@@ -43,6 +48,7 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
   const pollMs = useVisibilityPolling(5_000, 10_000);
   const busyRef = useRef(false);
   const unavailableRef = useRef(false);
+  const stopRequestedRef = useRef(false);
 
   const policy = evaluateClickerPolicy({
     swapperRunning,
@@ -54,7 +60,18 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
   });
 
   const stop = useCallback(async () => {
-    await fetch("/api/clicker/stop", { method: "POST" }).catch(() => undefined);
+    stopRequestedRef.current = true;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch("/api/clicker/stop", { method: "POST" });
+        if (res.ok) return; // success — tick will clear the ref once process is observed stopped
+      } catch {
+        // transient fetch error — retry
+      }
+      if (attempt < 2) await new Promise<void>((r) => setTimeout(r, 250));
+    }
+    // All retries exhausted; stopRequestedRef stays true — the tick will
+    // keep re-asserting the stop until the process is observed stopped.
   }, []);
 
   const start = useCallback(async (settings: StartRequest): Promise<string | null> => {
@@ -94,6 +111,21 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
         setStatus(data.status);
         setProcessAlive(data.processAlive);
         setEvents(data.events);
+
+        // Level-triggered disarm: if a stop was requested and the process is
+        // still alive, re-assert the stop and skip the heartbeat for this tick.
+        const sessionActive =
+          data.status &&
+          data.status.state !== "stopped" &&
+          data.processAlive;
+        if (stopRequestedRef.current) {
+          if (sessionActive) {
+            fetch("/api/clicker/stop", { method: "POST" }).catch(() => undefined);
+          } else {
+            stopRequestedRef.current = false; // process observed stopped — disarm achieved
+          }
+          return; // skip normal decision block; no heartbeat while disarm is pending
+        }
 
         const decision = evaluateClickerPolicy({
           swapperRunning,
