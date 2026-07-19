@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { evaluateClickerPolicy, deriveMiningActive } from "@/lib/clicker/clickerPolicyEvaluator";
+import { evaluateClickerPolicy, deriveMiningActive, isConfirmedStop } from "@/lib/clicker/clickerPolicyEvaluator";
 import type { ClickerStatus } from "@/lib/clicker/types";
 import type { RigHealthSnapshot } from "@/lib/alerts/types";
 
@@ -82,6 +82,27 @@ describe("evaluateClickerPolicy", () => {
   it("is green armed with heartbeat in the happy path", () => {
     const r = evaluateClickerPolicy(baseInput());
     expect(r).toMatchObject({ led: "green", desiredPaused: false, shouldSendHeartbeat: true, shouldStop: false, offline: false });
+  });
+});
+
+describe("isConfirmedStop", () => {
+  it("returns false when status is null (torn read must NOT confirm)", () => {
+    // torn status.json read — status route reports processAlive false here, which must not count as confirmation
+    expect(isConfirmedStop(null, false)).toBe(false);
+    expect(isConfirmedStop(null, true)).toBe(false);
+  });
+
+  it("returns false when status is armed and processAlive is true", () => {
+    expect(isConfirmedStop(status({ state: "armed" }), true)).toBe(false);
+  });
+
+  it("returns true when status is stopped and processAlive is false", () => {
+    expect(isConfirmedStop(status({ state: "stopped", reason: "control_disarm" }), false)).toBe(true);
+  });
+
+  it("returns true when processAlive is false regardless of armed/paused state (dead process cannot click)", () => {
+    expect(isConfirmedStop(status({ state: "armed" }), false)).toBe(true);
+    expect(isConfirmedStop(status({ state: "paused" }), false)).toBe(true);
   });
 });
 

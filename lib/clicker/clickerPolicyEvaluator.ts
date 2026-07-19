@@ -55,6 +55,15 @@ export function evaluateClickerPolicy(input: ClickerPolicyInput): ClickerPolicyR
 }
 
 /**
+ * A pending user disarm may only be considered complete when a CONFIRMED
+ * stop is observed. A null status (torn read of status.json) is unknown —
+ * never confirmation. Wrong twice in review; change only with tests.
+ */
+export function isConfirmedStop(status: ClickerStatus | null, processAlive: boolean): boolean {
+  return status !== null && (status.state === "stopped" || !processAlive);
+}
+
+/**
  * Heuristic: the cary0x health data has no "is mining" flag, so mining is
  * considered active while claims sit in the mempool or the session count
  * just increased. The panel also offers a manual pause as a safety net.

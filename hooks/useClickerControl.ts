@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useVisibilityPolling } from "./useVisibilityPolling";
 import {
   evaluateClickerPolicy,
+  isConfirmedStop,
   type ClickerPolicyResult,
 } from "@/lib/clicker/clickerPolicyEvaluator";
 import type {
@@ -124,9 +125,7 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
         // (torn read of status.json) we keep the ref true and re-assert the
         // stop — unknown status must never be mistaken for observed stopped.
         if (stopRequestedRef.current) {
-          const confirmedStop =
-            data.status !== null &&
-            (data.status.state === "stopped" || !data.processAlive);
+          const confirmedStop = isConfirmedStop(data.status, data.processAlive);
           if (confirmedStop) {
             stopRequestedRef.current = false; // confirmed stop — disarm achieved
           } else {
