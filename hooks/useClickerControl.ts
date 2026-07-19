@@ -36,8 +36,13 @@ export interface UseClickerControlResult {
  *
  * Disarm is level-triggered: stop() sets stopRequestedRef and retries up
  * to 3 times immediately; each subsequent tick re-asserts the stop POST
- * until the process is observed stopped, and suppresses heartbeat writes
- * while a disarm is pending so our own heartbeat never races the disarm.
+ * until a CONFIRMED stop is observed (data.status !== null AND state is
+ * "stopped" OR processAlive is false).  When data.status === null (torn
+ * read of status.json) the ref stays true and the stop is re-asserted —
+ * unknown status must never be mistaken for "observed stopped".
+ * Heartbeat writes are suppressed on every tick where the ref is true.
+ * start() on success clears the ref so an explicit re-arm supersedes a
+ * pending disarm.
  */
 export function useClickerControl(args: UseClickerControlArgs): UseClickerControlResult {
   const { swapperRunning, miningActive, manualPause } = args;
@@ -85,6 +90,7 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
         const data = await res.json().catch(() => null);
         return data?.error ?? `Start failed (${res.status})`;
       }
+      stopRequestedRef.current = false; // explicit re-arm supersedes any pending disarm
       return null;
     } catch (error) {
       return error instanceof Error ? error.message : "Start failed";
@@ -112,19 +118,22 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
         setProcessAlive(data.processAlive);
         setEvents(data.events);
 
-        // Level-triggered disarm: if a stop was requested and the process is
-        // still alive, re-assert the stop and skip the heartbeat for this tick.
-        const sessionActive =
-          data.status &&
-          data.status.state !== "stopped" &&
-          data.processAlive;
+        // Level-triggered disarm: clear the ref ONLY on a confirmed stop.
+        // A confirmed stop requires data.status !== null AND (state is
+        // "stopped" OR the process is not alive).  When data.status === null
+        // (torn read of status.json) we keep the ref true and re-assert the
+        // stop — unknown status must never be mistaken for observed stopped.
         if (stopRequestedRef.current) {
-          if (sessionActive) {
-            fetch("/api/clicker/stop", { method: "POST" }).catch(() => undefined);
+          const confirmedStop =
+            data.status !== null &&
+            (data.status.state === "stopped" || !data.processAlive);
+          if (confirmedStop) {
+            stopRequestedRef.current = false; // confirmed stop — disarm achieved
           } else {
-            stopRequestedRef.current = false; // process observed stopped — disarm achieved
+            // active session or unknown status — re-assert the stop
+            fetch("/api/clicker/stop", { method: "POST" }).catch(() => undefined);
           }
-          return; // skip normal decision block; no heartbeat while disarm is pending
+          return; // suppress heartbeat on any tick where the ref was set
         }
 
         const decision = evaluateClickerPolicy({

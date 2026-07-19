@@ -118,7 +118,7 @@ export async function writeControl(control: ControlFile): Promise<void> {
       const code = (err as NodeJS.ErrnoException).code;
       if (!TRANSIENT.has(code ?? "")) throw err; // non-transient — propagate immediately
       lastErr = err;
-      await new Promise<void>((r) => setTimeout(r, 50));
+      if (attempt < 4) await new Promise<void>((r) => setTimeout(r, 50)); // no sleep after final attempt
     }
   }
   // All rename attempts exhausted — fall back to direct write (fail-safe: a
