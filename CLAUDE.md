@@ -21,6 +21,11 @@ wallet — treat every change on the swap path as production financial code.**
 - `lib/alerts/` + `hooks/useAlertEngine.ts` — reference-quality architecture: pure evaluators + one orchestrator hook
 - `lib/portfolio/` — PnL math (well tested)
 - `tools/` — read-only exploration toolkit (CLI + MCP server, registered in `.mcp.json`); never add signing/sending here
+- `autoclicker/` — opt-in, guard-railed local wallet-popup clicker: Python
+  process + `app/api/clicker/*` + `ClickerPanel`, gated by `CLICKER_ENABLED=1`
+  (dev only). Guardrails are enforced in the Python process (timer, click
+  budget, heartbeat). It lives here, NOT in `tools/`, so the "tools/ is
+  read-only" rule stays absolute.
 
 ## Conventions (enforced in review)
 

@@ -148,6 +148,13 @@ exist; **USER_MANUAL.md:648-650 recommends a PyAutoGUI autoclicker to
 auto-approve wallet prompts — delete this line**; it contradicts the
 manual's own security guidance.
 
+> **Superseded (2026-07-19):** the autoclicker half of A8 is superseded by the
+> guard-railed autoclicker tool
+> (`docs/superpowers/specs/2026-07-19-autoclicker-tool-design.md`): the
+> USER_MANUAL line now documents the official, opt-in, guard-railed tool
+> instead of an unguarded script. The INSTALLATION_MANUAL half of A8 remains
+> open.
+
 Strengths to preserve: `lib/alerts` + `lib/portfolio` pure-evaluator +
 orchestrator-hook architecture, zod persistence schemas, visibility-aware
 polling, thorough PnL tests. (Refuted: there is only one swap UI/engine —
