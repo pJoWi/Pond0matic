@@ -35,12 +35,22 @@ describe("evaluateClickerPolicy", () => {
   it("is idle gray when never started", () => {
     const r = evaluateClickerPolicy(baseInput({ status: null, processAlive: false }));
     expect(r).toMatchObject({ led: "gray", shouldSendHeartbeat: false, shouldStop: false, offline: false });
+    expect(r.label).toContain("not started");
   });
 
   it("is gray with the stop reason after a stop", () => {
     const r = evaluateClickerPolicy(baseInput({ status: status({ state: "stopped", reason: "click_budget" }), processAlive: false }));
     expect(r.led).toBe("gray");
     expect(r.label).toContain("click_budget");
+  });
+
+  it("is gray with 'process died' when status exists but process is gone", () => {
+    // Crash case: status was armed (not stopped), but the process is no longer alive.
+    const r = evaluateClickerPolicy(baseInput({ status: status({ state: "armed" }), processAlive: false }));
+    expect(r.led).toBe("gray");
+    expect(r.label).toContain("process died");
+    expect(r.shouldSendHeartbeat).toBe(false);
+    expect(r.shouldStop).toBe(false);
   });
 
   it("reports offline and requests stop when status is stale", () => {

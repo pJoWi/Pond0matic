@@ -30,7 +30,10 @@ export function evaluateClickerPolicy(input: ClickerPolicyInput): ClickerPolicyR
   const { swapperRunning, miningActive, manualPause, status, processAlive, now } = input;
 
   if (!status || status.state === "stopped" || !processAlive) {
-    const reason = status?.state === "stopped" ? status.reason : "not started";
+    const reason =
+      status?.state === "stopped" ? status.reason
+      : status ? "process died"
+      : "not started";
     return { led: "gray", label: `stopped (${reason})`, shouldSendHeartbeat: false, desiredPaused: false, shouldStop: false, offline: false };
   }
 

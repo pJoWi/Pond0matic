@@ -31,8 +31,8 @@ export interface UseClickerControlResult {
  * Orchestrator for the guard-railed autoclicker. All decisions live in
  * evaluateClickerPolicy; this hook only polls, applies the result
  * (heartbeat / pause / stop) and exposes actions to the panel.
- * Poll cadence (5 s visible) doubles as the heartbeat, well inside the
- * Python side's 15 s dead-man's window.
+ * Poll cadence (5 s visible / 10 s hidden) doubles as the heartbeat;
+ * both cadences must stay below the Python side's 15 s dead-man's window.
  */
 export function useClickerControl(args: UseClickerControlArgs): UseClickerControlResult {
   const { swapperRunning, miningActive, manualPause } = args;
@@ -40,8 +40,9 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
   const [status, setStatus] = useState<ClickerStatus | null>(null);
   const [processAlive, setProcessAlive] = useState(false);
   const [events, setEvents] = useState<ClickerEvent[]>([]);
-  const pollMs = useVisibilityPolling(5_000, 60_000);
+  const pollMs = useVisibilityPolling(5_000, 10_000);
   const busyRef = useRef(false);
+  const unavailableRef = useRef(false);
 
   const policy = evaluateClickerPolicy({
     swapperRunning,
@@ -77,11 +78,13 @@ export function useClickerControl(args: UseClickerControlArgs): UseClickerContro
     let cancelled = false;
 
     const tick = async () => {
+      if (unavailableRef.current) return;
       if (busyRef.current) return;
       busyRef.current = true;
       try {
         const res = await fetch("/api/clicker/status");
         if (res.status === 404) {
+          unavailableRef.current = true;
           if (!cancelled) setAvailable(false);
           return;
         }
