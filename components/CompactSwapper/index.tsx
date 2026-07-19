@@ -11,6 +11,7 @@ import { SwapInterface } from "./components/SwapInterface";
 import { ActionButton } from "./components/ActionButton";
 import { MiniActivityFeed } from "./components/MiniActivityFeed";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { ClickerPanel } from "./components/ClickerPanel";
 
 // Mode system components
 import { ModeSelectorV2 } from "./components/ModeSelectorV2";
@@ -330,6 +331,9 @@ export function CompactSwapper({
             onPlatformFeeChange={ctx.setPlatformFeeBps}
             onSlippageChange={ctx.setSlippageBps}
           />
+
+          {/* Auto-Clicker (local opt-in tool; renders null unless CLICKER_ENABLED=1) */}
+          <ClickerPanel />
 
           {/* Action Button */}
           <ActionButton
