@@ -121,10 +121,10 @@ export function TopNavigation({
     const fetchSolPrice = async () => {
       try {
         const response = await fetch(
-          "https://api.jup.ag/price/v2?ids=So11111111111111111111111111111111111111112"
+          "https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112"
         );
         const data = await response.json();
-        const price = data?.data?.So11111111111111111111111111111111111111112?.price;
+        const price = data?.So11111111111111111111111111111111111111112?.usdPrice;
         if (price) {
           setSolPrice(price);
         }

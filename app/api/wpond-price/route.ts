@@ -32,7 +32,8 @@ export async function GET() {
       console.warn('DexScreener failed, trying Jupiter:', dexError);
     }
 
-    // Fallback to Jupiter Price API v2
+    // Fallback to Jupiter Price API v3 (free tier on lite-api.jup.ag;
+    // the old api.jup.ag/price/v2 is dead and returns 404)
     const headers: HeadersInit = {};
     const jupiterApiKey = process.env.JUPITER_API_KEY;
     if (jupiterApiKey) {
@@ -40,7 +41,7 @@ export async function GET() {
     }
 
     const jupResponse = await fetch(
-      `https://api.jup.ag/price/v2?ids=${WPOND_MINT}`,
+      `https://lite-api.jup.ag/price/v3?ids=${WPOND_MINT}`,
       {
         headers,
         next: { revalidate: 30 },
@@ -52,7 +53,7 @@ export async function GET() {
     }
 
     const jupData = await jupResponse.json();
-    const priceData = jupData.data?.[WPOND_MINT];
+    const priceData = jupData?.[WPOND_MINT];
 
     if (!priceData) {
       return NextResponse.json(
@@ -62,7 +63,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      price: priceData.price || 0,
+      price: priceData.usdPrice || 0,
       priceChange24h: 0,
       volume24h: 0,
       timestamp: Date.now(),
