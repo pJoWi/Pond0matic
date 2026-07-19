@@ -44,3 +44,6 @@ AGENTS.md
 
 .vercel
 .claude
+
+# Autoclicker runtime state (gitignored by contract — later tasks read these files)
+autoclicker/runtime/
