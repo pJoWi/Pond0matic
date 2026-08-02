@@ -52,14 +52,16 @@ export async function getMintDecimals(mint: string): Promise<number> {
     const found = Array.isArray(list)
       ? list.find((t: any) => t.address === mint)
       : null;
-    const decimals = found?.decimals ?? 6;
-    decimalsCache.set(mint, decimals);
-    return decimals;
+    if (!found) {
+      throw new Error(`Unable to resolve decimals for mint ${mint}`);
+    }
+    decimalsCache.set(mint, found.decimals);
+    return found.decimals;
   } catch (error) {
-    // Fallback to 6 decimals (common for SPL tokens)
-    const fallback = 6;
-    decimalsCache.set(mint, fallback);
-    return fallback;
+    if (error instanceof Error && error.message.startsWith('Unable to resolve decimals')) {
+      throw error;
+    }
+    throw new Error(`Unable to resolve decimals for mint ${mint}`);
   }
 }
 

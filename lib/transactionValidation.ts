@@ -21,13 +21,13 @@ export interface TransactionValidationResult {
  *
  * @param tx - The deserialized VersionedTransaction
  * @param expectedFeePayer - The user's public key (expected fee payer)
- * @param maxFeeLamports - Maximum acceptable fee (default: 0.01 SOL)
  * @returns Validation result with errors and warnings
+ *
+ * Priority-fee capping is deliberately not implemented here yet — tracked in the security hardening follow-up.
  */
 export function validateSwapTransaction(
   tx: VersionedTransaction,
-  expectedFeePayer: PublicKey,
-  maxFeeLamports: number = 10_000_000 // 0.01 SOL
+  expectedFeePayer: PublicKey
 ): TransactionValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];

@@ -9,7 +9,7 @@ const SettingsSchema = z.object({
   rpcVerified: z.boolean(),
   apiKeyVerified: z.boolean(),
   theme: z.enum(["dark", "light", "system"]),
-  slippageBps: z.number().int().min(0).max(10000),
+  slippageBps: z.number().int().min(0).max(500),
   platformFeeBps: z.number().int().min(0).max(10000),
   affiliate: z.enum(["pond0x", "aquavaults"]),
 });

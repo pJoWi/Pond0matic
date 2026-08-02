@@ -295,6 +295,15 @@ export function useSwapEngine() {
         log(`⚠️ No accumulated ${symbolFor(config.toMint)} to return swap`);
         return;
       }
+      const returnCheck = validateSwapAmount(returnAmount, finalAmount, symbolFor(config.toMint));
+      if (!returnCheck.isValid) {
+        log(`❌ Return swap blocked: ${returnCheck.error}`);
+        return;
+      }
+      if (returnCheck.requiresConfirmation) {
+        log(`⚠️ Return swap skipped (needs confirmation): ${returnCheck.error}`);
+        return;
+      }
       log(
         step.manualAmountUi
           ? `↩️ Return swap: ${returnAmount} ${symbolFor(config.toMint)} (manual amount)`

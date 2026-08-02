@@ -14,7 +14,6 @@ export const TOKEN_VAULTS_AFFILIATE_2: Record<string, string> = {
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "5wV1qSp8n9z5DEGHV6JJoEoxdYeBrnVCtP9LbD4Vwx7D",
   "3JgFwoYV74f6LwWjQWnr3YDPFnmBdwQfNyubv99jqUoq": "E4s4KzRBvYQxpFR1L7z7cLDtT814i7bqWFSGgqCDBCn9",
   "he1iusmfkpAdwvxLNGV8Y1iSbj4rUy6yMhEA3fotn9A": "54GcC3SjZzavvVJ5ipFfCvQHNnpPRsJLXUdfxNmeJHHm",
-  "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZ7ytfqcJm7So": "49URcyxPiaKRgoEAWfDtJHGWcZus3SVkF39b9Szf3XqC",
   "B5WTLaRwaUQpKk7ir1wniNB6m5o8GgMrimhKMYan2R6B": "Ff7tzrabm8sxHbL4cTmBDby2EQvvtab6NTh56R69u6KS"
 };
 export const TOKEN_NAMES: Record<string, string> = {
@@ -23,6 +22,5 @@ export const TOKEN_NAMES: Record<string, string> = {
   "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "USDT",
   "3JgFwoYV74f6LwWjQWnr3YDPFnmBdwQfNyubv99jqUoq": "wPOND",
   "he1iusmfkpAdwvxLNGV8Y1iSbj4rUy6yMhEA3fotn9A": "hSOL",
-  "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZ7ytfqcJm7So": "mSOL",
   "B5WTLaRwaUQpKk7ir1wniNB6m5o8GgMrimhKMYan2R6B": "PepeOnSOL"
 };

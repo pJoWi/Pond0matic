@@ -10,8 +10,8 @@ export function SwapDefaultsSettings() {
         <label className="flex flex-col gap-1 text-xs text-ink-muted">
           Slippage (bps)
           <input
-            type="number" min={0} max={10000} value={settings.slippageBps}
-            onChange={(e) => update({ slippageBps: Math.max(0, Math.min(10000, Number(e.target.value) || 0)) })}
+            type="number" min={0} max={500} value={settings.slippageBps}
+            onChange={(e) => update({ slippageBps: Math.max(0, Math.min(500, Number(e.target.value) || 0)) })}
             className="rounded-lg border border-edge bg-bg px-3 py-2 font-num text-sm text-ink"
           />
         </label>
