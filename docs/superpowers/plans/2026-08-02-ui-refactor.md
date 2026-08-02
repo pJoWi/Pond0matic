@@ -20,7 +20,7 @@
 - **Polling** via `hooks/useVisibilityPolling.ts`, never bare `setInterval`.
 - **Tests**: Vitest (`npx vitest run`), never Jest. Test env is `node` — no jsdom, no DOM in tests.
 - **Behavior parity**: Normal/Boost/Rewards semantics identical to the legacy loops in `hooks/useSwapExecution.ts` (documented per-task below).
-- **Jupiter endpoints**: `https://api.jup.ag/swap/v1/quote` and `.../swap` with `x-api-key` header. Keyless price feed stays on `https://lite-api.jup.ag/price/v3`.
+- **Jupiter endpoints**: Swap API v2 order-and-execute — `GET https://api.jup.ag/swap/v2/order` and `POST https://api.jup.ag/swap/v2/execute`, both REQUIRE the `x-api-key` header (docs: https://developers.jup.ag/docs/swap/order-and-execute). Jupiter lands the transaction after `/execute`; the client only signs. Keyless price feed stays on `https://lite-api.jup.ag/price/v3`.
 - **New dependencies allowed**: `tailwindcss@^4`, `@tailwindcss/postcss` only. Removed at the end: `canvas-confetti`, `@types/canvas-confetti`, `autoprefixer`.
 - **All numeric UI** (amounts, prices, addresses, tx ids, counters) uses the `font-num` utility class (mono + tabular-nums).
 - **Semantic color tokens only** in new components: `bg-bg`, `bg-surface`, `bg-surface-2`, `border-edge`, `text-ink`, `text-ink-muted`, `text-accent`, `bg-accent`, `text-danger`, `text-warn` — never raw hex/palette classes.
@@ -45,7 +45,7 @@ contexts/
   RigContext.tsx                   # NEW  (wraps useMiningRig)
 lib/
   swap/sessionPlanner.ts           # NEW  pure: planRound/hasNextRound/randomAmount
-  swap/quotes.ts                   # NEW  pure: URLs, headers, zod schemas, error msgs
+  swap/orders.ts                   # NEW  pure: v2 order/execute builders, zod schemas
   settings/storage.ts              # NEW  pure: parse/serialize localStorage settings
   settings/validation.ts           # NEW  testRpcEndpoint / testJupiterApiKey
 hooks/
@@ -373,7 +373,7 @@ Expected: FAIL — `Cannot find module '@/lib/swap/sessionPlanner'`.
  * Behavior parity with the legacy loops in hooks/useSwapExecution.ts:
  * amounts, delays, ordering and infinite-session semantics are identical.
  * The engine (hooks/useSwapEngine.ts) executes the returned steps and owns
- * every side effect (balances, quotes, signing, pausing, stopping).
+ * every side effect (balances, orders, signing, executing, pausing, stopping).
  */
 import type { SwapMode } from "@/types/swapModes";
 
@@ -474,68 +474,106 @@ git add lib/swap/sessionPlanner.ts tests/swap/sessionPlanner.test.ts
 git commit -m "feat: add pure swap session planner with truth-table tests"
 ```
 
-### Task 5: `lib/swap/quotes.ts` — Jupiter request builders + Zod boundary validation
+### Task 5: `lib/swap/orders.ts` — Jupiter order-and-execute builders + Zod boundary validation
+
+The app uses Jupiter's **Swap API v2 order-and-execute flow**
+(https://developers.jup.ag/docs/swap/order-and-execute), NOT the legacy
+`/quote` + `/swap` flow: `GET https://api.jup.ag/swap/v2/order` returns the
+quote AND an assembled unsigned transaction plus a `requestId`; after signing,
+`POST https://api.jup.ag/swap/v2/execute` hands the signed transaction to
+Jupiter, which lands it (managed slippage/priority fees/sending/confirmation)
+and returns `status`/`signature`. Both endpoints REQUIRE the `x-api-key`
+header. Fee routing rides on the order request via `referralAccount` +
+`referralFee` (Jupiter accepts 50–255 bps). An order WITHOUT `taker` is
+price-only (`transaction: null`) — used for USD estimates and API-key
+validation.
 
 **Files:**
-- Create: `lib/swap/quotes.ts`
-- Test: `tests/swap/quotes.test.ts`
+- Create: `lib/swap/orders.ts`
+- Test: `tests/swap/orders.test.ts`
 
 **Interfaces:**
 - Consumes: `zod` (v4)
 - Produces (used by Task 9 engine and Task 6 validation helpers):
-  - `JUP_QUOTE`, `JUP_SWAP`, `SOL_MINT`, `USDC_MINT` string constants
-  - `interface QuoteParams { inputMint: string; outputMint: string; amountRaw: string; slippageBps: number; platformFeeBps: number }`
-  - `buildQuoteUrl(p: QuoteParams): string`
+  - `JUP_ORDER`, `JUP_EXECUTE`, `SOL_MINT`, `USDC_MINT` string constants
+  - `interface OrderParams { inputMint: string; outputMint: string; amountRaw: string; taker?: string; referralAccount?: string; referralFee?: number; slippageBps?: number }`
+  - `buildOrderUrl(p: OrderParams): string`
   - `jupiterHeaders(apiKey: string, json?: boolean): HeadersInit`
   - `jupiterErrorMessage(status: number): string`
-  - `parseQuote(json: unknown): JupiterQuote` (throws ZodError on bad shape); `type JupiterQuote` with at least `inAmount: string; outAmount: string; outputDecimals?: number`
-  - `parseSwapResponse(json: unknown): { swapTransaction: string }`
+  - `clampReferralFeeBps(bps: number): number` — clamps into Jupiter's 50–255 range
+  - `parseOrder(json: unknown): JupiterOrder` (throws ZodError on bad shape); `type JupiterOrder` with at least `requestId: string; transaction: string | null; outAmount: string; errorCode?: number | string; errorMessage?: string`
+  - `buildExecuteBody(signedTransactionB64: string, requestId: string): string`
+  - `parseExecuteResponse(json: unknown): JupiterExecuteResult` — `{ status: "Success" | "Failed"; signature?: string; code?: number; totalInputAmount?: string; totalOutputAmount?: string }`
+  - `bytesToBase64(bytes: Uint8Array): string` — encodes the signed transaction for `/execute`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `tests/swap/quotes.test.ts`:
+Create `tests/swap/orders.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
 import {
-  buildQuoteUrl,
+  buildOrderUrl,
+  buildExecuteBody,
   jupiterHeaders,
   jupiterErrorMessage,
-  parseQuote,
-  parseSwapResponse,
-  JUP_QUOTE,
+  clampReferralFeeBps,
+  parseOrder,
+  parseExecuteResponse,
+  bytesToBase64,
+  JUP_ORDER,
   SOL_MINT,
   USDC_MINT,
-} from "@/lib/swap/quotes";
+} from "@/lib/swap/orders";
 
-const quoteFixture = {
-  inputMint: SOL_MINT,
-  outputMint: USDC_MINT,
+const orderFixture = {
+  requestId: "req-123",
+  transaction: "AQIDBA==",
   inAmount: "10000000",
   outAmount: "1500000",
-  otherAmountThreshold: "1492500",
-  swapMode: "ExactIn",
-  slippageBps: 50,
-  routePlan: [{ swapInfo: {}, percent: 100 }],
+  mode: "manual",
+  router: "metis",
+  swapType: "aggregator",
 };
 
-describe("buildQuoteUrl", () => {
-  it("encodes all params on the quote endpoint", () => {
+describe("buildOrderUrl", () => {
+  it("encodes required params on the order endpoint", () => {
     const url = new URL(
-      buildQuoteUrl({
-        inputMint: SOL_MINT,
-        outputMint: USDC_MINT,
-        amountRaw: "12345",
-        slippageBps: 50,
-        platformFeeBps: 100,
-      })
+      buildOrderUrl({ inputMint: SOL_MINT, outputMint: USDC_MINT, amountRaw: "12345" })
     );
-    expect(url.origin + url.pathname).toBe(JUP_QUOTE);
+    expect(url.origin + url.pathname).toBe(JUP_ORDER);
     expect(url.searchParams.get("inputMint")).toBe(SOL_MINT);
     expect(url.searchParams.get("outputMint")).toBe(USDC_MINT);
     expect(url.searchParams.get("amount")).toBe("12345");
+    // price-only order: no taker, no fee params
+    expect(url.searchParams.get("taker")).toBeNull();
+    expect(url.searchParams.get("referralAccount")).toBeNull();
+  });
+  it("includes taker, referral and slippage params when provided", () => {
+    const url = new URL(
+      buildOrderUrl({
+        inputMint: USDC_MINT,
+        outputMint: SOL_MINT,
+        amountRaw: "1000",
+        taker: "Wallet1111111111111111111111111111111111111",
+        referralAccount: "Vault111111111111111111111111111111111111111",
+        referralFee: 100,
+        slippageBps: 50,
+      })
+    );
+    expect(url.searchParams.get("taker")).toBe("Wallet1111111111111111111111111111111111111");
+    expect(url.searchParams.get("referralAccount")).toBe("Vault111111111111111111111111111111111111111");
+    expect(url.searchParams.get("referralFee")).toBe("100");
     expect(url.searchParams.get("slippageBps")).toBe("50");
-    expect(url.searchParams.get("platformFeeBps")).toBe("100");
+  });
+});
+
+describe("clampReferralFeeBps", () => {
+  it("clamps into Jupiter's 50-255 range", () => {
+    expect(clampReferralFeeBps(100)).toBe(100);
+    expect(clampReferralFeeBps(10)).toBe(50);
+    expect(clampReferralFeeBps(0)).toBe(50);
+    expect(clampReferralFeeBps(9999)).toBe(255);
   });
 });
 
@@ -561,68 +599,130 @@ describe("jupiterErrorMessage", () => {
   });
 });
 
-describe("parseQuote", () => {
-  it("accepts a valid quote and keeps unknown fields", () => {
-    const q = parseQuote(quoteFixture);
-    expect(q.outAmount).toBe("1500000");
-    expect((q as any).routePlan).toBeDefined(); // loose object passthrough
+describe("parseOrder", () => {
+  it("accepts a valid order and keeps unknown fields", () => {
+    const o = parseOrder(orderFixture);
+    expect(o.requestId).toBe("req-123");
+    expect(o.transaction).toBe("AQIDBA==");
+    expect(o.outAmount).toBe("1500000");
+    expect((o as any).swapType).toBe("aggregator"); // loose passthrough
   });
-  it("rejects a response missing outAmount", () => {
-    const { outAmount: _drop, ...bad } = quoteFixture;
-    expect(() => parseQuote(bad)).toThrow();
+  it("accepts a price-only order (transaction null) and a failed build (empty string)", () => {
+    expect(parseOrder({ ...orderFixture, transaction: null }).transaction).toBeNull();
+    const failed = parseOrder({
+      ...orderFixture,
+      transaction: "",
+      errorCode: 1001,
+      errorMessage: "no route",
+    });
+    expect(failed.transaction).toBe("");
+    expect(failed.errorCode).toBe(1001);
+  });
+  it("rejects a response missing requestId or outAmount", () => {
+    const { requestId: _r, ...noId } = orderFixture;
+    expect(() => parseOrder(noId)).toThrow();
+    const { outAmount: _o, ...noOut } = orderFixture;
+    expect(() => parseOrder(noOut)).toThrow();
   });
   it("rejects non-object input", () => {
-    expect(() => parseQuote("<html>rate limited</html>")).toThrow();
+    expect(() => parseOrder("<html>rate limited</html>")).toThrow();
   });
 });
 
-describe("parseSwapResponse", () => {
-  it("accepts a base64 swapTransaction", () => {
-    expect(parseSwapResponse({ swapTransaction: "AQID" }).swapTransaction).toBe("AQID");
+describe("buildExecuteBody / parseExecuteResponse", () => {
+  it("builds the execute body", () => {
+    expect(JSON.parse(buildExecuteBody("c2lnbmVk", "req-123"))).toEqual({
+      signedTransaction: "c2lnbmVk",
+      requestId: "req-123",
+    });
   });
-  it("rejects empty or missing swapTransaction", () => {
-    expect(() => parseSwapResponse({ swapTransaction: "" })).toThrow();
-    expect(() => parseSwapResponse({})).toThrow();
+  it("parses success and failure results", () => {
+    const ok = parseExecuteResponse({
+      status: "Success",
+      signature: "5sig",
+      code: 0,
+      totalInputAmount: "1000",
+      totalOutputAmount: "990",
+    });
+    expect(ok.status).toBe("Success");
+    expect(ok.signature).toBe("5sig");
+    const fail = parseExecuteResponse({ status: "Failed", code: -1, signature: "5sig" });
+    expect(fail.status).toBe("Failed");
+    expect(fail.code).toBe(-1);
+  });
+  it("rejects an unknown status", () => {
+    expect(() => parseExecuteResponse({ status: "Maybe" })).toThrow();
+  });
+});
+
+describe("bytesToBase64", () => {
+  it("round-trips bytes to base64", () => {
+    expect(bytesToBase64(new Uint8Array([1, 2, 3, 4]))).toBe("AQIDBA==");
+    expect(bytesToBase64(new Uint8Array([]))).toBe("");
   });
 });
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `npx vitest run tests/swap/quotes.test.ts`
-Expected: FAIL — `Cannot find module '@/lib/swap/quotes'`.
+Run: `npx vitest run tests/swap/orders.test.ts`
+Expected: FAIL — `Cannot find module '@/lib/swap/orders'`.
 
-- [ ] **Step 3: Implement `lib/swap/quotes.ts`**
+- [ ] **Step 3: Implement `lib/swap/orders.ts`**
 
 ```ts
 /**
- * Jupiter swap API: request builders and boundary validation (Zod v4).
- * Pure module — no fetch here; the engine and settings validation own I/O.
+ * Jupiter Swap API v2 order-and-execute: request builders and boundary
+ * validation (Zod v4). Pure module — no fetch here; the engine and settings
+ * validation own all I/O.
+ *
+ * Flow (https://developers.jup.ag/docs/swap/order-and-execute):
+ *   GET /order   → quote + assembled unsigned tx + requestId (x-api-key required)
+ *   POST /execute → Jupiter lands the signed tx and confirms it
  */
 import { z } from "zod";
 
-export const JUP_QUOTE = "https://api.jup.ag/swap/v1/quote";
-export const JUP_SWAP = "https://api.jup.ag/swap/v1/swap";
+export const JUP_ORDER = "https://api.jup.ag/swap/v2/order";
+export const JUP_EXECUTE = "https://api.jup.ag/swap/v2/execute";
 export const SOL_MINT = "So11111111111111111111111111111111111111112";
 export const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
-export interface QuoteParams {
+export interface OrderParams {
   inputMint: string;
   outputMint: string;
   /** Raw integer amount in base units, as string */
   amountRaw: string;
-  slippageBps: number;
-  platformFeeBps: number;
+  /** Signer wallet. Omit for a price-only order (transaction will be null). */
+  taker?: string;
+  /** Fee collection account (affiliate vault or referral address). */
+  referralAccount?: string;
+  /** Fee in bps — Jupiter accepts 50–255; pass through clampReferralFeeBps. */
+  referralFee?: number;
+  /** Custom slippage (switches the order to "manual" mode). */
+  slippageBps?: number;
 }
 
-export function buildQuoteUrl(p: QuoteParams): string {
-  const url = new URL(JUP_QUOTE);
+export function buildOrderUrl(p: OrderParams): string {
+  const url = new URL(JUP_ORDER);
   url.searchParams.set("inputMint", p.inputMint);
   url.searchParams.set("outputMint", p.outputMint);
   url.searchParams.set("amount", p.amountRaw);
-  url.searchParams.set("slippageBps", String(p.slippageBps));
-  url.searchParams.set("platformFeeBps", String(p.platformFeeBps));
+  if (p.taker) url.searchParams.set("taker", p.taker);
+  if (p.referralAccount) {
+    url.searchParams.set("referralAccount", p.referralAccount);
+    if (p.referralFee !== undefined) {
+      url.searchParams.set("referralFee", String(p.referralFee));
+    }
+  }
+  if (p.slippageBps !== undefined) {
+    url.searchParams.set("slippageBps", String(p.slippageBps));
+  }
   return url.toString();
+}
+
+/** Jupiter accepts referral fees of 50–255 bps on /order. */
+export function clampReferralFeeBps(bps: number): number {
+  return Math.min(255, Math.max(50, Math.round(bps)));
 }
 
 export function jupiterHeaders(apiKey: string, json = false): HeadersInit {
@@ -642,40 +742,64 @@ export function jupiterErrorMessage(status: number): string {
   return `Jupiter request failed (${status}).`;
 }
 
-const QuoteSchema = z.looseObject({
-  inputMint: z.string(),
-  outputMint: z.string(),
-  inAmount: z.string(),
+const OrderSchema = z.looseObject({
+  requestId: z.string(),
+  /** null = price-only (no taker); "" = router could not build a tx */
+  transaction: z.string().nullable(),
+  inAmount: z.string().optional(),
   outAmount: z.string(),
-  otherAmountThreshold: z.string(),
-  outputDecimals: z.number().optional(),
+  mode: z.string().optional(),
+  router: z.string().optional(),
+  errorCode: z.union([z.number(), z.string()]).optional(),
+  errorMessage: z.string().optional(),
 });
-export type JupiterQuote = z.infer<typeof QuoteSchema>;
+export type JupiterOrder = z.infer<typeof OrderSchema>;
 
-const SwapResponseSchema = z.looseObject({
-  swapTransaction: z.string().min(1),
-});
-
-export function parseQuote(json: unknown): JupiterQuote {
-  return QuoteSchema.parse(json);
+export function parseOrder(json: unknown): JupiterOrder {
+  return OrderSchema.parse(json);
 }
 
-export function parseSwapResponse(json: unknown): { swapTransaction: string } {
-  return SwapResponseSchema.parse(json);
+export function buildExecuteBody(signedTransactionB64: string, requestId: string): string {
+  return JSON.stringify({ signedTransaction: signedTransactionB64, requestId });
+}
+
+const ExecuteResponseSchema = z.looseObject({
+  status: z.enum(["Success", "Failed"]),
+  signature: z.string().optional(),
+  code: z.number().optional(),
+  error: z.string().optional(),
+  totalInputAmount: z.string().optional(),
+  totalOutputAmount: z.string().optional(),
+});
+export type JupiterExecuteResult = z.infer<typeof ExecuteResponseSchema>;
+
+export function parseExecuteResponse(json: unknown): JupiterExecuteResult {
+  return ExecuteResponseSchema.parse(json);
+}
+
+/** Base64-encode a signed transaction for /execute (btoa is available in
+ *  browsers and Node 18+; chunked to stay under argument limits). */
+export function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
 }
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `npx vitest run tests/swap/quotes.test.ts`
+Run: `npx vitest run tests/swap/orders.test.ts`
 Expected: PASS.
 
 - [ ] **Step 5: Full gates and commit**
 
 ```bash
 npm run build && npx vitest run
-git add lib/swap/quotes.ts tests/swap/quotes.test.ts
-git commit -m "feat: add Jupiter quote/swap request builders with zod boundary validation"
+git add lib/swap/orders.ts tests/swap/orders.test.ts
+git commit -m "feat: add Jupiter v2 order-and-execute builders with zod boundary validation"
 ```
 
 ---
@@ -691,7 +815,7 @@ Nothing in this phase is imported by `app/` yet, so the running app is unchanged
 - Test: `tests/settings/storage.test.ts`
 
 **Interfaces:**
-- Consumes: `buildQuoteUrl`, `jupiterHeaders`, `jupiterErrorMessage`, `SOL_MINT`, `USDC_MINT` from `lib/swap/quotes.ts` (Task 5); `DEFAULT_RPC` from `lib/vaults.ts`
+- Consumes: `buildOrderUrl`, `jupiterHeaders`, `jupiterErrorMessage`, `SOL_MINT`, `USDC_MINT` from `lib/swap/orders.ts` (Task 5); `DEFAULT_RPC` from `lib/vaults.ts`
 - Produces (used by Tasks 7–16):
   - `type ThemeSetting = "dark" | "light" | "system"`
   - `interface StoredSettings { rpc: string; jupiterApiKey: string; rpcVerified: boolean; apiKeyVerified: boolean; theme: ThemeSetting; slippageBps: number; platformFeeBps: number; affiliate: "pond0x" | "aquavaults" }`
@@ -802,12 +926,12 @@ Expected: PASS.
 /** Connection health checks used by the setup modal and /settings page. */
 import { Connection } from "@solana/web3.js";
 import {
-  buildQuoteUrl,
+  buildOrderUrl,
   jupiterHeaders,
   jupiterErrorMessage,
   SOL_MINT,
   USDC_MINT,
-} from "@/lib/swap/quotes";
+} from "@/lib/swap/orders";
 
 export interface RpcTestResult {
   ok: boolean;
@@ -836,16 +960,14 @@ export interface KeyTestResult {
   error?: string;
 }
 
-/** Validates a Jupiter API key with a minimal 0.001 SOL → USDC quote. */
+/** Validates a Jupiter API key with a price-only /order call (no taker). */
 export async function testJupiterApiKey(key: string): Promise<KeyTestResult> {
   if (!key.trim()) return { ok: false, error: "Enter your Jupiter API key" };
   try {
-    const url = buildQuoteUrl({
+    const url = buildOrderUrl({
       inputMint: SOL_MINT,
       outputMint: USDC_MINT,
       amountRaw: "1000000",
-      slippageBps: 50,
-      platformFeeBps: 0,
     });
     const res = await fetch(url, { headers: jupiterHeaders(key.trim()) });
     if (res.ok) return { ok: true };
@@ -1190,13 +1312,13 @@ git commit -m "feat: add ActivityContext and RigContext wrapping existing data h
 
 ### Task 9: `hooks/useSwapEngine.ts` — orchestrator replacing `useSwapExecution`
 
-This is the money path. It ports `jupExecute`/`swapOnce`/mode loops from `hooks/useSwapExecution.ts` 1:1 onto: wallet-adapter (no `getPhantomProvider`), the pure planner (Task 4), zod-validated Jupiter responses (Task 5), sonner toasts, and the new contexts. Read `hooks/useSwapExecution.ts` side by side while implementing — every log line, validation, and event dispatch has a legacy counterpart. No confetti (removed feature).
+This is the money path. It ports `jupExecute`/`swapOnce`/mode loops from `hooks/useSwapExecution.ts` onto: wallet-adapter (no `getPhantomProvider`), the pure planner (Task 4), Jupiter's v2 **order-and-execute** flow with zod-validated responses (Task 5), sonner toasts, and the new contexts. Key flow change vs legacy: the engine no longer sends or confirms transactions itself — `/order` returns an assembled unsigned transaction, the wallet signs it, and `/execute` hands it to Jupiter which lands and confirms it. `validateSwapTransaction` still gates signing. Read `hooks/useSwapExecution.ts` side by side while implementing — sequencing, validation gates and event dispatches have legacy counterparts. No confetti (removed feature).
 
 **Files:**
 - Create: `hooks/useSwapEngine.ts`
 
 **Interfaces:**
-- Consumes: `useSettings`, `useSwapConfig`, `useSession`, `useActivity`, `useRig` (Tasks 6–8); `planRound`, `hasNextRound`, `totalRounds`, type `SessionConfig` (Task 4); `buildQuoteUrl`, `jupiterHeaders`, `jupiterErrorMessage`, `parseQuote`, `parseSwapResponse`, `JUP_SWAP`, `USDC_MINT` (Task 5); UNCHANGED existing modules: `validateSwapTransaction(tx, pk)`, `validateSwapAmount(uiAmountStr, currentBalance, tokenSymbol)` from `lib/transactionValidation`; `extractReferralCode`, `buildJupiterSwapRequest`, `getFeeRoutingDescription` from `lib/referral`; `fetchTokenBalance(wallet, mint, rpc)` from `lib/tokenBalance`; `b64ToUint8Array`, `getMintDecimals` from `lib/solana`; `short`, `solscanTx` from `lib/utils`; `dispatchSwapEvent`, `makeInternalSwapId` from `lib/portfolio/swapEventBus`; `TOKEN_NAMES` from `lib/vaults`; `useBalances` from `hooks/useBalances`; `useWallet` from `@solana/wallet-adapter-react`; `toast` from `sonner`
+- Consumes: `useSettings`, `useSwapConfig`, `useSession`, `useActivity`, `useRig` (Tasks 6–8); `planRound`, `hasNextRound`, `totalRounds`, type `SessionConfig` (Task 4); `buildOrderUrl`, `buildExecuteBody`, `jupiterHeaders`, `jupiterErrorMessage`, `parseOrder`, `parseExecuteResponse`, `clampReferralFeeBps`, `bytesToBase64`, `JUP_EXECUTE`, `USDC_MINT` (Task 5); UNCHANGED existing modules: `validateSwapTransaction(tx, pk)`, `validateSwapAmount(uiAmountStr, currentBalance, tokenSymbol)` from `lib/transactionValidation`; `extractReferralCode`, `getFeeRoutingDescription` from `lib/referral` (`buildJupiterSwapRequest` is NOT used — fee routing now rides on the order params); `fetchTokenBalance(wallet, mint, rpc)` from `lib/tokenBalance`; `b64ToUint8Array`, `getMintDecimals` from `lib/solana`; `short`, `solscanTx` from `lib/utils`; `dispatchSwapEvent`, `makeInternalSwapId` from `lib/portfolio/swapEventBus`; `TOKEN_NAMES` from `lib/vaults`; `useBalances` from `hooks/useBalances`; `useWallet` from `@solana/wallet-adapter-react`; `toast` from `sonner`
 - Produces (used by Task 13 SwapPanel): `useSwapEngine(): { startSession(): Promise<void>; stopSession(): void; pauseSession(): void; resumeSession(): void; getUsdValue(mint: string, uiAmountStr: string): Promise<number> }`
 
 - [ ] **Step 1: Implement `hooks/useSwapEngine.ts`**
@@ -1205,14 +1327,18 @@ This is the money path. It ports `jupExecute`/`swapOnce`/mode loops from `hooks/
 "use client";
 /**
  * Swap session orchestrator. Owns every side effect on the swap path:
- * quotes, transaction build, validation, signing, sending, confirmation,
- * balances, event dispatch and progress state. All sequencing decisions
- * come from the pure planner in lib/swap/sessionPlanner.
+ * orders, transaction validation, signing, execution via Jupiter, balances,
+ * event dispatch and progress state. All sequencing decisions come from the
+ * pure planner in lib/swap/sessionPlanner.
+ *
+ * Uses Jupiter Swap API v2 order-and-execute: /order builds the transaction,
+ * the wallet signs it, /execute lets Jupiter land and confirm it. The client
+ * never submits to the network itself.
  *
  * Behavior parity target: hooks/useSwapExecution.ts (legacy engine).
  */
 import { useCallback } from "react";
-import { Connection, VersionedTransaction } from "@solana/web3.js";
+import { VersionedTransaction } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "sonner";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -1229,20 +1355,19 @@ import {
   type SessionStep,
 } from "@/lib/swap/sessionPlanner";
 import {
-  buildQuoteUrl,
+  buildOrderUrl,
+  buildExecuteBody,
   jupiterHeaders,
   jupiterErrorMessage,
-  parseQuote,
-  parseSwapResponse,
-  JUP_SWAP,
+  parseOrder,
+  parseExecuteResponse,
+  clampReferralFeeBps,
+  bytesToBase64,
+  JUP_EXECUTE,
   USDC_MINT,
-} from "@/lib/swap/quotes";
+} from "@/lib/swap/orders";
 import { validateSwapTransaction, validateSwapAmount } from "@/lib/transactionValidation";
-import {
-  extractReferralCode,
-  buildJupiterSwapRequest,
-  getFeeRoutingDescription,
-} from "@/lib/referral";
+import { extractReferralCode, getFeeRoutingDescription } from "@/lib/referral";
 import { fetchTokenBalance, SOL_MINT } from "@/lib/tokenBalance";
 import { b64ToUint8Array, getMintDecimals } from "@/lib/solana";
 import { short, solscanTx } from "@/lib/utils";
@@ -1250,7 +1375,6 @@ import { dispatchSwapEvent, makeInternalSwapId } from "@/lib/portfolio/swapEvent
 import { TOKEN_NAMES } from "@/lib/vaults";
 import type { SwapMode } from "@/types/swapModes";
 
-const CONFIRMATION_TIMEOUT_MS = 30_000;
 const VERY_SMALL_AMOUNT_THRESHOLD = 1000; // base units (legacy parity)
 const MIN_DECIMALS_FOR_WARNING = 6;
 
@@ -1264,7 +1388,7 @@ export function useSwapEngine() {
   const session = useSession();
   const { log } = useActivity();
   const { incrementBoosts } = useRig();
-  const { publicKey, signTransaction, sendTransaction } = useWallet();
+  const { publicKey, signTransaction } = useWallet();
   const walletAddress = publicKey?.toBase58() ?? "";
   const { solBalance, tokenBalance } = useBalances(walletAddress, settings.rpc, config.fromMint);
 
@@ -1286,7 +1410,7 @@ export function useSwapEngine() {
     }
   }, []);
 
-  /** USD value via a zero-fee quote to USDC (legacy parity: getUsdValue). */
+  /** USD value via a price-only /order to USDC (no taker → transaction null). */
   const getUsdValue = useCallback(
     async (mint: string, uiAmountStr: string): Promise<number> => {
       try {
@@ -1295,15 +1419,12 @@ export function useSwapEngine() {
         const raw = Math.floor((Number(uiAmountStr) || 0) * Math.pow(10, decimals));
         if (raw <= 0) return 0;
         const res = await fetch(
-          buildQuoteUrl({
-            inputMint: mint, outputMint: USDC_MINT, amountRaw: String(raw),
-            slippageBps: 0, platformFeeBps: 0,
-          }),
+          buildOrderUrl({ inputMint: mint, outputMint: USDC_MINT, amountRaw: String(raw) }),
           { headers: jupiterHeaders(settings.jupiterApiKey) }
         );
         if (!res.ok) return 0;
-        const quote = parseQuote(await res.json());
-        return Number(quote.outAmount || quote.otherAmountThreshold || 0) / 1_000_000;
+        const order = parseOrder(await res.json());
+        return Number(order.outAmount || 0) / 1_000_000;
       } catch {
         return 0;
       }
@@ -1362,49 +1483,41 @@ export function useSwapEngine() {
       }
 
       try {
-        const quoteRes = await fetch(
-          buildQuoteUrl({
-            inputMint: pairFrom, outputMint: pairTo, amountRaw: String(raw),
-            slippageBps: settings.slippageBps, platformFeeBps: settings.platformFeeBps,
+        // Fee routing: explicit referral-link address wins, else the affiliate
+        // vault for the input mint. This mirrors the legacy precedence in
+        // lib/referral.ts buildJupiterSwapRequest ("Priority: referral >
+        // vault > none", lib/referral.ts:204-210).
+        const feeAccount = referralAddress || config.vaultMap[pairFrom] || undefined;
+        const orderRes = await fetch(
+          buildOrderUrl({
+            inputMint: pairFrom,
+            outputMint: pairTo,
+            amountRaw: String(raw),
+            taker: publicKey.toBase58(),
+            referralAccount: feeAccount,
+            referralFee: feeAccount ? clampReferralFeeBps(settings.platformFeeBps) : undefined,
+            slippageBps: settings.slippageBps,
           }),
           { headers: jupiterHeaders(settings.jupiterApiKey) }
         );
-        if (!quoteRes.ok) {
-          const msg = jupiterErrorMessage(quoteRes.status);
+        if (!orderRes.ok) {
+          const msg = jupiterErrorMessage(orderRes.status);
           log(`⚠️ ${msg}`);
           toast.error(msg);
           return;
         }
-        const quote = parseQuote(await quoteRes.json());
-
-        const vaultAddress = config.vaultMap[pairFrom];
-        const body = buildJupiterSwapRequest({
-          quoteResponse: quote,
-          userPublicKey: publicKey.toBase58(),
-          vaultAddress,
-          referralAddress,
-        });
-        log(`💰 ${getFeeRoutingDescription(vaultAddress, referralAddress)}`);
-
-        const swapRes = await fetch(JUP_SWAP, {
-          method: "POST",
-          headers: jupiterHeaders(settings.jupiterApiKey, true),
-          body: JSON.stringify(body),
-        });
-        if (!swapRes.ok) {
-          if (swapRes.status === 429 || swapRes.status === 401 || swapRes.status === 403) {
-            const msg = jupiterErrorMessage(swapRes.status);
-            log(`⚠️ ${msg}`);
-            toast.error(msg);
-            return;
-          }
-          const text = await swapRes.text();
-          log("Swap build failed: " + text.slice(0, 180));
+        const order = parseOrder(await orderRes.json());
+        if (!order.transaction) {
+          // "" = router could not build a tx; null should not happen (taker set)
+          log(
+            `❌ No swap transaction (router: ${order.router ?? "?"}, code: ${order.errorCode ?? "?"}): ${order.errorMessage ?? "unknown"}`
+          );
+          toast.error("Jupiter could not build the swap transaction");
           return;
         }
-        const { swapTransaction } = parseSwapResponse(await swapRes.json());
-        const tx = VersionedTransaction.deserialize(b64ToUint8Array(swapTransaction));
+        log(`💰 ${getFeeRoutingDescription(config.vaultMap[pairFrom], referralAddress)}`);
 
+        const tx = VersionedTransaction.deserialize(b64ToUint8Array(order.transaction));
         const validation = validateSwapTransaction(tx, publicKey);
         if (!validation.isValid) {
           log(`❌ Transaction validation failed: ${validation.errors.join(", ")}`);
@@ -1414,7 +1527,7 @@ export function useSwapEngine() {
           log(`⚠️ Transaction warnings: ${validation.warnings.join(", ")}`);
         }
 
-        const outputDecimals = quote.outputDecimals ?? (await getMintDecimals(pairTo));
+        const outputDecimals = await getMintDecimals(pairTo);
         dispatchSwapEvent({
           type: "swap-started",
           internalId,
@@ -1424,45 +1537,46 @@ export function useSwapEngine() {
           fromAmount: Number(uiAmountStr) || 0,
           toMint: pairTo,
           toSymbol: symbolFor(pairTo),
-          toAmount: Number(quote.outAmount ?? 0) / Math.pow(10, outputDecimals) || 0,
+          toAmount: Number(order.outAmount ?? 0) / Math.pow(10, outputDecimals) || 0,
         });
         dispatchedStart = true;
 
-        const connection = new Connection(settings.rpc, {
-          commitment: "confirmed",
-          wsEndpoint: undefined,
-        });
-        let signature: string;
-        if (signTransaction) {
-          const signed = await signTransaction(tx);
-          signature = await connection.sendRawTransaction(signed.serialize());
-        } else {
-          signature = await sendTransaction(tx, connection);
+        if (!signTransaction) {
+          log("Wallet does not support signing.");
+          dispatchSwapEvent({ type: "swap-failed", internalId, reason: "Wallet does not support signing" });
+          return;
         }
-        dispatchSwapEvent({ type: "swap-sent", internalId, signature });
-        log("Sent → " + short(signature, 6) + " | " + solscanTx(signature));
+        // Sign immediately — the order goes stale as on-chain prices move.
+        const signed = await signTransaction(tx);
 
-        const confirmPromise = connection.confirmTransaction(signature, "confirmed");
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Transaction confirmation timeout")), CONFIRMATION_TIMEOUT_MS)
-        );
-        try {
-          await Promise.race([confirmPromise, timeoutPromise]);
-          log("Confirmed → " + short(signature, 6));
+        const execRes = await fetch(JUP_EXECUTE, {
+          method: "POST",
+          headers: jupiterHeaders(settings.jupiterApiKey, true),
+          body: buildExecuteBody(bytesToBase64(signed.serialize()), order.requestId),
+        });
+        if (!execRes.ok) {
+          const msg = jupiterErrorMessage(execRes.status);
+          log(`⚠️ ${msg}`);
+          toast.error(msg);
+          dispatchSwapEvent({ type: "swap-failed", internalId, reason: msg });
+          return;
+        }
+        const result = parseExecuteResponse(await execRes.json());
+        if (result.signature) {
+          dispatchSwapEvent({ type: "swap-sent", internalId, signature: result.signature });
+          log("Sent → " + short(result.signature, 6) + " | " + solscanTx(result.signature));
+        }
+        if (result.status === "Success") {
+          log("Confirmed → " + (result.signature ? short(result.signature, 6) : "(no signature)"));
           dispatchSwapEvent({ type: "swap-confirmed", internalId });
           toast.success("Swap confirmed");
-        } catch (timeoutError: unknown) {
-          const msg = timeoutError instanceof Error ? timeoutError.message : String(timeoutError);
-          if (msg === "Transaction confirmation timeout") {
-            log("⚠️ Confirmation timeout. Check manually: " + solscanTx(signature));
-            toast.warning("Confirmation timeout — check the transaction manually");
-            dispatchSwapEvent({ type: "swap-failed", internalId, reason: "Confirmation timeout" });
-          } else {
-            dispatchSwapEvent({ type: "swap-failed", internalId, reason: msg });
-            throw timeoutError;
-          }
+          incrementBoosts();
+        } else {
+          const reason = `Execute failed (code ${result.code ?? "?"})${result.error ? `: ${result.error.slice(0, 120)}` : ""}`;
+          log(`❌ ${reason}${result.signature ? " — check " + solscanTx(result.signature) : ""}`);
+          toast.error(reason.slice(0, 80));
+          dispatchSwapEvent({ type: "swap-failed", internalId, reason });
         }
-        incrementBoosts();
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         log("Execute error: " + msg);
@@ -1472,7 +1586,7 @@ export function useSwapEngine() {
         }
       }
     },
-    [publicKey, signTransaction, sendTransaction, settings, config.fromMint, config.vaultMap,
+    [publicKey, signTransaction, settings, config.fromMint, config.vaultMap,
      solBalance, tokenBalance, log, incrementBoosts]
   );
 
@@ -1619,18 +1733,17 @@ export function useSwapEngine() {
 Open `hooks/useSwapExecution.ts` next to the new file and verify each item:
 - amount validation gates (invalid / requiresConfirmation) — identical messages and early-returns
 - raw amount computation `Math.floor(ui * 10^decimals)` and small-amount warning
-- quote URL params (slippageBps, platformFeeBps from settings)
-- `buildJupiterSwapRequest` receives `{ quoteResponse, userPublicKey, vaultAddress, referralAddress }`
-- `validateSwapTransaction(tx, publicKey)` gate before signing
+- order params: `taker` = wallet, `slippageBps` from settings, `referralFee` = `clampReferralFeeBps(settings.platformFeeBps)`
+- fee-account precedence: open `lib/referral.ts` → `buildJupiterSwapRequest` and confirm whether the referral-link address or the vault wins there; the engine's `feeAccount = referralAddress || vault` must mirror it exactly
+- `validateSwapTransaction(tx, publicKey)` gate BEFORE signing (unchanged safety property)
 - swap-started/sent/confirmed/failed event dispatch order and payloads
-- confirmation timeout 30s treated as failed for record-keeping
-- `incrementBoosts()` after confirmation path
+- `/execute` result handling: `Success` → confirmed + `incrementBoosts()`; `Failed` → swap-failed with `code`; HTTP error → swap-failed (Jupiter owns sending/confirmation now — there is deliberately no client-side confirm loop or 30s timeout)
 - boost: randomized amounts, delay between swaps not after last, return swap per round (manual `loopReturnAmount` override), round delay between rounds
 - rewards: fixed amount, forward + delay + accumulated return per round
 - normal: single swap, no return
 - stop is level-triggered (`runRef`), pause busy-waits at 100ms
 
-Fix any deviation found. Differences that are intentional: wallet-adapter signing instead of `getPhantomProvider`, sonner toasts instead of `useToast`, no confetti, `parseQuote`/`parseSwapResponse` zod gates.
+Fix any deviation found. Differences that are intentional: order-and-execute flow instead of quote+swap+self-send (Jupiter lands the transaction), wallet-adapter signing instead of `getPhantomProvider`, sonner toasts instead of `useToast`, no confetti, `parseOrder`/`parseExecuteResponse` zod gates.
 
 - [ ] **Step 3: Full gates and commit**
 
@@ -3381,10 +3494,10 @@ git commit -m "refactor: delete legacy shell, SwapperContext, useSwapExecution a
 
 Apply these content changes (keep everything else):
 - Commands: replace the vitest single-file example if the path changed; add `Tailwind CSS v4 — CSS-first config in app/globals.css, no tailwind.config.ts`.
-- Architecture map: replace the `contexts/SwapperContext.tsx` and `hooks/useSwapExecution.ts` bullets with: `contexts/` (SettingsContext, SwapConfigContext, SessionContext, ActivityContext, RigContext — one concern each), `lib/swap/` (pure sessionPlanner + quotes with zod), `hooks/useSwapEngine.ts` (the orchestrator), `components/swap/`, `components/dashboard/`, `components/layout/` (AppShell/Sidebar), `components/connect/`.
+- Architecture map: replace the `contexts/SwapperContext.tsx` and `hooks/useSwapExecution.ts` bullets with: `contexts/` (SettingsContext, SwapConfigContext, SessionContext, ActivityContext, RigContext — one concern each), `lib/swap/` (pure sessionPlanner + orders with zod), `hooks/useSwapEngine.ts` (the orchestrator), `components/swap/`, `components/dashboard/`, `components/layout/` (AppShell/Sidebar), `components/connect/`.
 - Remove the `lib/alerts` bullet; convention #2's model example becomes `lib/swap/sessionPlanner.ts` + `useSwapEngine`.
 - Convention #1: drop the parenthetical about the legacy path (it is removed now).
-- Key external facts: add `Jupiter swap API requires an API key (portal.jup.ag) — the app collects it in the connect flow; price feed lite-api.jup.ag stays keyless.`
+- Key external facts: add `Swaps use Jupiter Swap API v2 order-and-execute (api.jup.ag/swap/v2/order + /execute; docs: developers.jup.ag/docs/swap/order-and-execute) — API key required (portal.jup.ag), collected in the connect flow; Jupiter lands the transaction after /execute. Price feed lite-api.jup.ag stays keyless.`
 - Docs section: note alerts feature removed as of this refactor spec.
 
 - [ ] **Step 2: Sync the user manuals**
@@ -3400,7 +3513,7 @@ npm run build && npm run lint && npx vitest run
 
 - [ ] **Step 4: Security review of the swap path**
 
-Dispatch the `solana-code-reviewer` agent over the final diff with focus files: `hooks/useSwapEngine.ts`, `lib/swap/quotes.ts`, `lib/swap/sessionPlanner.ts`, `contexts/SettingsContext.tsx`, `lib/settings/validation.ts`, `components/connect/ConnectSetupModal.tsx`, `components/swap/*`. Fix every finding rated important or higher before finishing; re-run gates after fixes.
+Dispatch the `solana-code-reviewer` agent over the final diff with focus files: `hooks/useSwapEngine.ts`, `lib/swap/orders.ts`, `lib/swap/sessionPlanner.ts`, `contexts/SettingsContext.tsx`, `lib/settings/validation.ts`, `components/connect/ConnectSetupModal.tsx`, `components/swap/*`. Fix every finding rated important or higher before finishing; re-run gates after fixes.
 
 - [ ] **Step 5: Commit**
 
@@ -3416,7 +3529,7 @@ git commit -m "docs: update CLAUDE.md and user manuals for the cockpit refactor"
 | Phase | Tasks | App state after |
 |---|---|---|
 | 1 Cleanup | 1–3 | Old UI, minus alerts/dead code |
-| 2 Pure logic | 4–5 | Unchanged UI; planner+quotes tested |
+| 2 Pure logic | 4–5 | Unchanged UI; planner+orders tested |
 | 3 Contexts | 6–8 | Unchanged UI; new contexts compiled |
 | 4 Engine | 9 | Unchanged UI; engine compiled |
 | 5 New UI | 10–15 | Unchanged UI; new components compiled |

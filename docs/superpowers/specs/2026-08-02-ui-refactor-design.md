@@ -54,8 +54,10 @@ Swapping is disabled until all three are valid (`setupComplete`).
    code anywhere).
 2. **RPC** — URL input + "Test" button performing a real health check
    (`getSlot` + latency display). Valid only after a passing test.
-3. **Jupiter API key** — input + validation ping (cheap quote call with
-   `x-api-key` header), link to portal.jup.ag to create a key.
+3. **Jupiter API key** — input + validation ping (price-only `/order` call —
+   no `taker` — with `x-api-key` header), link to portal.jup.ag to create a
+   key. The key is hard-required: both v2 endpoints reject requests without
+   it.
 
 Persistence: localStorage (`pond0matic:settings`), API key masked in UI.
 Managed later on `/settings`. While setup is incomplete: swap panel shows a
@@ -86,18 +88,28 @@ feeds `ConnectionProvider` dynamically. Legacy `hooks/useWallet.ts` is deleted
 - `lib/swap/sessionPlanner.ts` — **pure**: `(mode, config) → next-step plan`
   (ordering, amounts incl. micro-randomization, delays, round boundaries,
   infinite-session stepping, stop conditions). Truth-table tested.
-- `lib/swap/quotes.ts` — **pure**: Jupiter quote/swap request builders + Zod
-  schemas validating responses at the boundary (convention #3). Endpoints:
-  `api.jup.ag/swap/v1/quote|swap` with `x-api-key` header (key required via
-  setup flow).
+- `lib/swap/orders.ts` — **pure**: Jupiter order/execute request builders + Zod
+  schemas validating responses at the boundary (convention #3). Uses the
+  Swap API v2 **order-and-execute** flow
+  (https://developers.jup.ag/docs/swap/order-and-execute): `GET
+  api.jup.ag/swap/v2/order` returns quote + assembled unsigned transaction +
+  `requestId`; `POST api.jup.ag/swap/v2/execute` takes the signed transaction
+  and Jupiter lands it (managed slippage/priority fees/sending/confirmation).
+  Both endpoints require the `x-api-key` header. Fee routing goes through the
+  order's `referralAccount` + `referralFee` params (fee clamped to Jupiter's
+  50–255 bps range); the account is the affiliate vault for the fromMint, or
+  the referral-link address when one is set (same precedence as legacy).
 - `hooks/useSwapEngine.ts` — the single orchestrator owning side effects:
-  quote → validate (`lib/transactionValidation`) → sign (wallet-adapter) →
-  send → confirm → log/emit portfolio events.
+  order → validate transaction (`lib/transactionValidation`) → sign
+  (wallet-adapter) → execute (Jupiter sends + confirms) → log/emit portfolio
+  events. The client never submits the transaction to the network itself.
 
 Unchanged and untouched: `lib/referral.ts`, `lib/transactionValidation.ts`
-(tested, financial-critical). The new engine calls them exactly as today.
-Swap mode behavior (Normal / Boost / Rewards semantics, defaults, affiliate
-vault routing) is preserved.
+(tested, financial-critical). `validateSwapTransaction` still gates signing;
+`extractReferralCode` and `getFeeRoutingDescription` are still used
+(`buildJupiterSwapRequest` remains in the file but is only needed by the
+legacy engine until its deletion). Swap mode behavior (Normal / Boost /
+Rewards semantics, defaults, affiliate vault routing) is preserved.
 
 ## Swap panel components
 
@@ -160,7 +172,7 @@ autoclicker (Python process, `app/api/clicker/*`, policy evaluator in
 
 - `sessionPlanner`: truth-table tests per mode (counts, delays, infinite
   behavior, stop conditions) following `swap-testing` patterns
-- `quotes.ts`: Zod schema tests with fixture responses
+- `orders.ts`: Zod schema tests with fixture responses (order + execute results)
 - Existing tests stay green: portfolio, clicker policy, utils, tools-core;
   alerts tests are removed with the feature
 - Phased migration — the app builds and works after every phase; each phase
