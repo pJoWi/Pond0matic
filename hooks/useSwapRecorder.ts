@@ -17,10 +17,6 @@ import type { SwapRecord } from "@/lib/portfolio/types";
 const PRICE_LOOKUP_BY_SYMBOL: Record<string, keyof TokenPrices> = {
   SOL: "solPrice",
   wPOND: "wpondPrice",
-  pondSOL: "pondSolPrice",
-  ETH: "ethPrice",
-  PNDC: "pndcPrice",
-  PORK: "porkPrice",
 };
 
 function priceForSymbol(symbol: string, prices: TokenPrices): number {

@@ -121,21 +121,14 @@ function ChainSection({ title, tokens, chainColor, chainIcon, loading }: ChainSe
 }
 
 /**
- * Two-column market panel showing Solana + Ethereum token prices.
+ * Market panel showing Solana token prices (SOL + wPOND).
  */
 export function TokenPricesPanel({ prices }: TokenPricesPanelProps) {
-  const { solPrice, wpondPrice, pondSolPrice, ethPrice, pndcPrice, porkPrice, loading } = prices;
+  const { solPrice, wpondPrice, loading } = prices;
 
   const solanaTokens: TokenRowData[] = [
     { symbol: "SOL", price: solPrice, icon: TOKEN_ICONS.SOL, featured: true },
     { symbol: "wPOND", price: wpondPrice, icon: TOKEN_ICONS.wPOND, featured: true },
-    { symbol: "pondSOL", price: pondSolPrice, icon: TOKEN_ICONS.pondSOL, featured: false },
-  ];
-
-  const ethereumTokens: TokenRowData[] = [
-    { symbol: "ETH", price: ethPrice, icon: TOKEN_ICONS.ETH, featured: true },
-    { symbol: "PNDC", price: pndcPrice, icon: TOKEN_ICONS.PNDC, featured: true },
-    { symbol: "PORK", price: porkPrice, icon: TOKEN_ICONS.PORK, featured: false },
   ];
 
   return (
@@ -147,22 +140,13 @@ export function TokenPricesPanel({ prices }: TokenPricesPanelProps) {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChainSection
-          title="Solana Pond"
-          tokens={solanaTokens}
-          chainColor="border-purple-400/40"
-          chainIcon="💜"
-          loading={loading}
-        />
-        <ChainSection
-          title="Ethereum Pond"
-          tokens={ethereumTokens}
-          chainColor="border-blue-400/40"
-          chainIcon="💙"
-          loading={loading}
-        />
-      </div>
+      <ChainSection
+        title="Solana Pond"
+        tokens={solanaTokens}
+        chainColor="border-purple-400/40"
+        chainIcon="💜"
+        loading={loading}
+      />
     </div>
   );
 }

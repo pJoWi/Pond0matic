@@ -67,8 +67,6 @@ function priceForSymbol(symbol: string, prices: TokenPrices | null): number {
       return prices.solPrice;
     case "wPOND":
       return prices.wpondPrice;
-    case "pondSOL":
-      return prices.pondSolPrice;
     case "USDC":
     case "USDT":
       return 1;
