@@ -6,7 +6,6 @@ import { useRigHealth } from "@/hooks/useRigHealth";
 import { useClickerControl } from "@/hooks/useClickerControl";
 import { deriveMiningActive } from "@/lib/clicker/clickerPolicyEvaluator";
 import { cn } from "@/lib/utils";
-import type { ClickerPolicyResult } from "@/lib/clicker/clickerPolicyEvaluator";
 
 // Inline LED dot — semantic tokens only; avoids dependency on legacy StatusLED
 // which uses raw-palette classes (bg-green-500, shadow-[...], animate-led-pulse).
