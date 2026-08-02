@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Deep Pond semantic tokens — light values on :root, dark overrides on .dark */
+:root {
+  --bg: #f4f7f5;
+  --surface: #ffffff;
+  --surface-2: #eef4f0;
+  --edge: #dbe5df;
+  --ink: #1c2a24;
+  --ink-muted: #5d7266;
+  --accent: #10b981;
+  --accent-strong: #059669;
+  --accent-deep: #06281c;
+}
+.dark {
+  --bg: #0b1512;
+  --surface: #101d18;
+  --surface-2: #16261f;
+  --edge: #1d312a;
+  --ink: #d7e5de;
+  --ink-muted: #7c9c8f;
+  --accent: #34d399;
+  --accent-strong: #10b981;
+  --accent-deep: #06281c;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-edge: var(--edge);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-deep: var(--accent-deep);
+  --color-danger: #ef4444;
+  --color-warn: #f59e0b;
+
+  --radius-card: 0.75rem;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    @apply bg-bg text-ink font-sans;
+  }
+}
+
+@utility font-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
