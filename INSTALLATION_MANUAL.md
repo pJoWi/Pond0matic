@@ -288,11 +288,20 @@ Alternative RPC providers include:
 
 Follow their documentation to obtain an RPC endpoint URL and update your `.env.local` accordingly.
 
-### Step 3: Configure Jupiter API Key (Optional)
+### Step 3: Configure Jupiter API Key (Required for Swaps)
 
-Jupiter is the swap aggregator used by Pond0matic. While the Jupiter API can be used without authentication, providing an API key may improve rate limits and reliability.
+Pond0matic uses the Jupiter Swap API v2 order-and-execute flow, which requires an authenticated API key. Swaps will not execute without a valid key.
 
-**NOTE**: As of version 2.0.0, Jupiter API key configuration is handled internally. No action is required for basic functionality.
+**How to obtain a Jupiter API key**:
+
+1. Visit [https://portal.jup.ag](https://portal.jup.ag)
+2. Sign up or log in with your wallet
+3. Create a new API key (free tier available)
+4. Copy the key
+
+The key is entered in the app's **3-step connect flow** (not `.env.local`) — open the app, click **Connect**, and paste it in Step 3. It is stored in browser `localStorage` and never sent to any server other than `api.jup.ag`.
+
+**NOTE**: The price feed (`lite-api.jup.ag/price/v3`) is keyless and works without an API key. Only order-and-execute swap calls require authentication.
 
 ### Step 4: Review and Adjust Default Settings
 
@@ -384,9 +393,8 @@ npm run build
 
 Route (app)                              Size     First Load JS
 ┌ ○ /                                    142 B          87.5 kB
-├ ○ /compact                             142 B          87.5 kB
-├ ○ /swapper                             142 B          87.5 kB
-└ ○ /unified                             142 B          87.5 kB
+├ ○ /portfolio                           142 B          87.5 kB
+└ ○ /settings                            142 B          87.5 kB
 ```
 
 This process may take 30-60 seconds.
@@ -578,8 +586,10 @@ Congratulations! You've successfully installed and configured Pond0matic. Here's
 
 ### 2. Familiarize Yourself with the Interface
 
-- Explore the Dashboard view to see mining rig statistics
-- Navigate to the Swapper view to access swap functionality
+- Explore the **Dashboard** in the sidebar — use the Rig, Prices, and Activity tabs
+- The **swap panel** is on the right of the dashboard (or a bottom sheet on mobile)
+- Navigate to **Portfolio** for PnL and swap history
+- Go to **Settings** to update your RPC endpoint, Jupiter API key, or swap defaults
 - Review the different swap modes (Normal, Boost, Rewards)
 
 ### 3. Test with Small Amounts
@@ -621,14 +631,13 @@ Once comfortable with the basics, explore:
 The following documentation files are included in the project:
 
 - `USER_MANUAL.md` - Comprehensive user guide for using Pond0matic
-- `DASHBOARD_README.md` - Technical documentation for the dashboard features
-- `UI_STYLE_GUIDE.md` - UI design and styling guidelines
+- `QUICK_START.md` - Quick setup and first-run instructions
 
 ### External Documentation
 
 - **Next.js Documentation**: [https://nextjs.org/docs](https://nextjs.org/docs)
 - **Solana Documentation**: [https://docs.solana.com/](https://docs.solana.com/)
-- **Jupiter API Documentation**: [https://station.jup.ag/docs/apis/swap-api](https://station.jup.ag/docs/apis/swap-api)
+- **Jupiter API Documentation**: [https://developers.jup.ag/docs/swap/order-and-execute](https://developers.jup.ag/docs/swap/order-and-execute)
 - **Solana Web3.js**: [https://solana-labs.github.io/solana-web3.js/](https://solana-labs.github.io/solana-web3.js/)
 
 ### Useful Commands
@@ -697,32 +706,42 @@ Understanding the project structure:
 ```
 Pond0matic/
 ├── app/                    # Next.js app directory (pages and routes)
-│   ├── page.tsx           # Home page (Dashboard)
-│   ├── layout.tsx         # Root layout component
-│   ├── swapper/           # Swapper page
-│   ├── compact/           # Compact swapper page
-│   └── unified/           # Unified view page
+│   ├── page.tsx           # Home page (Dashboard + swap panel)
+│   ├── layout.tsx         # Root layout component (AppShell)
+│   ├── portfolio/         # Portfolio / PnL page
+│   ├── settings/          # Settings page
+│   └── api/               # API proxy routes (cary0x, DexScreener, Jupiter)
 ├── components/            # React components
-│   ├── CompactSwapper/    # Compact swapper components
-│   ├── Dashboard.tsx      # Main dashboard component
-│   ├── layout/            # Layout components
-│   ├── swapper/           # Swapper-specific components
+│   ├── connect/           # ConnectSetupModal (3-step guided connect flow)
+│   ├── dashboard/         # Dashboard tab components
+│   ├── layout/            # AppShell, Sidebar, ConnectionStatus, ThemeToggle
+│   ├── swap/              # Swap panel suite
 │   └── ui/                # Reusable UI components
-├── contexts/              # React context providers
-│   └── SwapperContext.tsx # Swap state management
+├── contexts/              # React context providers (one concern each)
+│   ├── SettingsContext.tsx
+│   ├── SwapConfigContext.tsx
+│   ├── SessionContext.tsx
+│   ├── ActivityContext.tsx
+│   └── RigContext.tsx
 ├── hooks/                 # Custom React hooks
-├── lib/                   # Utility libraries
-│   ├── jupiter.ts         # Jupiter API integration
+│   └── useSwapEngine.ts   # Swap session orchestrator
+├── lib/                   # Pure utility libraries
+│   ├── swap/              # sessionPlanner + orders (Zod-validated)
+│   ├── referral.ts        # Jupiter fee-account routing
+│   ├── transactionValidation.ts  # Pre-signing safety checks
+│   ├── portfolio/         # PnL math
 │   ├── solana.ts          # Solana blockchain utilities
 │   └── vaults.ts          # Token vault configurations
+├── tests/                 # Vitest unit tests (pure logic only)
+├── tools/                 # Read-only Solana/Pond0x exploration CLI + MCP server
+├── autoclicker/           # Opt-in wallet-popup clicker (CLICKER_ENABLED=1 only)
 ├── public/                # Static assets
-├── styles/                # CSS and styling files
 ├── types/                 # TypeScript type definitions
+├── app/globals.css        # Tailwind v4 CSS-first theme (no tailwind.config.ts)
 ├── .env.example           # Example environment configuration
 ├── .env.local             # Your local environment (create this)
 ├── package.json           # Project dependencies and scripts
-├── tsconfig.json          # TypeScript configuration
-└── tailwind.config.ts     # Tailwind CSS configuration
+└── tsconfig.json          # TypeScript configuration
 ```
 
 ## Appendix B: Environment Variables Reference

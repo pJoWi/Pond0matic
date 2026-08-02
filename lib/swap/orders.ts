@@ -104,6 +104,19 @@ export function parseExecuteResponse(json: unknown): JupiterExecuteResult {
   return ExecuteResponseSchema.parse(json);
 }
 
+/**
+ * Fee collection account for an order: an explicit referral address wins,
+ * otherwise the affiliate vault for the input mint. Mirrors the legacy
+ * precedence in lib/referral.ts buildJupiterSwapRequest (referral > vault > none).
+ */
+export function selectFeeAccount(
+  referralAddress: string | undefined,
+  vaultMap: Record<string, string>,
+  inputMint: string
+): string | undefined {
+  return referralAddress || vaultMap[inputMint] || undefined;
+}
+
 /** Base64-encode a signed transaction for /execute (btoa is available in
  *  browsers and Node 18+; chunked to stay under argument limits). */
 export function bytesToBase64(bytes: Uint8Array): string {

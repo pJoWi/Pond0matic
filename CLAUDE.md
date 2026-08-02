@@ -1,7 +1,7 @@
 # Pond0matic
 
 Unified dashboard for the Pond0x protocol: Jupiter auto-swapper (swap-to-mine),
-mining rig stats, portfolio/PnL, alerts. **Executes real swaps with a real
+mining rig stats, portfolio/PnL. **Executes real swaps with a real
 wallet — treat every change on the swap path as production financial code.**
 
 ## Commands
@@ -13,16 +13,20 @@ wallet — treat every change on the swap path as production financial code.**
   watch: `npm run test:watch`. Node environment, no jsdom — tests cover pure
   logic, which is why business rules must live in pure evaluators.
 - `npx tsx tools/cli.ts` — read-only Solana/Pond0x exploration CLI (see `.claude/skills/onchain-query`)
+- Tailwind CSS v4 — CSS-first config in `app/globals.css`, no `tailwind.config.ts`
 
 ## Architecture map
 
-- `app/` — Next.js App Router: `/` (dashboard + swap drawer), `/swapper`, `/portfolio`, `/alerts`, `app/api/*` (proxies to cary0x.com, DexScreener, Jupiter)
-- `contexts/SwapperContext.tsx` — central swap state (large; being decomposed)
-- `hooks/useSwapExecution.ts` — the swap/boost/rewards execution engine
-- `lib/jupiter.ts` — Jupiter quote/swap-transaction API client (financial-critical)
+- `app/` — Next.js App Router: `/` (dashboard + swap panel), `/portfolio`, `/settings`, `app/api/*` (proxies to cary0x.com, DexScreener, Jupiter)
+- `contexts/` — SettingsContext, SwapConfigContext, SessionContext, ActivityContext, RigContext — one concern each
+- `lib/swap/` — pure `sessionPlanner` + `orders` with Zod boundary validation
+- `hooks/useSwapEngine.ts` — the swap session orchestrator (all side effects)
+- `components/swap/` — swap panel suite
+- `components/dashboard/` — dashboard tabs (Rig/Prices/Activity)
+- `components/layout/` — AppShell, Sidebar
+- `components/connect/` — ConnectSetupModal (3-step guided connect flow)
 - `lib/referral.ts` — Jupiter fee-account routing (financial-critical)
 - `lib/transactionValidation.ts` — pre-signing safety checks
-- `lib/alerts/` + `hooks/useAlertEngine.ts` — reference-quality architecture: pure evaluators + one orchestrator hook
 - `lib/portfolio/` — PnL math (well tested)
 - `tools/` — read-only exploration toolkit (CLI + MCP server, registered in `.mcp.json`); never add signing/sending here
 - `autoclicker/` — opt-in, guard-railed local wallet-popup clicker: Python
@@ -37,11 +41,10 @@ wallet — treat every change on the swap path as production financial code.**
 1. **One wallet identity.** All wallet/publicKey access goes through
    `@solana/wallet-adapter-react` (`useWallet()`/`useConnection()`). Never
    call `window.solana` / `getPhantomProvider()` directly; never accept a raw
-   `wallet: string` in new code. (Legacy path in `hooks/useWallet.ts` is being
-   removed.)
+   `wallet: string` in new code.
 2. **Pure evaluator + orchestrator hook** for feature logic: business rules as
    pure functions (data in → result out, no React/DOM/storage), one hook per
-   feature owning side effects. Model: `lib/alerts/*Evaluator.ts` + `useAlertEngine`.
+   feature owning side effects. Model: `lib/swap/sessionPlanner.ts` + `useSwapEngine`.
 3. **Validate external data at the boundary.** Zod (or `parseSnapshot`-style
    field checks) for API responses and route params — never `as ApiResponse`.
    Validate `[wallet]` params as base58 before building upstream URLs.
@@ -60,6 +63,10 @@ wallet — treat every change on the swap path as production financial code.**
   PNDC/PORK are Ethereum ERC-20s, not SPL tokens.
 - Jupiter free price API is `https://lite-api.jup.ag/price/v3` — the old
   `api.jup.ag/price/v2` is dead (404).
+- Swaps use Jupiter Swap API v2 order-and-execute (`api.jup.ag/swap/v2/order` +
+  `/execute`; docs: `developers.jup.ag/docs/swap/order-and-execute`) — API key
+  required (portal.jup.ag), collected in the connect flow; Jupiter lands the
+  transaction after `/execute`. Price feed `lite-api.jup.ag` stays keyless.
 - Community rig stats: `https://www.cary0x.com/api/{manifest,health}/<wallet>`.
 - Public RPC is rate-limited; prefer `SOLANA_RPC` / `NEXT_PUBLIC_DEFAULT_RPC`
   set to a Helius/QuickNode endpoint.
@@ -74,3 +81,4 @@ wallet — treat every change on the swap path as production financial code.**
 - `docs/LEARNING_PATH.md` — Solana skill-building milestones tied to real fixes.
 - `QUICK_START.md` / `USER_MANUAL.md` / `INSTALLATION_MANUAL.md` — end-user
   docs (root); keep in sync when changing user-facing swap behavior.
+- Alerts feature removed as of the cockpit refactor (tasks 1–19, 2026-08).

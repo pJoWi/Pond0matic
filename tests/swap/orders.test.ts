@@ -8,6 +8,7 @@ import {
   parseOrder,
   parseExecuteResponse,
   bytesToBase64,
+  selectFeeAccount,
   JUP_ORDER,
   SOL_MINT,
   USDC_MINT,
@@ -146,5 +147,19 @@ describe("bytesToBase64", () => {
   it("round-trips bytes to base64", () => {
     expect(bytesToBase64(new Uint8Array([1, 2, 3, 4]))).toBe("AQIDBA==");
     expect(bytesToBase64(new Uint8Array([]))).toBe("");
+  });
+});
+
+describe("selectFeeAccount", () => {
+  const vaults = { MintA: "VaultA" };
+  it("referral address wins over vault", () => {
+    expect(selectFeeAccount("Referral1", vaults, "MintA")).toBe("Referral1");
+  });
+  it("falls back to the vault for the input mint", () => {
+    expect(selectFeeAccount(undefined, vaults, "MintA")).toBe("VaultA");
+  });
+  it("returns undefined when neither exists (no fee params on order)", () => {
+    expect(selectFeeAccount(undefined, vaults, "MintB")).toBeUndefined();
+    expect(selectFeeAccount("", vaults, "MintB")).toBeUndefined();
   });
 });

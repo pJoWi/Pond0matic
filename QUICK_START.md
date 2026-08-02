@@ -28,7 +28,7 @@ npm install
 Create `.env.local` file:
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 Or manually create `.env.local` with this content:
@@ -51,12 +51,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## First Use
 
-1. **Connect Wallet**: Click "Connect Wallet" and approve in Phantom
-2. **Select Tokens**: Choose tokens to swap (e.g., SOL → USDC)
-3. **Configure Swap**:
-   - Enter amount or click "50%"/"MAX"
-   - Choose swap mode (Normal/Boost/Rewards)
-4. **Execute**: Click "Execute Swap" and approve in Phantom
+The app uses a guided 3-step connect flow. Click the **Connect** button on the dashboard:
+
+1. **Connect Wallet** — select your Solana wallet (Phantom, Solflare, etc.) and approve the connection
+2. **Set RPC Endpoint** — paste a Helius or QuickNode endpoint URL (or leave the default for testing)
+3. **Jupiter API Key** — get a free key at [portal.jup.ag](https://portal.jup.ag) and paste it here (required for swaps)
+
+After setup the swap panel appears on the right (desktop) or as a bottom sheet (mobile). Navigate the sidebar to **Dashboard** (Rig / Prices / Activity tabs), **Portfolio**, or **Settings**.
 
 ## Swap Modes Quick Reference
 

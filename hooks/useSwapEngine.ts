@@ -37,6 +37,7 @@ import {
   parseExecuteResponse,
   clampReferralFeeBps,
   bytesToBase64,
+  selectFeeAccount,
   JUP_EXECUTE,
   USDC_MINT,
 } from "@/lib/swap/orders";
@@ -161,7 +162,7 @@ export function useSwapEngine() {
         // vault for the input mint. This mirrors the legacy precedence in
         // lib/referral.ts buildJupiterSwapRequest ("Priority: referral >
         // vault > none", lib/referral.ts:204-210).
-        const feeAccount = referralAddress || config.vaultMap[pairFrom] || undefined;
+        const feeAccount = selectFeeAccount(referralAddress, config.vaultMap, pairFrom);
         const orderRes = await fetch(
           buildOrderUrl({
             inputMint: pairFrom,

@@ -89,20 +89,16 @@ Before using Pond0matic, ensure you have:
 
 Pond0matic features a clean, intuitive interface organized into several key areas:
 
-### Top Navigation Bar
+### Sidebar Navigation
 
-Located at the very top of the screen, the navigation bar contains:
+A persistent sidebar on the left (or drawer on mobile) contains:
 
 - **Application Logo/Title**: "Pond0matic" branding
 - **Navigation Links**:
-  - **Dashboard**: View mining statistics and vault information
-  - **Swapper**: Access the swap interface (default view)
-  - **Compact**: Compact version of the swapper
-  - **Unified**: Combined dashboard and swapper view
-- **Wallet Controls**:
-  - **Connect Wallet** button (when disconnected)
-  - **Wallet Address** display (when connected)
-  - **Disconnect** option (when connected)
+  - **Dashboard**: Mining rig stats, token prices, and activity feed (three tabs: Rig / Prices / Activity)
+  - **Portfolio**: PnL tracking and swap history
+  - **Settings**: RPC endpoint, Jupiter API key, swap defaults
+- **Connection Status**: wallet address and connect/disconnect control
 
 ### Status Bar
 
@@ -118,41 +114,36 @@ Below the navigation, the status bar displays:
 
 ### Main Content Area
 
-The main area changes based on the selected view:
+The main area changes based on the selected sidebar item:
 
 #### Dashboard View
 
-- **Mining Rig Statistics Card**:
-  - SOL swaps count
-  - BX swaps count
-  - Total boosted amount
-- **Token Price Cards**:
-  - wPOND price (from Jupiter)
-  - Market cap (from DexScreener)
-  - Liquidity metrics
-- **Vault Balance Card**:
-  - Real-time vault SOL balance
-  - Vault address information
-- **Quick Actions**: Button to open swapper
+Three tabs across the top:
 
-#### Swapper View
+- **Rig tab**: Mining rig statistics (SOL swaps, BX swaps, total boosted amount) fetched from the cary0x.com community API
+- **Prices tab**: wPOND price (Jupiter), market cap and liquidity (DexScreener), vault balance
+- **Activity tab**: Real-time log of swap events, timestamps, transaction links to Solscan
 
-- **Token Selection Panel**: Choose FROM and TO tokens
-- **Amount Input**: Specify swap amount with balance display
+#### Swap Panel
+
+Always visible on the right side of the dashboard on desktop; opens as a bottom sheet on mobile:
+
+- **Token Selection**: Choose FROM and TO tokens
+- **Amount Input**: Swap amount with live balance display
 - **Mode Selector**: Switch between Normal, Boost, and Rewards modes
 - **Configuration Panels**: Mode-specific settings (collapsible)
-- **Settings Panel**: Advanced swap settings (slippage, fees)
-- **Action Button**: Execute or stop swaps
-- **Activity Feed**: Real-time log of swap activities
+- **Action Button**: Start or stop the swap session
+- **Auto-Clicker** (optional, collapsible): Guard-railed popup clicker — requires `CLICKER_ENABLED=1` and explicit opt-in
 
-### Footer/Activity Feed
+#### Portfolio View
 
-Located at the bottom of the swapper interface:
+PnL tracking and historical swap data for the connected wallet.
 
-- **Recent Activities**: Last 5 swap-related events
-- **Timestamps**: When each activity occurred
-- **Status Indicators**: Success, pending, or error states
-- **Clear Log** button: Remove all activity entries
+#### Settings Page
+
+- **RPC Endpoint**: Solana node URL (Helius/QuickNode recommended)
+- **Jupiter API Key**: Required for order-and-execute swaps (obtain at [portal.jup.ag](https://portal.jup.ag))
+- **Swap Defaults**: Slippage, platform fee, and other configurable defaults
 
 ---
 
@@ -169,43 +160,44 @@ Pond0matic requires a Solana wallet connection to execute transactions. The appl
 
 ### Connection Process
 
-#### Step 1: Install a Wallet
+Pond0matic uses a guided 3-step connect flow. Click the **Connect** button on the dashboard:
 
-If you don't have a Solana wallet:
+#### Step 1: Connect Wallet
 
-1. Visit [https://phantom.app/](https://phantom.app/) or [https://solflare.com/](https://solflare.com/)
-2. Install the browser extension for your browser
-3. Create a new wallet or import an existing one
-4. Securely back up your seed phrase
+1. Click **Connect** on the dashboard or in the sidebar
+2. A guided modal opens — click **Connect Wallet** on the first step
+3. Select your wallet (e.g., "Phantom") from the list
+4. Your wallet extension prompts for permission — click **Connect** or **Approve**
 
 **WARNING**: Never share your seed phrase with anyone. Pond0matic will never ask for your seed phrase.
 
-#### Step 2: Connect to Pond0matic
+#### Step 2: Set RPC Endpoint
 
-1. Open Pond0matic in your browser
-2. Locate the **Connect Wallet** button in the top-right corner
-3. Click **Connect Wallet**
-4. A popup will appear showing available wallets
-5. Select your wallet (e.g., "Phantom")
-6. Your wallet extension will prompt for permission
-7. Review the connection request details
-8. Click **Connect** or **Approve** in your wallet
+1. The modal advances to the RPC step automatically
+2. Paste a Helius or QuickNode endpoint URL, or leave the default for testing
+3. The default public RPC is rate-limited — a private endpoint is strongly recommended for swap sessions
 
-**Expected Result**:
+#### Step 3: Jupiter API Key
 
-- The "Connect Wallet" button changes to show your wallet address
-- Your wallet address appears truncated (e.g., "7xK9...3mPq")
-- Network status indicator turns green
-- Token balances load in the interface
+1. The modal advances to the Jupiter API key step
+2. Get a free key at [portal.jup.ag](https://portal.jup.ag)
+3. Paste your key and click **Finish**
 
-#### Step 3: Verify Connection
+**NOTE**: The Jupiter API key is required for order-and-execute swaps. Without it, the swap panel will not send transactions.
+
+**Expected Result after all 3 steps**:
+
+- Sidebar shows your wallet address (truncated, e.g., "7xK9...3mPq")
+- The swap panel unlocks and is ready for use
+- Dashboard data starts loading
+
+#### Verify Connection
 
 Confirm successful connection by checking:
 
-- Wallet address is displayed in the top navigation
-- SOL balance appears in the status bar
-- Token balances show in the swap interface
-- Network status shows "Connected" (green indicator)
+- Wallet address appears in the sidebar
+- Swap panel is active (not blocked by the connect prompt)
+- Dashboard data loads in the Rig / Prices tabs
 
 ### Disconnecting Your Wallet
 
@@ -1222,8 +1214,8 @@ The Dashboard view provides comprehensive information about your mining rig perf
 
 ### Accessing the Dashboard
 
-1. Click **Dashboard** in the top navigation
-2. The dashboard loads with multiple information cards
+1. Click **Dashboard** in the sidebar
+2. The dashboard loads with Rig, Prices, and Activity tabs
 
 ### Mining Rig Statistics
 
@@ -1417,11 +1409,10 @@ Advanced settings allow you to fine-tune swap behavior for optimal results.
 
 ### Accessing Settings
 
-The Settings Panel is located below the swap interface in all modes:
+The Settings page is accessible from the sidebar:
 
-1. Scroll down in the swapper view
-2. Locate the **Settings** panel (always expanded)
-3. Adjust slippage and platform fee values
+1. Click **Settings** in the sidebar
+2. Adjust RPC endpoint, Jupiter API key, slippage, and platform fee values
 
 ### Slippage Tolerance
 
@@ -2228,8 +2219,8 @@ A: Try:
    - Especially after long boost sequences
 
 3. **Reduce visual effects** (if laggy):
-   - Use Compact view instead of full Swapper view
    - Disable browser hardware acceleration as test
+   - Close other browser tabs
 
 4. **System resources**:
    - Close other applications
@@ -2381,7 +2372,8 @@ If issues persist after trying the above solutions:
 | Shortcut | Action |
 |----------|--------|
 | `Alt + D` | Navigate to Dashboard |
-| `Alt + S` | Navigate to Swapper |
+| `Alt + P` | Navigate to Portfolio |
+| `Alt + S` | Navigate to Settings |
 
 **NOTE**: Keyboard shortcuts may vary by browser and OS.
 
