@@ -708,6 +708,7 @@ Pond0matic/
 ├── app/                    # Next.js app directory (pages and routes)
 │   ├── page.tsx           # Home page (Dashboard + swap panel)
 │   ├── layout.tsx         # Root layout component (AppShell)
+│   ├── globals.css        # Tailwind v4 CSS-first theme (no tailwind.config.ts)
 │   ├── portfolio/         # Portfolio / PnL page
 │   ├── settings/          # Settings page
 │   └── api/               # API proxy routes (cary0x, DexScreener, Jupiter)
@@ -740,8 +741,7 @@ Pond0matic/
 ├── .env.example           # Example environment configuration
 ├── .env.local             # Your local environment (create this)
 ├── package.json           # Project dependencies and scripts
-├── tsconfig.json          # TypeScript configuration
-└── app/globals.css        # Tailwind v4 CSS-first theme (no tailwind.config.ts)
+└── tsconfig.json          # TypeScript configuration
 ```
 
 ## Appendix B: Environment Variables Reference
