@@ -19,7 +19,7 @@ export function PondwaterPnLPanel() {
 
   if (!breakdown) {
     return (
-      <div className="px-4 py-8 text-center text-teal-300/80 text-sm">
+      <div className="px-4 py-8 text-center text-ink-muted text-sm">
         Connect a wallet to view your pondwater PnL.
       </div>
     );
@@ -54,7 +54,7 @@ export function PondwaterPnLPanel() {
       </div>
 
       {breakdown.hasNegativeUnaccounted && (
-        <div className="px-3 py-2 bg-amber-950/40 border border-amber-400/40 rounded-xl text-xs text-amber-200">
+        <div className="px-3 py-2 bg-warn/10 border border-warn rounded-xl text-xs text-warn">
           Heads up: your wPOND balance is lower than the swap-history math expects.
           That usually means you sent or burned wPOND outside Pond0matic. Mined
           value has been clamped to 0; treat the PnL number as a lower bound.

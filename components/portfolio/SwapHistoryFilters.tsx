@@ -11,11 +11,11 @@ export function SwapHistoryFilters({ filters, onChange }: Props) {
   return (
     <div className="flex flex-wrap items-end gap-2">
       <label className="block">
-        <span className="text-[10px] uppercase tracking-wide text-teal-400/80">Mode</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-muted">Mode</span>
         <select
           value={filters.mode ?? ""}
           onChange={(e) => onChange({ ...filters, mode: (e.target.value as Filters["mode"]) || undefined })}
-          className="mt-1 bg-black/40 border border-teal-400/30 rounded-lg px-2 py-1.5 text-xs text-cyan-200"
+          className="mt-1 bg-bg border border-edge rounded-lg px-2 py-1.5 text-xs text-ink"
         >
           <option value="">Any</option>
           <option value="normal">Normal</option>
@@ -25,11 +25,11 @@ export function SwapHistoryFilters({ filters, onChange }: Props) {
       </label>
 
       <label className="block">
-        <span className="text-[10px] uppercase tracking-wide text-teal-400/80">Status</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-muted">Status</span>
         <select
           value={filters.status ?? ""}
           onChange={(e) => onChange({ ...filters, status: (e.target.value as Filters["status"]) || undefined })}
-          className="mt-1 bg-black/40 border border-teal-400/30 rounded-lg px-2 py-1.5 text-xs text-cyan-200"
+          className="mt-1 bg-bg border border-edge rounded-lg px-2 py-1.5 text-xs text-ink"
         >
           <option value="">Any</option>
           <option value="confirmed">Confirmed</option>
@@ -39,20 +39,20 @@ export function SwapHistoryFilters({ filters, onChange }: Props) {
       </label>
 
       <label className="block">
-        <span className="text-[10px] uppercase tracking-wide text-teal-400/80">Symbol</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-muted">Symbol</span>
         <input
           type="text"
           value={filters.symbol ?? ""}
           onChange={(e) => onChange({ ...filters, symbol: e.target.value || undefined })}
           placeholder="e.g. wPOND"
-          className="mt-1 bg-black/40 border border-teal-400/30 rounded-lg px-2 py-1.5 text-xs text-cyan-200 w-32"
+          className="mt-1 bg-bg border border-edge rounded-lg px-2 py-1.5 text-xs text-ink w-32"
         />
       </label>
 
       <button
         type="button"
         onClick={() => onChange({})}
-        className="px-3 py-1.5 bg-slate-950/60 hover:bg-slate-900/60 border border-slate-500/40 rounded-lg text-xs font-medium text-slate-300 transition-all"
+        className="px-3 py-1.5 bg-surface-2 hover:bg-surface border border-edge rounded-lg text-xs font-medium text-ink-muted transition-all"
       >
         Clear
       </button>

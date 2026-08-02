@@ -23,15 +23,15 @@ export function PnLBreakdown({ breakdown }: { breakdown: PnLBreakdownType }) {
   ];
 
   return (
-    <div className="px-4 py-3 bg-slate-950/60 border border-teal-400/20 rounded-2xl">
-      <div className="text-[11px] font-semibold tracking-wide text-teal-300 uppercase mb-2">
+    <div className="px-4 py-3 bg-bg border border-edge rounded-2xl">
+      <div className="text-[11px] font-semibold tracking-wide text-ink-muted uppercase mb-2">
         Breakdown
       </div>
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
         {rows.map((row) => (
           <div key={row.label} className="flex items-center justify-between gap-4 py-0.5">
-            <dt className="text-teal-300/80">{row.label}</dt>
-            <dd className="font-mono text-cyan-200 tabular-nums">{row.value}</dd>
+            <dt className="text-ink-muted">{row.label}</dt>
+            <dd className="font-num text-ink">{row.value}</dd>
           </div>
         ))}
       </dl>

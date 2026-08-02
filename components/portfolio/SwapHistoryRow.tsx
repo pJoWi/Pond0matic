@@ -5,9 +5,9 @@ import { solscanTx } from "@/lib/utils";
 import type { SwapRecord } from "@/lib/portfolio/types";
 
 const STATUS_STYLES: Record<SwapRecord["status"], string> = {
-  confirmed: "text-emerald-300 border-emerald-400/40 bg-emerald-950/40",
-  pending: "text-amber-300 border-amber-400/40 bg-amber-950/40",
-  failed: "text-pink-300 border-pink-400/40 bg-rose-950/40",
+  confirmed: "text-accent border-accent bg-accent/10",
+  pending: "text-warn border-warn bg-warn/10",
+  failed: "text-danger border-danger bg-danger/10",
 };
 
 const MODE_LABELS: Record<SwapRecord["mode"], string> = {
@@ -34,18 +34,18 @@ export function SwapHistoryRow({ record, onDelete }: Props) {
   const isRealSig = !record.signature.startsWith("pending-");
 
   return (
-    <li className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-2 bg-slate-950/60 border border-teal-400/20 rounded-xl">
+    <li className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-2 bg-surface-2 border border-edge rounded-xl">
       <div className="flex flex-col items-start gap-1 min-w-[110px]">
-        <span className="text-[10px] text-teal-400/70 tabular-nums">{fmtTime(record.timestamp)}</span>
-        <span className="text-[10px] uppercase tracking-wide text-teal-300/80">{MODE_LABELS[record.mode]}</span>
+        <span className="text-[10px] text-ink-muted font-num">{fmtTime(record.timestamp)}</span>
+        <span className="text-[10px] uppercase tracking-wide text-ink-muted">{MODE_LABELS[record.mode]}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 min-w-0">
-        <span className="text-sm text-cyan-200 tabular-nums">
+        <span className="text-sm text-ink font-num">
           {fmtAmount(record.fromAmount)} {record.fromSymbol}
         </span>
-        <span className="text-teal-400/70">→</span>
-        <span className="text-sm text-cyan-200 tabular-nums">
+        <span className="text-ink-muted">→</span>
+        <span className="text-sm text-ink font-num">
           {fmtAmount(record.toAmount)} {record.toSymbol}
         </span>
       </div>
@@ -59,7 +59,7 @@ export function SwapHistoryRow({ record, onDelete }: Props) {
             href={solscanTx(record.signature)}
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-teal-300 hover:text-teal-100 underline-offset-2 hover:underline"
+            className="text-xs text-accent hover:text-accent-strong underline-offset-2 hover:underline font-num"
           >
             tx ↗
           </a>
@@ -68,7 +68,7 @@ export function SwapHistoryRow({ record, onDelete }: Props) {
           <button
             type="button"
             onClick={() => onDelete(record.id)}
-            className="text-xs px-2 py-1 text-pink-300 hover:text-pink-200"
+            className="text-xs px-2 py-1 text-danger hover:text-danger/80"
             title="Delete record"
           >
             ✕
