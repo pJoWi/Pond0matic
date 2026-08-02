@@ -40,15 +40,15 @@ export function useTokenPrices(): TokenPrices {
 
     const fetchAll = async () => {
       try {
-        const wpondRes = await fetch("/api/wpond-price");
+        const [wpondRes, cryptoRes] = await Promise.all([
+          fetch("/api/wpond-price"),
+          fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"),
+        ]);
         const wpondData = await safeJson(wpondRes);
 
         let solPrice = 0;
 
         try {
-          const cryptoRes = await fetch(
-            "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
-          );
           const cryptoData = await safeJson(cryptoRes);
           solPrice = cryptoData?.solana?.usd || 0;
         } catch {
