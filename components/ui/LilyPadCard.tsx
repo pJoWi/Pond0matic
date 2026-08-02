@@ -15,8 +15,8 @@ export interface LilyPadCardProps {
 
 const STATUS_COLORS: Record<LilyPadStatus, string> = {
   positive: "bg-surface border-accent hover:border-accent-strong",
-  negative: "bg-surface border-danger hover:border-danger",
-  warning: "bg-surface border-warn hover:border-warn",
+  negative: "bg-surface border-danger",
+  warning: "bg-surface border-warn",
   neutral: "bg-surface border-edge hover:border-accent",
 };
 

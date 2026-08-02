@@ -59,7 +59,7 @@ export function SwapHistoryRow({ record, onDelete }: Props) {
             href={solscanTx(record.signature)}
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-accent hover:text-accent-strong underline-offset-2 hover:underline font-num"
+            className="text-xs text-accent hover:text-accent-strong underline-offset-2 hover:underline"
           >
             tx ↗
           </a>

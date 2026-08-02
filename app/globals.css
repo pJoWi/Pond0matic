@@ -13,6 +13,8 @@
   --accent: #10b981;
   --accent-strong: #059669;
   --accent-deep: #06281c;
+  --danger: #dc2626;
+  --warn: #d97706;
 }
 .dark {
   --bg: #0b1512;
@@ -24,6 +26,8 @@
   --accent: #34d399;
   --accent-strong: #10b981;
   --accent-deep: #06281c;
+  --danger: #ef4444;
+  --warn: #f59e0b;
 }
 
 @theme inline {
@@ -39,8 +43,8 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-deep: var(--accent-deep);
-  --color-danger: #ef4444;
-  --color-warn: #f59e0b;
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
 
   --radius-card: 0.75rem;
 }
