@@ -41,7 +41,7 @@ export function Sidebar() {
               )}
             >
               <span aria-hidden>{item.icon}</span>
-              <span className="hidden lg:inline">{item.label}</span>
+              <span className="sr-only lg:not-sr-only">{item.label}</span>
             </Link>
           );
         })}
@@ -50,6 +50,7 @@ export function Sidebar() {
         {!fullyConnected ? (
           <button
             type="button"
+            aria-label="Connect wallet"
             onClick={() => setSetupOpen(true)}
             className="rounded-lg bg-gradient-to-br from-accent to-accent-strong px-3 py-2 text-xs font-bold text-accent-deep"
           >
