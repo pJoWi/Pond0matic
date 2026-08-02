@@ -295,7 +295,15 @@ export function useSwapEngine() {
         log(`⚠️ No accumulated ${symbolFor(config.toMint)} to return swap`);
         return;
       }
-      const returnCheck = validateSwapAmount(returnAmount, finalAmount, symbolFor(config.toMint));
+      // Accumulated return swaps are BY DESIGN ~100% of the freshly-built
+      // balance (roundStartBalance ≈ 0 at round start → accumulated ≈ finalAmount).
+      // The default 90% cap would block them every time, so we disable it by
+      // passing 100 (the > 100 branch is unreachable — the balance guard fires
+      // first). Manual amounts (user-typed) keep the default cap as fat-finger
+      // protection.
+      const returnCheck = step.manualAmountUi
+        ? validateSwapAmount(returnAmount, finalAmount, symbolFor(config.toMint))
+        : validateSwapAmount(returnAmount, finalAmount, symbolFor(config.toMint), 100);
       if (!returnCheck.isValid) {
         log(`❌ Return swap blocked: ${returnCheck.error}`);
         return;
