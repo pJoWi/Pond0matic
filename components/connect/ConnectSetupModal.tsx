@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -18,11 +18,22 @@ export function ConnectSetupModal() {
   const [testing, setTesting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (setupOpen) {
+      setRpcDraft(settings.rpc);
+      setKeyDraft(settings.jupiterApiKey);
+      setStep(1);
+      setFeedback(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setupOpen]);
+
   if (!setupOpen) return null;
 
   const address = publicKey?.toBase58();
 
   const testRpc = async () => {
+    if (testing) return;
     setTesting(true);
     setFeedback(null);
     const result = await testRpcEndpoint(rpcDraft);
@@ -37,6 +48,7 @@ export function ConnectSetupModal() {
   };
 
   const testKey = async () => {
+    if (testing) return;
     setTesting(true);
     setFeedback(null);
     const result = await testJupiterApiKey(keyDraft);
