@@ -25,11 +25,15 @@ function StatusDot({ color, pulsing }: { color: LEDColor; pulsing?: boolean }) {
     <span
       className={cn(
         "inline-block h-2.5 w-2.5 rounded-full",
-        LED_TOKEN[color],
+        LED_TOKEN[color] ?? "bg-edge",
         pulsing && "animate-pulse"
       )}
     />
   );
+}
+
+function getLedClass(color: unknown): string {
+  return LED_TOKEN[color as keyof typeof LED_TOKEN] ?? "bg-edge";
 }
 
 const DEFAULTS = { scanIntervalS: 2, sessionMinutes: 60, clickBudget: 50 };
@@ -67,7 +71,7 @@ export function ClickerSection() {
 
   return (
     <details className="border-t border-edge pt-2">
-      <summary className="cursor-pointer text-[11px] text-ink-muted">
+      <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer text-[11px] text-ink-muted">
         <span className="inline-flex items-center gap-2">
           <StatusDot color={clicker.policy.led as LEDColor} pulsing={clicker.policy.led === "green"} />
           ⚙ Autoclicker
