@@ -4,7 +4,6 @@ import { useSwapperContext } from "@/contexts/SwapperContext";
 import { useViewMode } from "@/components/layout/LayoutClient";
 import { MiningRigDashboard } from "@/components/swapper/MiningRigDashboard";
 import { CompactPond0xDashboard } from "@/components/swapper/CompactPond0xDashboard";
-import { LiveActivityMonitor } from "@/components/LiveActivityMonitor";
 
 interface DashboardProps {
   onOpenSwapper: () => void;
@@ -88,9 +87,6 @@ export function Dashboard({ onOpenSwapper }: DashboardProps) {
             }}
           />
         )}
-
-        {/* Live Activity Monitor */}
-        <LiveActivityMonitor maxItems={10} autoScroll={true} />
 
     </div>
   );
