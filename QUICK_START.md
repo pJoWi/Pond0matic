@@ -39,6 +39,8 @@ NEXT_PUBLIC_DEFAULT_RPC=https://api.mainnet.solana.com
 
 # Optional: For better performance, get a free API key from https://helius.dev
 # NEXT_PUBLIC_DEFAULT_RPC=https://mainnet.helius-rpc.com/?api-key=YOUR_KEY_HERE
+
+# Note: the Jupiter API key is NOT set here — you enter it in the app's connect flow (portal.jup.ag)
 ```
 
 ### 4. Start the Application

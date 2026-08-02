@@ -80,7 +80,7 @@ Before using Pond0matic, ensure you have:
 
 1. **Open the application** in your web browser at `http://localhost:3000`
 2. **Connect your wallet** (see [Connecting Your Wallet](#connecting-your-wallet))
-3. **Verify your connection** - Check that your wallet address appears in the top navigation bar
+3. **Verify your connection** - Check that your wallet address appears in the sidebar footer
 4. **Review available tokens** - The dashboard shows supported tokens and balances
 
 ---
@@ -203,7 +203,7 @@ Confirm successful connection by checking:
 
 To disconnect your wallet:
 
-1. Click on your **wallet address** in the top navigation
+1. Click on your **wallet address** in the sidebar footer
 2. Select **Disconnect** from the dropdown menu
 3. Confirm disconnection in your wallet if prompted
 

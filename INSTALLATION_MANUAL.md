@@ -580,7 +580,7 @@ Congratulations! You've successfully installed and configured Pond0matic. Here's
 ### 1. Connect Your Wallet
 
 - Open the application in your browser
-- Click the "Connect Wallet" button in the top navigation
+- Click the "Connect" button on the dashboard (or in the sidebar)
 - Select your wallet provider (Phantom, Solflare, etc.)
 - Approve the connection request
 
@@ -737,11 +737,11 @@ Pond0matic/
 ├── autoclicker/           # Opt-in wallet-popup clicker (CLICKER_ENABLED=1 only)
 ├── public/                # Static assets
 ├── types/                 # TypeScript type definitions
-├── app/globals.css        # Tailwind v4 CSS-first theme (no tailwind.config.ts)
 ├── .env.example           # Example environment configuration
 ├── .env.local             # Your local environment (create this)
 ├── package.json           # Project dependencies and scripts
-└── tsconfig.json          # TypeScript configuration
+├── tsconfig.json          # TypeScript configuration
+└── app/globals.css        # Tailwind v4 CSS-first theme (no tailwind.config.ts)
 ```
 
 ## Appendix B: Environment Variables Reference
