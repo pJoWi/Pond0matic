@@ -4,12 +4,10 @@ import { Dashboard } from "@/components/Dashboard";
 import { CompactSwapper } from "@/components/CompactSwapper";
 import { useSwapExecution } from "@/hooks/useSwapExecution";
 import { useToast } from "@/hooks/useToast";
-import { useAlertEngine } from "@/hooks/useAlertEngine";
 import { useSwapRecorder } from "@/hooks/useSwapRecorder";
 import { cn } from "@/lib/utils";
 
 export default function HomePage() {
-  useAlertEngine(); // Mount once: orchestrates all rig + price alerts
   useSwapRecorder(); // Mount once: captures swap lifecycle events into the portfolio store
   const [swapperOpen, setSwapperOpen] = useState(false);
   const { info } = useToast();

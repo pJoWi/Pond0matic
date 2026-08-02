@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PublicKey } from "@solana/web3.js";
 import { useVisibilityPolling } from "./useVisibilityPolling";
-import type { RigHealthSnapshot } from "@/lib/alerts/types";
+import type { RigHealthSnapshot } from "@/lib/rig/types";
 
 interface UseRigHealthResult {
   current: RigHealthSnapshot | null;

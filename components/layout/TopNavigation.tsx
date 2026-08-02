@@ -7,7 +7,6 @@ import { StatusBar, type DashboardType } from "./StatusBar";
 import type { SwapMode } from "@/types/swapModes";
 import { useBalances } from "@/hooks/useBalances";
 import { TokenLogo } from "@/components/icons/tokens/TokenLogo";
-import { useAlertsBadgeCount } from "@/hooks/useAlertsBadgeCount";
 
 interface TopNavigationProps {
   theme: "dark" | "light";
@@ -106,8 +105,6 @@ export function TopNavigation({
     log
   );
 
-  const alertBadgeCount = useAlertsBadgeCount();
-
   useEffect(() => {
     setRpcDraft(rpc);
   }, [rpc]);
@@ -142,7 +139,6 @@ export function TopNavigation({
   const navItems = [
     { href: "/", label: "Dashboard", tone: "lily" as const },
     { href: "/swapper", label: "Swapper", tone: "wave" as const },
-    { href: "/alerts", label: "Alerts", tone: "spark" as const, badgeCount: alertBadgeCount },
     { href: "/portfolio", label: "Portfolio", tone: "wave" as const },
   ];
 
@@ -232,7 +228,6 @@ export function TopNavigation({
                   active={pathname === item.href}
                   label={item.label}
                   tone={item.tone}
-                  badgeCount={"badgeCount" in item ? item.badgeCount : undefined}
                 />
               ))}
             </div>

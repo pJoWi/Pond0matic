@@ -1,4 +1,4 @@
-import type { RigHealthSnapshot } from "@/lib/alerts/types";
+import type { RigHealthSnapshot } from "@/lib/rig/types";
 import type { ClickerStatus } from "./types";
 
 export interface ClickerPolicyInput {

@@ -56,9 +56,8 @@ function recordFromStartEvent(
 /**
  * Subscribes to the swap event bus and writes records to localStorage.
  *
- * Mount this hook ONCE per app — typically in app/page.tsx alongside
- * useAlertEngine. Mounting it twice would create duplicate records for
- * each swap event.
+ * Mount this hook ONCE per app — typically in app/page.tsx. Mounting it
+ * twice would create duplicate records for each swap event.
  *
  * The hook is purely a side-effect; it returns void.
  */

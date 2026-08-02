@@ -6,9 +6,12 @@ wallet — treat every change on the swap path as production financial code.**
 
 ## Commands
 
-- `npm run dev` — dev server
+- `npm run dev` — dev server (copy `.env.example` → `.env.local` first; set
+  `NEXT_PUBLIC_DEFAULT_RPC` to a real RPC endpoint)
 - `npm run build` / `npm run lint`
-- `npx vitest run` — tests (config: `vitest.config.ts`, tests in `tests/**`)
+- `npx vitest run` — all tests; single file: `npx vitest run tests/portfolio/pnl.test.ts`;
+  watch: `npm run test:watch`. Node environment, no jsdom — tests cover pure
+  logic, which is why business rules must live in pure evaluators.
 - `npx tsx tools/cli.ts` — read-only Solana/Pond0x exploration CLI (see `.claude/skills/onchain-query`)
 
 ## Architecture map
@@ -16,6 +19,7 @@ wallet — treat every change on the swap path as production financial code.**
 - `app/` — Next.js App Router: `/` (dashboard + swap drawer), `/swapper`, `/portfolio`, `/alerts`, `app/api/*` (proxies to cary0x.com, DexScreener, Jupiter)
 - `contexts/SwapperContext.tsx` — central swap state (large; being decomposed)
 - `hooks/useSwapExecution.ts` — the swap/boost/rewards execution engine
+- `lib/jupiter.ts` — Jupiter quote/swap-transaction API client (financial-critical)
 - `lib/referral.ts` — Jupiter fee-account routing (financial-critical)
 - `lib/transactionValidation.ts` — pre-signing safety checks
 - `lib/alerts/` + `hooks/useAlertEngine.ts` — reference-quality architecture: pure evaluators + one orchestrator hook
@@ -24,8 +28,9 @@ wallet — treat every change on the swap path as production financial code.**
 - `autoclicker/` — opt-in, guard-railed local wallet-popup clicker: Python
   process + `app/api/clicker/*` + `ClickerPanel`, gated by `CLICKER_ENABLED=1`
   (dev only). Guardrails are enforced in the Python process (timer, click
-  budget, heartbeat). It lives here, NOT in `tools/`, so the "tools/ is
-  read-only" rule stays absolute.
+  budget, heartbeat); the TypeScript-side policy is a pure evaluator in
+  `lib/clicker/`. It lives here, NOT in `tools/`, so the "tools/ is
+  read-only" rule stays absolute. Setup/usage: `autoclicker/README.md`.
 
 ## Conventions (enforced in review)
 
@@ -59,8 +64,13 @@ wallet — treat every change on the swap path as production financial code.**
 - Public RPC is rate-limited; prefer `SOLANA_RPC` / `NEXT_PUBLIC_DEFAULT_RPC`
   set to a Helius/QuickNode endpoint.
 
-## Audit & learning docs
+## Docs & skills
 
+- `.claude/skills/` — project skills: `onchain-query`, `pond0x-protocol`,
+  `solana-dev`, `swap-testing`, `web3-security-review`. Use them whenever
+  their domain applies.
 - `docs/audit/2026-07-10-audit-report.md` — consolidated security /
   architecture / on-chain audit and remediation backlog.
 - `docs/LEARNING_PATH.md` — Solana skill-building milestones tied to real fixes.
+- `QUICK_START.md` / `USER_MANUAL.md` / `INSTALLATION_MANUAL.md` — end-user
+  docs (root); keep in sync when changing user-facing swap behavior.
