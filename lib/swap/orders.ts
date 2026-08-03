@@ -117,6 +117,27 @@ export function selectFeeAccount(
   return referralAddress || vaultMap[inputMint] || undefined;
 }
 
+/**
+ * Fee account for an order, honoring a configured fee of 0 as "no fee".
+ *
+ * The legacy quote+swap engine passed platformFeeBps straight through, so 0
+ * meant a true 0% fee. Jupiter's v2 referral API rejects sub-50-bps fees
+ * (hence clampReferralFeeBps), so the ONLY way to charge 0% is to omit the
+ * fee account entirely — otherwise a configured 0 would be floored to 50 bps
+ * (0.5%) whenever a vault exists. We honor 0 exactly; a configured 1–49 is
+ * still floored to Jupiter's 50-bps minimum (an unavoidable API constraint,
+ * a small divergence from legacy).
+ */
+export function feeAccountForOrder(
+  platformFeeBps: number,
+  referralAddress: string | undefined,
+  vaultMap: Record<string, string>,
+  inputMint: string
+): string | undefined {
+  if (platformFeeBps <= 0) return undefined;
+  return selectFeeAccount(referralAddress, vaultMap, inputMint);
+}
+
 /** Base64-encode a signed transaction for /execute (btoa is available in
  *  browsers and Node 18+; chunked to stay under argument limits). */
 export function bytesToBase64(bytes: Uint8Array): string {

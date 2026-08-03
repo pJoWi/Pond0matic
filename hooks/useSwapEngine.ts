@@ -37,7 +37,7 @@ import {
   parseExecuteResponse,
   clampReferralFeeBps,
   bytesToBase64,
-  selectFeeAccount,
+  feeAccountForOrder,
   JUP_EXECUTE,
   USDC_MINT,
 } from "@/lib/swap/orders";
@@ -161,8 +161,14 @@ export function useSwapEngine() {
         // Fee routing: explicit referral-link address wins, else the affiliate
         // vault for the input mint. This mirrors the legacy precedence in
         // lib/referral.ts buildJupiterSwapRequest ("Priority: referral >
-        // vault > none", lib/referral.ts:204-210).
-        const feeAccount = selectFeeAccount(referralAddress, config.vaultMap, pairFrom);
+        // vault > none", lib/referral.ts:204-210). A configured fee of 0
+        // omits the account entirely (true 0% — see feeAccountForOrder).
+        const feeAccount = feeAccountForOrder(
+          settings.platformFeeBps,
+          referralAddress,
+          config.vaultMap,
+          pairFrom
+        );
         const orderRes = await fetch(
           buildOrderUrl({
             inputMint: pairFrom,
@@ -190,7 +196,11 @@ export function useSwapEngine() {
           toast.error("Jupiter could not build the swap transaction");
           return;
         }
-        log(`💰 ${getFeeRoutingDescription(config.vaultMap[pairFrom], referralAddress)}`);
+        log(
+          feeAccount
+            ? `💰 ${getFeeRoutingDescription(config.vaultMap[pairFrom], referralAddress)}`
+            : "💰 No platform fee (fee set to 0)"
+        );
 
         const tx = VersionedTransaction.deserialize(b64ToUint8Array(order.transaction));
         const validation = validateSwapTransaction(tx, publicKey);

@@ -9,6 +9,7 @@ import {
   parseExecuteResponse,
   bytesToBase64,
   selectFeeAccount,
+  feeAccountForOrder,
   JUP_ORDER,
   SOL_MINT,
   USDC_MINT,
@@ -161,5 +162,24 @@ describe("selectFeeAccount", () => {
   it("returns undefined when neither exists (no fee params on order)", () => {
     expect(selectFeeAccount(undefined, vaults, "MintB")).toBeUndefined();
     expect(selectFeeAccount("", vaults, "MintB")).toBeUndefined();
+  });
+});
+
+describe("feeAccountForOrder", () => {
+  const vaults = { MintA: "VaultA" };
+  it("omits the fee account when the configured fee is 0 (true 0%, no vault charge)", () => {
+    // Jupiter v2 floors sub-50-bps referral fees, so 0 must drop the account
+    // entirely — otherwise a configured 0 would silently become 0.5%.
+    expect(feeAccountForOrder(0, undefined, vaults, "MintA")).toBeUndefined();
+    expect(feeAccountForOrder(0, "Referral1", vaults, "MintA")).toBeUndefined();
+    expect(feeAccountForOrder(-5, "Referral1", vaults, "MintA")).toBeUndefined();
+  });
+  it("preserves referral > vault > none precedence when a fee is configured", () => {
+    expect(feeAccountForOrder(100, "Referral1", vaults, "MintA")).toBe("Referral1");
+    expect(feeAccountForOrder(100, undefined, vaults, "MintA")).toBe("VaultA");
+    expect(feeAccountForOrder(100, undefined, vaults, "MintB")).toBeUndefined();
+  });
+  it("still returns an account for a sub-50 fee (floored to 50 bps by clamp downstream)", () => {
+    expect(feeAccountForOrder(25, undefined, vaults, "MintA")).toBe("VaultA");
   });
 });
