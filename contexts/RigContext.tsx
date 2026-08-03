@@ -1,21 +1,14 @@
 "use client";
 import React, { createContext, useContext } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useMiningRig } from "@/hooks/useMiningRig";
-import { useActivity } from "@/contexts/ActivityContext";
+import { useRigTelemetry, type RigTelemetry } from "@/hooks/useRigTelemetry";
 
-type RigValue = ReturnType<typeof useMiningRig>;
-
-const RigContext = createContext<RigValue | undefined>(undefined);
+const RigContext = createContext<RigTelemetry | undefined>(undefined);
 
 export function RigProvider({ children }: { children: React.ReactNode }) {
-  const { publicKey } = useWallet();
-  const { log } = useActivity();
-  const value = useMiningRig(publicKey?.toBase58() ?? "", log);
-  return <RigContext.Provider value={value}>{children}</RigContext.Provider>;
+  return <RigContext.Provider value={useRigTelemetry()}>{children}</RigContext.Provider>;
 }
 
-export function useRig(): RigValue {
+export function useRig(): RigTelemetry {
   const ctx = useContext(RigContext);
   if (!ctx) throw new Error("useRig must be used within RigProvider");
   return ctx;

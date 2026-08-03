@@ -63,7 +63,7 @@ export function useSwapEngine() {
   const config = useSwapConfig();
   const session = useSession();
   const { log } = useActivity();
-  const { incrementBoosts } = useRig();
+  const { incrementSwap } = useRig();
   const { publicKey, signTransaction } = useWallet();
   const walletAddress = publicKey?.toBase58() ?? "";
   const { solBalance, tokenBalance } = useBalances(walletAddress, settings.rpc, config.fromMint);
@@ -253,7 +253,7 @@ export function useSwapEngine() {
           log("Confirmed → " + (result.signature ? short(result.signature, 6) : "(no signature)"));
           dispatchSwapEvent({ type: "swap-confirmed", internalId });
           toast.success("Swap confirmed");
-          incrementBoosts();
+          incrementSwap();
         } else {
           const reason = `Execute failed (code ${result.code ?? "?"})${result.error ? `: ${result.error.slice(0, 120)}` : ""}`;
           log(`❌ ${reason}${result.signature ? " — check " + solscanTx(result.signature) : ""}`);
@@ -270,7 +270,7 @@ export function useSwapEngine() {
       }
     },
     [publicKey, signTransaction, settings, config.fromMint,
-     solBalance, tokenBalance, log, incrementBoosts]
+     solBalance, tokenBalance, log, incrementSwap]
   );
 
   /** Run one planned step. Returns false when the session should stop. */
