@@ -223,7 +223,7 @@ git commit -m "feat: pure boost-projection evaluator (lib/rig/boost)"
   - `findWalletRow(pool: unknown, wallet: string): PoolRow | null`
 - Consumed by Task 4 (realtime) and Task 5 (hook).
 
-> **Schema note (from Task 1):** the `mpool` row field names are `{ address|wallet, boost|multiplier, unclaimed }`. `parsePoolRow` reads both candidate names so it survives whichever pond0x uses. Update to the confirmed single names once Task 1 captured a populated row.
+> **Schema note (from Task 1):** Task 1 capture ran 2026-08-03 — SUB_STATUS: SUBSCRIBED confirmed, but pool was idle (empty `[]` broadcasts only). Field names are UNVERIFIED against a live row. Inferred per-miner shape: `{ address|wallet: string, boost|multiplier: number, unclaimed: number|string }`. `parsePoolRow` reads both candidate names so it survives whichever pond0x uses. If a populated row is later captured, update the confirmed single names here and narrow the parser.
 
 - [ ] **Step 1: Write the failing test**
 
