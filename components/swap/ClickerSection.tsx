@@ -32,10 +32,6 @@ function StatusDot({ color, pulsing }: { color: LEDColor; pulsing?: boolean }) {
   );
 }
 
-function getLedClass(color: unknown): string {
-  return LED_TOKEN[color as keyof typeof LED_TOKEN] ?? "bg-edge";
-}
-
 const DEFAULTS = { scanIntervalS: 2, sessionMinutes: 60, clickBudget: 50 };
 
 export function ClickerSection() {

@@ -26,7 +26,7 @@ export function PricesTab() {
         ))}
       </div>
       <p className="text-[10px] text-ink-muted">
-        Live via lite-api.jup.ag price v3 (keyless) — refreshes automatically while the tab is visible.
+        Live — SOL via CoinGecko, wPOND via DexScreener. Refreshes automatically while the tab is visible.
       </p>
     </div>
   );
