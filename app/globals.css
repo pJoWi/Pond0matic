@@ -65,3 +65,11 @@
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+
+@keyframes rig-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes rig-flash { 0% { background-color: color-mix(in oklab, var(--color-accent) 22%, transparent); } 100% { background-color: transparent; } }
+.rig-pulse { animation: rig-pulse 1.6s ease-in-out infinite; }
+.rig-flash { animation: rig-flash .6s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .rig-pulse, .rig-flash { animation: none; }
+}
