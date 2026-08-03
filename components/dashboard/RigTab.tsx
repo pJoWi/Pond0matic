@@ -22,7 +22,7 @@ export function RigTab() {
         <h2 className="text-sm font-semibold">Mining rig</h2>
         <span className={`flex items-center gap-1.5 rounded-full border border-edge px-3 py-1 text-xs ${rig.live ? "text-accent" : "text-ink-muted"}`}>
           <span className={`h-1.5 w-1.5 rounded-full ${rig.live ? "bg-accent rig-pulse" : "bg-edge"}`} />
-          {rig.live ? "MINING (live)" : "idle · ~schatting"}
+          {rig.live ? "MINING (live)" : "idle · ~estimate"}
         </span>
       </div>
       <BoostHero rig={rig} />

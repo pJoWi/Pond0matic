@@ -8,7 +8,7 @@ export function RigProfile({ rig }: { rig: ReturnType<typeof useRigTelemetry> })
     <div className="flex flex-col gap-3">
       {(m || rig.luck) && (
         <div>
-          <div className="mb-1.5 text-[10px] uppercase tracking-wider text-ink-muted">Badges &amp; profiel</div>
+          <div className="mb-1.5 text-[10px] uppercase tracking-wider text-ink-muted">Badges &amp; profile</div>
           <div className="flex flex-wrap gap-1.5">
             {m?.badges.map((b) => (
               <span key={b} className="rounded-md border border-accent-strong/40 bg-accent/10 px-2 py-1 text-[11px] text-accent">🏅 {b}</span>

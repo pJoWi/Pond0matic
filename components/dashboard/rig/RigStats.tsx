@@ -21,10 +21,10 @@ export function RigStats({ rig }: { rig: ReturnType<typeof useRigTelemetry> }) {
         <Stat label="Drift risk ⚠" value={String(h.drifted)} warn={h.drifted > 0} />
       </div>
       <div className="flex flex-wrap justify-between gap-2 rounded-xl border border-edge bg-surface p-4">
-        {[["Sessies", h.miningSessions], ["Sent", h.sent], ["Failed", h.failed], ["Drifted", h.drifted], ["Mempool", h.inMempool]].map(([l, v]) => (
+        {[["Sessions", h.miningSessions], ["Sent", h.sent], ["Failed", h.failed], ["Drifted", h.drifted], ["Mempool", h.inMempool]].map(([l, v]) => (
           <div key={String(l)}>
             <div className="text-[10px] uppercase tracking-wider text-ink-muted">{l}</div>
-            <div className="font-num text-sm text-ink">{Number(v).toLocaleString("nl-NL")}</div>
+            <div className="font-num text-sm text-ink">{Number(v).toLocaleString("en-US")}</div>
           </div>
         ))}
       </div>
