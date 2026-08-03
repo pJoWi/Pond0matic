@@ -58,9 +58,16 @@ export function parseLuck(json: unknown): Luck {
   return { luck: d.luck ?? 0, referrals: d.referrals ?? 0 };
 }
 
+function toNum(v: number | string | undefined): number | null {
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
 const PoolRowSchema = z.looseObject({
   address: z.string().optional(), wallet: z.string().optional(),
-  boost: z.number().optional(), multiplier: z.number().optional(),
+  boost: z.union([z.number(), z.string()]).optional(),
+  multiplier: z.union([z.number(), z.string()]).optional(),
   unclaimed: z.union([z.number(), z.string()]).optional(),
 });
 export function parsePoolRow(raw: unknown): PoolRow | null {
@@ -68,10 +75,10 @@ export function parsePoolRow(raw: unknown): PoolRow | null {
   if (!r.success) return null;
   const d = r.data;
   const wallet = d.address ?? d.wallet;
-  const boost = d.boost ?? d.multiplier;
+  const boost = toNum(d.boost ?? d.multiplier);
   if (!wallet || boost == null) return null;
-  const unclaimed = typeof d.unclaimed === "string" ? Number(d.unclaimed) : d.unclaimed ?? 0;
-  return { wallet, boost, unclaimed: Number.isFinite(unclaimed) ? unclaimed : 0 };
+  const unclaimed = toNum(d.unclaimed) ?? 0;
+  return { wallet, boost, unclaimed };
 }
 
 export function findWalletRow(pool: unknown, wallet: string): PoolRow | null {

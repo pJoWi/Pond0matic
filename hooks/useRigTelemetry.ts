@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import { boostProjection, type BoostProjection } from "@/lib/rig/boost";

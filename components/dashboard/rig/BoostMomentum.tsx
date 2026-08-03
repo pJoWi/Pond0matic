@@ -10,7 +10,7 @@ export function BoostMomentum({ rig }: { rig: ReturnType<typeof useRigTelemetry>
       <div className="flex items-center justify-between rounded-xl border border-edge bg-surface p-4">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-ink-muted">Naar max 615</div>
-          <div className="font-num text-lg text-accent">nog ~{p.swapsToMax.toLocaleString("nl-NL")} swaps</div>
+          <div className="font-num text-lg text-accent">{rig.boost != null ? `nog ~${p.swapsToMax.toLocaleString("nl-NL")} swaps` : "—"}</div>
         </div>
         <div className="text-right">
           <div className="text-[10px] uppercase tracking-wider text-ink-muted">Deze sessie</div>
@@ -20,7 +20,7 @@ export function BoostMomentum({ rig }: { rig: ReturnType<typeof useRigTelemetry>
       <div className="flex flex-wrap gap-2">
         <span className={chip}>1 run (18×3) = +9 boost = +3 sessies buffer</span>
         {rig.topBoost != null && (
-          <span className={chip}>🏆 jij <b className="font-num">{(rig.boost ?? 0).toFixed(1)}</b> · top <b className="font-num">{rig.topBoost.toFixed(0)}</b></span>
+          <span className={chip}>🏆 jij <b className="font-num">{rig.boost != null ? rig.boost.toFixed(1) : "—"}</b> · top <b className="font-num">{rig.topBoost.toFixed(0)}</b></span>
         )}
       </div>
     </div>

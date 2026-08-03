@@ -54,6 +54,13 @@ describe("parsePoolRow / findWalletRow", () => {
     expect(parsePoolRow({ boost: 5 })).toBeNull();      // no wallet
     expect(parsePoolRow(null)).toBeNull();
   });
+  it("coerces a stringified boost to a number", () => {
+    expect(parsePoolRow({ wallet: "AA", boost: "615", unclaimed: "1" }))
+      .toEqual({ wallet: "AA", boost: 615, unclaimed: 1 });
+  });
+  it("returns null when boost is an unusable string", () => {
+    expect(parsePoolRow({ wallet: "AA", boost: "abc" })).toBeNull();
+  });
   it("finds our wallet in a pool array", () => {
     const pool = [{ address: "AA", boost: 615, unclaimed: 1 }, { address: "GM8Qz8", boost: 174.6, unclaimed: 2 }];
     expect(findWalletRow(pool, "GM8Qz8")?.boost).toBe(174.6);
