@@ -59,14 +59,28 @@ export function jupiterHeaders(apiKey: string, json = false): HeadersInit {
   return headers;
 }
 
-export function jupiterErrorMessage(status: number): string {
-  if (status === 429) {
-    return "Jupiter rate limit exceeded. Add or upgrade your API key at portal.jup.ag.";
+export function jupiterErrorMessage(status: number, detail?: string): string {
+  const base =
+    status === 429
+      ? "Jupiter rate limit exceeded. Add or upgrade your API key at portal.jup.ag."
+      : status === 401 || status === 403
+        ? "Jupiter API key rejected. Check the key in Settings."
+        : `Jupiter request failed (${status}).`;
+  return detail ? `${base} ${detail}` : base;
+}
+
+/**
+ * Pull Jupiter's `{ error: "..." }` message out of a parsed error-response
+ * body, if present. Jupiter returns the real reason there (e.g. an
+ * uninitialised referral account) — surfacing it turns an opaque 400 into a
+ * one-line diagnosis instead of a blind "request failed".
+ */
+export function extractJupiterError(body: unknown): string | undefined {
+  if (body && typeof body === "object" && "error" in body) {
+    const e = (body as { error: unknown }).error;
+    if (typeof e === "string" && e.trim()) return e.trim();
   }
-  if (status === 401 || status === 403) {
-    return "Jupiter API key rejected. Check the key in Settings.";
-  }
-  return `Jupiter request failed (${status}).`;
+  return undefined;
 }
 
 const OrderSchema = z.looseObject({
@@ -109,33 +123,27 @@ export function parseExecuteResponse(json: unknown): JupiterExecuteResult {
  * otherwise the affiliate vault for the input mint. Mirrors the legacy
  * precedence in lib/referral.ts buildJupiterSwapRequest (referral > vault > none).
  */
-export function selectFeeAccount(
-  referralAddress: string | undefined,
-  vaultMap: Record<string, string>,
-  inputMint: string
-): string | undefined {
-  return referralAddress || vaultMap[inputMint] || undefined;
-}
-
 /**
- * Fee account for an order, honoring a configured fee of 0 as "no fee".
+ * Fee account for a v2 `/order` request.
  *
- * The legacy quote+swap engine passed platformFeeBps straight through, so 0
- * meant a true 0% fee. Jupiter's v2 referral API rejects sub-50-bps fees
- * (hence clampReferralFeeBps), so the ONLY way to charge 0% is to omit the
- * fee account entirely — otherwise a configured 0 would be floored to 50 bps
- * (0.5%) whenever a vault exists. We honor 0 exactly; a configured 1–49 is
- * still floored to Jupiter's 50-bps minimum (an unavoidable API constraint,
- * a small divergence from legacy).
+ * Jupiter's v2 order API requires `referralAccount` to be a referral account
+ * created under Jupiter's referral program (REFER4Zg…) for project
+ * DkiqsTrw1u1bYFumumC7sCG2S8K25qc2vemJFHyW2wJc — the current referral system.
+ * The legacy per-mint affiliate vault ATAs are NOT valid referral accounts
+ * here: passing one makes Jupiter reject the entire order with 400, so they
+ * must never be sent. We forward ONLY an explicitly configured referral
+ * account (from the user's Jupiter referral link); with none configured, the
+ * order runs fee-free — which is what makes swaps work out of the box.
+ *
+ * A configured fee of 0 also omits the account (true 0%); Jupiter floors a
+ * configured 1–49 to its 50-bps minimum via clampReferralFeeBps.
  */
 export function feeAccountForOrder(
   platformFeeBps: number,
-  referralAddress: string | undefined,
-  vaultMap: Record<string, string>,
-  inputMint: string
+  referralAccount: string | undefined
 ): string | undefined {
   if (platformFeeBps <= 0) return undefined;
-  return selectFeeAccount(referralAddress, vaultMap, inputMint);
+  return referralAccount || undefined;
 }
 
 /** Base64-encode a signed transaction for /execute (btoa is available in

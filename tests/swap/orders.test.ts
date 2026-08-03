@@ -8,8 +8,8 @@ import {
   parseOrder,
   parseExecuteResponse,
   bytesToBase64,
-  selectFeeAccount,
   feeAccountForOrder,
+  extractJupiterError,
   JUP_ORDER,
   SOL_MINT,
   USDC_MINT,
@@ -86,6 +86,28 @@ describe("jupiterErrorMessage", () => {
     expect(jupiterErrorMessage(403)).toMatch(/api key/i);
     expect(jupiterErrorMessage(500)).toMatch(/500/);
   });
+  it("appends a Jupiter error detail when provided", () => {
+    expect(jupiterErrorMessage(400, "referralAccount not initialized")).toBe(
+      "Jupiter request failed (400). referralAccount not initialized"
+    );
+    // base message unchanged when no detail
+    expect(jupiterErrorMessage(400)).toBe("Jupiter request failed (400).");
+  });
+});
+
+describe("extractJupiterError", () => {
+  it("pulls the error string from a Jupiter error body", () => {
+    expect(extractJupiterError({ error: "referralAccount not initialized under REFER4Zg…" })).toBe(
+      "referralAccount not initialized under REFER4Zg…"
+    );
+  });
+  it("returns undefined for non-error bodies", () => {
+    expect(extractJupiterError(null)).toBeUndefined();
+    expect(extractJupiterError({ ok: true })).toBeUndefined();
+    expect(extractJupiterError({ error: "" })).toBeUndefined();
+    expect(extractJupiterError({ error: 42 })).toBeUndefined();
+    expect(extractJupiterError("<html>rate limited</html>")).toBeUndefined();
+  });
 });
 
 describe("parseOrder", () => {
@@ -151,35 +173,21 @@ describe("bytesToBase64", () => {
   });
 });
 
-describe("selectFeeAccount", () => {
-  const vaults = { MintA: "VaultA" };
-  it("referral address wins over vault", () => {
-    expect(selectFeeAccount("Referral1", vaults, "MintA")).toBe("Referral1");
-  });
-  it("falls back to the vault for the input mint", () => {
-    expect(selectFeeAccount(undefined, vaults, "MintA")).toBe("VaultA");
-  });
-  it("returns undefined when neither exists (no fee params on order)", () => {
-    expect(selectFeeAccount(undefined, vaults, "MintB")).toBeUndefined();
-    expect(selectFeeAccount("", vaults, "MintB")).toBeUndefined();
-  });
-});
-
 describe("feeAccountForOrder", () => {
-  const vaults = { MintA: "VaultA" };
-  it("omits the fee account when the configured fee is 0 (true 0%, no vault charge)", () => {
+  it("omits the fee account when the configured fee is 0 (true 0%)", () => {
     // Jupiter v2 floors sub-50-bps referral fees, so 0 must drop the account
     // entirely — otherwise a configured 0 would silently become 0.5%.
-    expect(feeAccountForOrder(0, undefined, vaults, "MintA")).toBeUndefined();
-    expect(feeAccountForOrder(0, "Referral1", vaults, "MintA")).toBeUndefined();
-    expect(feeAccountForOrder(-5, "Referral1", vaults, "MintA")).toBeUndefined();
+    expect(feeAccountForOrder(0, "Referral1")).toBeUndefined();
+    expect(feeAccountForOrder(-5, "Referral1")).toBeUndefined();
   });
-  it("preserves referral > vault > none precedence when a fee is configured", () => {
-    expect(feeAccountForOrder(100, "Referral1", vaults, "MintA")).toBe("Referral1");
-    expect(feeAccountForOrder(100, undefined, vaults, "MintA")).toBe("VaultA");
-    expect(feeAccountForOrder(100, undefined, vaults, "MintB")).toBeUndefined();
+  it("forwards ONLY an explicitly configured referral account", () => {
+    // Legacy per-mint vault ATAs are invalid v2 referralAccounts (Jupiter 400s
+    // the order), so the only fee account we ever send is a configured one.
+    expect(feeAccountForOrder(100, "Referral1")).toBe("Referral1");
+    expect(feeAccountForOrder(100, undefined)).toBeUndefined();
+    expect(feeAccountForOrder(100, "")).toBeUndefined();
   });
-  it("still returns an account for a sub-50 fee (floored to 50 bps by clamp downstream)", () => {
-    expect(feeAccountForOrder(25, undefined, vaults, "MintA")).toBe("VaultA");
+  it("still forwards a configured account for a sub-50 fee (floored to 50 bps by clamp downstream)", () => {
+    expect(feeAccountForOrder(25, "Referral1")).toBe("Referral1");
   });
 });

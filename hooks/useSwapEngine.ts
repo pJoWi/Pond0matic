@@ -38,6 +38,7 @@ import {
   clampReferralFeeBps,
   bytesToBase64,
   feeAccountForOrder,
+  extractJupiterError,
   JUP_EXECUTE,
   USDC_MINT,
 } from "@/lib/swap/orders";
@@ -158,17 +159,12 @@ export function useSwapEngine() {
       }
 
       try {
-        // Fee routing: explicit referral-link address wins, else the affiliate
-        // vault for the input mint. This mirrors the legacy precedence in
-        // lib/referral.ts buildJupiterSwapRequest ("Priority: referral >
-        // vault > none", lib/referral.ts:204-210). A configured fee of 0
-        // omits the account entirely (true 0% — see feeAccountForOrder).
-        const feeAccount = feeAccountForOrder(
-          settings.platformFeeBps,
-          referralAddress,
-          config.vaultMap,
-          pairFrom
-        );
+        // Fee routing: forward ONLY an explicitly configured Jupiter referral
+        // account (from the referral link). The legacy affiliate vault ATAs are
+        // not valid v2 referralAccounts — Jupiter 400s the whole order if one
+        // is sent — so they are never used here. A configured fee of 0 also
+        // omits the account (true 0%). See feeAccountForOrder.
+        const feeAccount = feeAccountForOrder(settings.platformFeeBps, referralAddress);
         const orderRes = await fetch(
           buildOrderUrl({
             inputMint: pairFrom,
@@ -182,9 +178,10 @@ export function useSwapEngine() {
           { headers: jupiterHeaders(settings.jupiterApiKey) }
         );
         if (!orderRes.ok) {
-          const msg = jupiterErrorMessage(orderRes.status);
+          const detail = extractJupiterError(await orderRes.json().catch(() => null));
+          const msg = jupiterErrorMessage(orderRes.status, detail);
           log(`⚠️ ${msg}`);
-          toast.error(msg);
+          toast.error(msg.slice(0, 120));
           return;
         }
         const order = parseOrder(await orderRes.json());
@@ -198,8 +195,8 @@ export function useSwapEngine() {
         }
         log(
           feeAccount
-            ? `💰 ${getFeeRoutingDescription(config.vaultMap[pairFrom], referralAddress)}`
-            : "💰 No platform fee (fee set to 0)"
+            ? `💰 ${getFeeRoutingDescription(undefined, referralAddress)}`
+            : "💰 No platform fee"
         );
 
         const tx = VersionedTransaction.deserialize(b64ToUint8Array(order.transaction));
@@ -240,9 +237,10 @@ export function useSwapEngine() {
           body: buildExecuteBody(bytesToBase64(signed.serialize()), order.requestId),
         });
         if (!execRes.ok) {
-          const msg = jupiterErrorMessage(execRes.status);
+          const detail = extractJupiterError(await execRes.json().catch(() => null));
+          const msg = jupiterErrorMessage(execRes.status, detail);
           log(`⚠️ ${msg}`);
-          toast.error(msg);
+          toast.error(msg.slice(0, 120));
           dispatchSwapEvent({ type: "swap-failed", internalId, reason: msg });
           return;
         }
@@ -271,7 +269,7 @@ export function useSwapEngine() {
         }
       }
     },
-    [publicKey, signTransaction, settings, config.fromMint, config.vaultMap,
+    [publicKey, signTransaction, settings, config.fromMint,
      solBalance, tokenBalance, log, incrementBoosts]
   );
 
