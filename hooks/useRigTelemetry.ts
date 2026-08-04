@@ -61,7 +61,7 @@ export function useRigTelemetry(): RigTelemetry {
       const [h, m, l] = await Promise.all([
         fetch(`/api/rig/health/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
         fetch(`/api/rig/manifest/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-        fetch(`https://www.pond0x.com/api/solana/luck/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+        fetch(`/api/rig/luck/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
       ]);
       if (cancelled) return;
       try { setHealth(h ? parseHealth(h) : null); } catch { setHealth(null); }
