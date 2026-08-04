@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseHealth, parseManifest, parseLuck, parsePoolRow, findWalletRow } from "@/lib/rig/telemetry";
+import { parseHealth, parseManifest, parseLuck } from "@/lib/rig/telemetry";
 
 const health = {
   account: "GM8Qz8", stats: {
@@ -40,31 +40,5 @@ describe("parseLuck", () => {
   it("parses luck + referrals, tolerates absence", () => {
     expect(parseLuck({ luck: 12, referrals: 3 }).luck).toBe(12);
     expect(parseLuck({}).luck).toBe(0);
-  });
-});
-
-describe("parsePoolRow / findWalletRow", () => {
-  it("normalizes a miner row under either field-name convention", () => {
-    expect(parsePoolRow({ address: "GM8Qz8", boost: 174.6, unclaimed: 109300000 }))
-      .toEqual({ wallet: "GM8Qz8", boost: 174.6, unclaimed: 109300000 });
-    expect(parsePoolRow({ wallet: "AA", multiplier: 615, unclaimed: "373600000" }))
-      .toEqual({ wallet: "AA", boost: 615, unclaimed: 373600000 });
-  });
-  it("returns null for unusable rows", () => {
-    expect(parsePoolRow({ boost: 5 })).toBeNull();      // no wallet
-    expect(parsePoolRow(null)).toBeNull();
-  });
-  it("coerces a stringified boost to a number", () => {
-    expect(parsePoolRow({ wallet: "AA", boost: "615", unclaimed: "1" }))
-      .toEqual({ wallet: "AA", boost: 615, unclaimed: 1 });
-  });
-  it("returns null when boost is an unusable string", () => {
-    expect(parsePoolRow({ wallet: "AA", boost: "abc" })).toBeNull();
-  });
-  it("finds our wallet in a pool array", () => {
-    const pool = [{ address: "AA", boost: 615, unclaimed: 1 }, { address: "GM8Qz8", boost: 174.6, unclaimed: 2 }];
-    expect(findWalletRow(pool, "GM8Qz8")?.boost).toBe(174.6);
-    expect(findWalletRow(pool, "ZZ")).toBeNull();
-    expect(findWalletRow("not-an-array", "GM8Qz8")).toBeNull();
   });
 });

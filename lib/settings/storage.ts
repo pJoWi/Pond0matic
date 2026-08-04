@@ -12,6 +12,9 @@ const SettingsSchema = z.object({
   slippageBps: z.number().int().min(0).max(500),
   platformFeeBps: z.number().int().min(0).max(10000),
   affiliate: z.enum(["pond0x", "aquavaults"]),
+  // User-entered current rig boost (read from pond0x.com/mining); 0 = not set.
+  // .default(0) so settings saved before this field existed still parse.
+  rigBoost: z.number().min(0).max(10000).default(0),
 });
 export type StoredSettings = z.infer<typeof SettingsSchema>;
 export type ThemeSetting = StoredSettings["theme"];
@@ -25,6 +28,7 @@ export const DEFAULT_SETTINGS: StoredSettings = {
   slippageBps: Number(process.env.NEXT_PUBLIC_DEFAULT_SLIPPAGE_BPS) || 50,
   platformFeeBps: Number(process.env.NEXT_PUBLIC_DEFAULT_PLATFORM_FEE_BPS) || 100,
   affiliate: "pond0x",
+  rigBoost: 0,
 };
 
 export function parseStoredSettings(raw: string | null): StoredSettings {

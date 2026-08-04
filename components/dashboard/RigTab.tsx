@@ -20,10 +20,13 @@ export function RigTab() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">Mining rig</h2>
-        <span className={`flex items-center gap-1.5 rounded-full border border-edge px-3 py-1 text-xs ${rig.live ? "text-accent" : "text-ink-muted"}`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${rig.live ? "bg-accent rig-pulse" : "bg-edge"}`} />
-          {rig.live ? "MINING (live)" : "idle · ~estimate"}
-        </span>
+        <button
+          type="button"
+          onClick={() => rig.refresh()}
+          className="rounded-lg border border-edge px-3 py-1 text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink"
+        >
+          ↻ Refresh
+        </button>
       </div>
       <BoostHero rig={rig} />
       <BoostMomentum rig={rig} />

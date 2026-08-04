@@ -1,7 +1,5 @@
 "use client";
 import { useRigTelemetry } from "@/hooks/useRigTelemetry";
-import { useCountUp } from "@/hooks/useCountUp";
-import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { MAX_BOOST } from "@/lib/rig/boost";
 
 function compact(n: number): string {
@@ -12,30 +10,50 @@ function compact(n: number): string {
 }
 
 export function BoostHero({ rig }: { rig: ReturnType<typeof useRigTelemetry> }) {
-  const { wpondPrice } = useTokenPrices();
-  const boost = useCountUp(rig.boost ?? 0);
-  const unclaimed = useCountUp(rig.unclaimed ?? 0);
   const pct = Math.max(0, Math.min(100, rig.projection.pctToMax));
-  const usd = (rig.unclaimed ?? 0) * (wpondPrice || 0);
+  const maxClaim = rig.health?.maxClaimUsd ?? null;
 
   return (
     <div className="grid grid-cols-2 gap-3">
+      {/* Boost — user-entered (the live value isn't fetchable) */}
       <div className="rounded-xl border border-edge bg-surface p-4">
-        <div className="text-[10px] uppercase tracking-wider text-ink-muted">Current boost</div>
-        <div className="font-num text-3xl text-ink">
-          {rig.boost == null ? "—" : boost.toFixed(1)}
-          {!rig.live && rig.boost != null && <span className="text-ink-muted"> ~</span>}
+        <div className="text-[10px] uppercase tracking-wider text-ink-muted">Your boost</div>
+        <div className="flex items-baseline gap-1">
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            max={MAX_BOOST}
+            value={rig.boost ?? ""}
+            onChange={(e) => rig.setBoost(Number(e.target.value) || 0)}
+            placeholder="—"
+            aria-label="Current rig boost (from pond0x.com/mining)"
+            className="w-24 bg-transparent font-num text-3xl text-ink outline-none placeholder:text-ink-muted focus:text-accent"
+          />
+          <span className="font-num text-sm text-ink-muted">/ {MAX_BOOST}</span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2">
-          <div className="h-full bg-gradient-to-r from-accent to-accent-strong transition-[width] duration-500" style={{ width: `${pct}%` }} />
+          <div
+            className="h-full bg-gradient-to-r from-accent to-accent-strong transition-[width] duration-500"
+            style={{ width: `${pct}%` }}
+          />
         </div>
-        <div className="mt-1 font-num text-[11px] text-ink-muted">{pct.toFixed(0)}% to max {MAX_BOOST} · +0.167/swap</div>
+        <div className="mt-1 font-num text-[11px] text-ink-muted">
+          {rig.boost == null
+            ? "enter your boost from pond0x.com/mining"
+            : `${pct.toFixed(0)}% to max · +0.167/swap`}
+        </div>
       </div>
+
+      {/* Max claim estimate — real cary0x $ (replaces the unobtainable unclaimed) */}
       <div className="rounded-xl border border-edge bg-surface p-4">
-        <div className="text-[10px] uppercase tracking-wider text-ink-muted">Unclaimed wPOND</div>
-        <div className="font-num text-3xl text-accent">{rig.unclaimed == null ? "—" : compact(unclaimed)}</div>
-        <div className="mt-2 font-num text-xs text-ink-muted">≈ ${usd.toFixed(2)}</div>
-        {rig.health && <div className="font-num text-[11px] text-ink-muted">max-claim potential ${compact(rig.health.maxClaimUsd)}</div>}
+        <div className="text-[10px] uppercase tracking-wider text-ink-muted">Max claim est.</div>
+        <div className="font-num text-3xl text-accent">{maxClaim == null ? "—" : "$" + compact(maxClaim)}</div>
+        {rig.health && (
+          <div className="mt-2 font-num text-[11px] text-ink-muted">
+            {rig.health.miningSessions.toLocaleString("en-US")} sessions · drift {rig.health.drifted}
+          </div>
+        )}
       </div>
     </div>
   );

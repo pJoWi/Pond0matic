@@ -19,9 +19,6 @@ export function BoostMomentum({ rig }: { rig: ReturnType<typeof useRigTelemetry>
       </div>
       <div className="flex flex-wrap gap-2">
         <span className={chip}>1 run (18×3) = +9 boost = +3 sessions buffer</span>
-        {rig.topBoost != null && (
-          <span className={chip}>🏆 you <b className="font-num">{rig.boost != null ? rig.boost.toFixed(1) : "—"}</b> · top <b className="font-num">{rig.topBoost.toFixed(0)}</b></span>
-        )}
       </div>
     </div>
   );

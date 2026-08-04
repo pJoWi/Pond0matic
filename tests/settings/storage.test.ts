@@ -28,4 +28,18 @@ describe("parseStoredSettings", () => {
     const bad = { ...DEFAULT_SETTINGS, slippageBps: 99999 };
     expect(parseStoredSettings(JSON.stringify(bad))).toEqual(DEFAULT_SETTINGS);
   });
+  it("defaults rigBoost to 0 and migrates settings saved before it existed", () => {
+    expect(DEFAULT_SETTINGS.rigBoost).toBe(0);
+    // Settings saved before rigBoost existed must still parse (default applied),
+    // NOT reset to defaults — that would wipe the user's saved RPC/key.
+    const { rigBoost: _omit, ...legacy } = DEFAULT_SETTINGS;
+    const stored = { ...legacy, rpc: "https://x", jupiterApiKey: "k", rpcVerified: true, apiKeyVerified: true };
+    const parsed = parseStoredSettings(JSON.stringify(stored));
+    expect(parsed.rpc).toBe("https://x");
+    expect(parsed.rigBoost).toBe(0);
+  });
+  it("round-trips a set rigBoost", () => {
+    const s = { ...DEFAULT_SETTINGS, rigBoost: 174.6 };
+    expect(parseStoredSettings(serializeSettings(s)).rigBoost).toBeCloseTo(174.6);
+  });
 });
