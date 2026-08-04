@@ -1,13 +1,20 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useSettings } from "@/contexts/SettingsContext";
+import { resolveThemeIsDark } from "@/lib/settings/theme";
 
 export function ThemeToggle() {
   const { settings, update } = useSettings();
-  const isDark =
-    settings.theme === "dark" ||
-    (settings.theme === "system" &&
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  // Defer the OS-preference lookup until after mount: the server and the first
+  // client render must agree, so a "system" theme resolves without matchMedia
+  // until `mounted` is true (avoids a hydration mismatch). The <html> class is
+  // already set correctly at first paint by the layout's inline script.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const prefersDark =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const isDark = resolveThemeIsDark(settings.theme, mounted, prefersDark);
   return (
     <button
       type="button"
