@@ -8,6 +8,7 @@ import {
   parseHealth,
   parseManifest,
   parseLuck,
+  parseBubbles,
   type CaryHealth,
   type CaryManifest,
   type Luck,
@@ -26,6 +27,8 @@ export interface RigTelemetry {
   health: CaryHealth | null;
   manifest: CaryManifest | null;
   luck: Luck | null;
+  /** cary0x bubbles count; null until loaded / on error. */
+  bubbles: number | null;
   incrementSwap: () => void;
   refresh: () => void;
 }
@@ -39,23 +42,26 @@ export function useRigTelemetry(): RigTelemetry {
   const [health, setHealth] = useState<CaryHealth | null>(null);
   const [manifest, setManifest] = useState<CaryManifest | null>(null);
   const [luck, setLuck] = useState<Luck | null>(null);
+  const [bubbles, setBubbles] = useState<number | null>(null);
   const [sessionSwaps, setSessionSwaps] = useState(0);
   const [refreshTick, setRefreshTick] = useState(0);
 
-  // cary0x health + manifest + luck via visibility-aware polling
+  // cary0x health + manifest + luck + bubbles via visibility-aware polling
   useEffect(() => {
     if (!wallet) return;
     let cancelled = false;
     const load = async () => {
-      const [h, m, l] = await Promise.all([
+      const [h, m, l, b] = await Promise.all([
         fetch(`/api/rig/health/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
         fetch(`/api/rig/manifest/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
         fetch(`/api/rig/luck/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+        fetch(`/api/rig/bubbles/${wallet}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
       ]);
       if (cancelled) return;
       try { setHealth(h ? parseHealth(h) : null); } catch { setHealth(null); }
       try { setManifest(m ? parseManifest(m) : null); } catch { setManifest(null); }
       try { setLuck(l ? parseLuck(l) : null); } catch { setLuck(null); }
+      try { setBubbles(b ? parseBubbles(b).bubbles : null); } catch { setBubbles(null); }
     };
     load();
     const id = setInterval(load, intervalMs);
@@ -80,6 +86,7 @@ export function useRigTelemetry(): RigTelemetry {
     health,
     manifest,
     luck,
+    bubbles,
     incrementSwap,
     refresh,
   };

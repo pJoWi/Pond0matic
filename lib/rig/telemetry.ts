@@ -10,8 +10,17 @@ export interface CaryHealth {
   failed: number; drifted: number; driftRisk: number; priority: number;
   maxClaimUsd: number; driftedUsd: number; aiHints: string[];
 }
-export interface CaryManifest { isPro: boolean; badges: string[]; hasTwitter: boolean; }
+export interface CaryManifest {
+  isPro: boolean; badges: string[]; hasTwitter: boolean;
+  /** Pond0x-recognized Solana swap count (manifest `proSwapsSol`) — a lifetime
+   *  total, present even when isPro is false. The authoritative "total swaps". */
+  solSwaps: number;
+  /** Second manifest swap counter (`proSwapsBx`); "Bx" is undocumented. */
+  bxSwaps: number;
+}
 export interface Luck { luck: number; referrals: number; }
+/** cary0x bubbles metric — distinct from swaps (larger; semantics undocumented). */
+export interface Bubbles { bubbles: number; }
 
 const HealthSchema = z.looseObject({
   stats: z.looseObject({
@@ -41,6 +50,8 @@ const ManifestSchema = z.looseObject({
   isPro: z.boolean().optional(),
   badges: z.string().optional(),
   hasTwitter: z.boolean().optional(),
+  proSwapsSol: z.number().optional(),
+  proSwapsBx: z.number().optional(),
 });
 export function parseManifest(json: unknown): CaryManifest {
   const d = ManifestSchema.parse(json);
@@ -48,6 +59,8 @@ export function parseManifest(json: unknown): CaryManifest {
     isPro: d.isPro ?? false,
     hasTwitter: d.hasTwitter ?? false,
     badges: (d.badges ?? "").split(",").map((b) => b.trim()).filter(Boolean),
+    solSwaps: d.proSwapsSol ?? 0,
+    bxSwaps: d.proSwapsBx ?? 0,
   };
 }
 
@@ -55,4 +68,16 @@ const LuckSchema = z.looseObject({ luck: z.number().optional(), referrals: z.num
 export function parseLuck(json: unknown): Luck {
   const d = LuckSchema.parse(json);
   return { luck: d.luck ?? 0, referrals: d.referrals ?? 0 };
+}
+
+const BubblesSchema = z.looseObject({
+  bubbles: z.number().optional(),
+  error: z.string().optional(),
+});
+export function parseBubbles(json: unknown): Bubbles {
+  const d = BubblesSchema.parse(json);
+  // cary0x returns HTTP 200 with {"error":"Too many requests."} when rate-limited
+  // — reject it so the caller falls back to null instead of showing a bogus 0.
+  if (d.error) throw new Error(d.error);
+  return { bubbles: d.bubbles ?? 0 };
 }

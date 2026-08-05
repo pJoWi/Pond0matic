@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseHealth, parseManifest, parseLuck } from "@/lib/rig/telemetry";
+import { parseHealth, parseManifest, parseLuck, parseBubbles } from "@/lib/rig/telemetry";
 
 const health = {
   account: "GM8Qz8", stats: {
@@ -25,14 +25,30 @@ describe("parseHealth", () => {
 });
 
 describe("parseManifest", () => {
-  it("parses badges and pro flags", () => {
-    const m = parseManifest({ isPro: false, badges: "pork, chef", hasTwitter: true, proSwapsSol: 1, proSwapsBx: 2, cope: false });
+  it("parses badges, pro flags, and swap counts", () => {
+    const m = parseManifest({ isPro: false, badges: "pork, chef", hasTwitter: true, proSwapsSol: 177069, proSwapsBx: 2527, cope: false });
     expect(m.isPro).toBe(false);
     expect(m.badges).toEqual(["pork", "chef"]);
     expect(m.hasTwitter).toBe(true);
+    expect(m.solSwaps).toBe(177069);
+    expect(m.bxSwaps).toBe(2527);
   });
-  it("tolerates missing badges", () => {
-    expect(parseManifest({ isPro: true }).badges).toEqual([]);
+  it("tolerates missing badges and swap counts", () => {
+    const m = parseManifest({ isPro: true });
+    expect(m.badges).toEqual([]);
+    expect(m.solSwaps).toBe(0);
+    expect(m.bxSwaps).toBe(0);
+  });
+});
+
+describe("parseBubbles", () => {
+  it("parses the bubbles count", () => {
+    expect(parseBubbles({ bubbles: 186953, boosts: [] }).bubbles).toBe(186953);
+    expect(parseBubbles({}).bubbles).toBe(0);
+  });
+  it("throws on the rate-limit body cary0x returns with HTTP 200", () => {
+    // {"error":"Too many requests."} must NOT be treated as bubbles=0.
+    expect(() => parseBubbles({ error: "Too many requests." })).toThrow();
   });
 });
 
