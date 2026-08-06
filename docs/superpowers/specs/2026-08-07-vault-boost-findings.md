@@ -78,11 +78,32 @@ than that the vault-fee mechanism is inactive. A wallet snapshot cannot show "ri
 unless the wallet is actively swapping in the window. The decisive datapoint is the
 user's own `proSwapsSol` movement, which requires the user's wallet address.
 
-**Deeper limitation of the passive test:** even with the user's wallet, the signal is
-confounded — the user's wallet receives BOTH Ez Miner swaps (which carry `L2TExMFK` and
-would move boost/attribution) and any Pond0matic swaps (which carry neither marker). A
-rise on the user's wallet cannot be cleanly attributed to the vault mechanism vs Ez Miner.
-The only clean test is prospective: wire the vault fee, run ONLY Pond0matic swaps (no Ez
-Miner) for a window, and watch `proSwapsSol` — but that requires wiring first (Task 11),
-which the plan gates on confirmation. Passive confirmation may therefore be unreachable;
-this is a decision point for the user (see plan Task 10 → Task 11 gate).
+**Deeper limitation of the passive test:** even with the user's wallet, a rise could be
+confounded by concurrent Ez Miner (`L2TExMFK`) activity. This was closed by asking the user.
+
+### CONFIRMED (2026-08-07) — vault fee makes swaps count
+
+Updated read of the user wallet `GM8Qz8gmp9N3Rm94q9iTJeHobGBXoCYMhwZYY8zji3LA`:
+- `proSwapsSol` **177,157** vs 2026-08-06 baseline **177,069** → **+88**.
+- User confirms: in that window they ran swaps ONLY on the **old** Pond0matic version
+  (Vercel deploy, Jupiter **v1** with `feeAccount → affiliate vault`), with **no Ez
+  Miner / pond0x.com mining** running.
+- `AZ7F…` control unchanged (25,708).
+
+**Clean natural experiment (same wallet, no `L2TExMFK`):**
+- OLD version (v1, fee → affiliate vault): `proSwapsSol` **+88**.
+- NEW version (v2, fee-free, vault unused): `proSwapsSol` **flat** (prior session).
+
+The only mechanism difference between the two versions is the vault-fee routing.
+Conclusion: **routing the platform fee to the pond0x affiliate vault is what makes
+Pond0matic's own swaps count toward `proSwapsSol` (and RIG boost).** The v2 fee-free
+migration is exactly why current swaps stopped counting.
+
+### Implication for wiring (Task 11)
+
+The fix is not a small resolver tweak: the current engine speaks Jupiter **v2**
+(`/order` + `/execute`), whose `referralAccount` rejects the vault ATA with 400. To route
+the fee to the vault we must use the Jupiter **v1** `feeAccount` shape (as the old version
+did). That means changing the swap path's Jupiter integration (v2 → v1, or a v1 fee-bearing
+path) — a financial-critical money-path change requiring careful design, unit tests, and a
+security review before any real-swap validation by the user.
