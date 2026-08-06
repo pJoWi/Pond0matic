@@ -76,9 +76,8 @@ wallet — treat every change on the swap path as production financial code.**
 - `.claude/skills/` — project skills: `onchain-query`, `pond0x-protocol`,
   `solana-dev`, `swap-testing`, `web3-security-review`. Use them whenever
   their domain applies.
-- `docs/audit/2026-07-10-audit-report.md` — consolidated security /
-  architecture / on-chain audit and remediation backlog.
-- `docs/LEARNING_PATH.md` — Solana skill-building milestones tied to real fixes.
+- `docs/superpowers/` — current design spec + implementation plan for the
+  active v3 fresh-start (upgrades, cleanup, vault→boost).
 - `QUICK_START.md` / `USER_MANUAL.md` / `INSTALLATION_MANUAL.md` — end-user
   docs (root); keep in sync when changing user-facing swap behavior.
 - Alerts feature removed as of the cockpit refactor (tasks 1–19, 2026-08).

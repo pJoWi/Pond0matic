@@ -1,7 +1,7 @@
 # Autoclicker (guard-railed wallet-popup clicker)
 
 Opt-in local tool that clicks the Phantom wallet popup during auto-swap
-sessions. Design: `docs/superpowers/specs/2026-07-19-autoclicker-tool-design.md`.
+sessions.
 
 **This tool moves your real mouse and can approve real transactions.**
 Guardrails (enforced by this process itself): session timer, click budget,

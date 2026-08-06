@@ -642,9 +642,7 @@ Auto-Clicker panel that can approve the wallet popup for you during long swap
 sessions. It requires explicit opt-in (`CLICKER_ENABLED=1` in `.env.local`,
 dev builds only) and enforces a session timer, a click budget, a dead-man's
 switch tied to the swapper loop, and an automatic pause while your rig is
-mining. Every click is logged in the panel. Details:
-`autoclicker/README.md` and
-`docs/superpowers/specs/2026-07-19-autoclicker-tool-design.md`.
+mining. Every click is logged in the panel. Details: `autoclicker/README.md`.
 
 #### Step 6: Completion
 
