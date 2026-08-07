@@ -158,7 +158,8 @@ export function useSwapEngine() {
         // Fee routing: referral → affiliate vault → none. The vault ATA is a valid
         // v1 feeAccount (unlike v2 referralAccount), and routing the fee to the pond0x
         // vault is what makes the swap count toward RIG boost.
-        const vaultAddress = config.currentVault ?? undefined;
+        const vaultAddress = config.vaultMap[pairFrom] ?? undefined;
+        const effectiveFeeBps = vaultAddress || referralAddress ? settings.platformFeeBps : 0;
 
         const quoteRes = await fetch(
           buildV1QuoteUrl({
@@ -166,7 +167,7 @@ export function useSwapEngine() {
             outputMint: pairTo,
             amountRaw: String(raw),
             slippageBps: settings.slippageBps,
-            platformFeeBps: settings.platformFeeBps,
+            platformFeeBps: effectiveFeeBps,
           }),
           { headers: jupiterHeaders(settings.jupiterApiKey) }
         );
@@ -243,7 +244,6 @@ export function useSwapEngine() {
         dispatchSwapEvent({ type: "swap-confirmed", internalId });
         toast.success("Swap confirmed");
         incrementSwap();
-        log(solscanTx(signature));
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         log("Execute error: " + msg);
@@ -253,7 +253,7 @@ export function useSwapEngine() {
         }
       }
     },
-    [publicKey, signTransaction, settings, config.fromMint, config.currentVault,
+    [publicKey, signTransaction, settings, config.fromMint, config.vaultMap,
      solBalance, tokenBalance, log, incrementSwap]
   );
 
