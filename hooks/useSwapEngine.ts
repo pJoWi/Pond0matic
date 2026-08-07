@@ -12,7 +12,7 @@
  * Behavior parity target: hooks/useSwapExecution.ts (legacy engine).
  */
 import { useCallback } from "react";
-import { VersionedTransaction } from "@solana/web3.js";
+import { Connection, VersionedTransaction } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "sonner";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -30,18 +30,14 @@ import {
 } from "@/lib/swap/sessionPlanner";
 import {
   buildOrderUrl,
-  buildExecuteBody,
   jupiterHeaders,
   jupiterErrorMessage,
   parseOrder,
-  parseExecuteResponse,
-  clampReferralFeeBps,
-  bytesToBase64,
-  feeAccountForOrder,
   extractJupiterError,
-  JUP_EXECUTE,
   USDC_MINT,
 } from "@/lib/swap/orders";
+import { buildV1QuoteUrl, buildV1SwapBody, parseV1Quote, parseV1SwapResponse, JUP_V1_SWAP } from "@/lib/swap/v1";
+import { sendAndConfirm } from "@/lib/swap/send";
 import { validateSwapTransaction, validateSwapAmount } from "@/lib/transactionValidation";
 import { extractReferralCode, getFeeRoutingDescription } from "@/lib/referral";
 import { fetchTokenBalance, SOL_MINT } from "@/lib/tokenBalance";
@@ -159,47 +155,54 @@ export function useSwapEngine() {
       }
 
       try {
-        // Fee routing: forward ONLY an explicitly configured Jupiter referral
-        // account (from the referral link). The legacy affiliate vault ATAs are
-        // not valid v2 referralAccounts — Jupiter 400s the whole order if one
-        // is sent — so they are never used here. A configured fee of 0 also
-        // omits the account (true 0%). See feeAccountForOrder.
-        const feeAccount = feeAccountForOrder(settings.platformFeeBps, referralAddress);
-        const orderRes = await fetch(
-          buildOrderUrl({
+        // Fee routing: referral → affiliate vault → none. The vault ATA is a valid
+        // v1 feeAccount (unlike v2 referralAccount), and routing the fee to the pond0x
+        // vault is what makes the swap count toward RIG boost.
+        const vaultAddress = config.currentVault ?? undefined;
+
+        const quoteRes = await fetch(
+          buildV1QuoteUrl({
             inputMint: pairFrom,
             outputMint: pairTo,
             amountRaw: String(raw),
-            taker: publicKey.toBase58(),
-            referralAccount: feeAccount,
-            referralFee: feeAccount ? clampReferralFeeBps(settings.platformFeeBps) : undefined,
             slippageBps: settings.slippageBps,
+            platformFeeBps: settings.platformFeeBps,
           }),
           { headers: jupiterHeaders(settings.jupiterApiKey) }
         );
-        if (!orderRes.ok) {
-          const detail = extractJupiterError(await orderRes.json().catch(() => null));
-          const msg = jupiterErrorMessage(orderRes.status, detail);
+        if (!quoteRes.ok) {
+          const detail = extractJupiterError(await quoteRes.json().catch(() => null));
+          const msg = jupiterErrorMessage(quoteRes.status, detail);
           log(`⚠️ ${msg}`);
           toast.error(msg.slice(0, 120));
           return;
         }
-        const order = parseOrder(await orderRes.json());
-        if (!order.transaction) {
-          // "" = router could not build a tx; null should not happen (taker set)
-          log(
-            `❌ No swap transaction (router: ${order.router ?? "?"}, code: ${order.errorCode ?? "?"}): ${order.errorMessage ?? "unknown"}`
-          );
-          toast.error("Jupiter could not build the swap transaction");
+        const quote = parseV1Quote(await quoteRes.json());
+
+        const swapRes = await fetch(JUP_V1_SWAP, {
+          method: "POST",
+          headers: jupiterHeaders(settings.jupiterApiKey, true),
+          body: JSON.stringify(
+            buildV1SwapBody({
+              quoteResponse: quote,
+              userPublicKey: publicKey.toBase58(),
+              referralAddress,
+              vaultAddress,
+            })
+          ),
+        });
+        if (!swapRes.ok) {
+          const detail = extractJupiterError(await swapRes.json().catch(() => null));
+          const msg = jupiterErrorMessage(swapRes.status, detail);
+          log(`⚠️ ${msg}`);
+          toast.error(msg.slice(0, 120));
           return;
         }
-        log(
-          feeAccount
-            ? `💰 ${getFeeRoutingDescription(undefined, referralAddress)}`
-            : "💰 No platform fee"
-        );
+        const { swapTransaction } = parseV1SwapResponse(await swapRes.json());
 
-        const tx = VersionedTransaction.deserialize(b64ToUint8Array(order.transaction));
+        log(referralAddress || vaultAddress ? `💰 ${getFeeRoutingDescription(vaultAddress, referralAddress)}` : "💰 No platform fee");
+
+        const tx = VersionedTransaction.deserialize(b64ToUint8Array(swapTransaction));
         const validation = validateSwapTransaction(tx, publicKey);
         if (!validation.isValid) {
           log(`❌ Transaction validation failed: ${validation.errors.join(", ")}`);
@@ -219,7 +222,7 @@ export function useSwapEngine() {
           fromAmount: Number(uiAmountStr) || 0,
           toMint: pairTo,
           toSymbol: symbolFor(pairTo),
-          toAmount: Number(order.outAmount ?? 0) / Math.pow(10, outputDecimals) || 0,
+          toAmount: Number(quote.outAmount ?? 0) / Math.pow(10, outputDecimals) || 0,
         });
         dispatchedStart = true;
 
@@ -228,38 +231,19 @@ export function useSwapEngine() {
           dispatchSwapEvent({ type: "swap-failed", internalId, reason: "Wallet does not support signing" });
           return;
         }
-        // Sign immediately — the order goes stale as on-chain prices move.
+        // Sign immediately — the quote goes stale as on-chain prices move.
         const signed = await signTransaction(tx);
 
-        const execRes = await fetch(JUP_EXECUTE, {
-          method: "POST",
-          headers: jupiterHeaders(settings.jupiterApiKey, true),
-          body: buildExecuteBody(bytesToBase64(signed.serialize()), order.requestId),
-        });
-        if (!execRes.ok) {
-          const detail = extractJupiterError(await execRes.json().catch(() => null));
-          const msg = jupiterErrorMessage(execRes.status, detail);
-          log(`⚠️ ${msg}`);
-          toast.error(msg.slice(0, 120));
-          dispatchSwapEvent({ type: "swap-failed", internalId, reason: msg });
-          return;
-        }
-        const result = parseExecuteResponse(await execRes.json());
-        if (result.signature) {
-          dispatchSwapEvent({ type: "swap-sent", internalId, signature: result.signature });
-          log("Sent → " + short(result.signature, 6) + " | " + solscanTx(result.signature));
-        }
-        if (result.status === "Success") {
-          log("Confirmed → " + (result.signature ? short(result.signature, 6) : "(no signature)"));
-          dispatchSwapEvent({ type: "swap-confirmed", internalId });
-          toast.success("Swap confirmed");
-          incrementSwap();
-        } else {
-          const reason = `Execute failed (code ${result.code ?? "?"})${result.error ? `: ${result.error.slice(0, 120)}` : ""}`;
-          log(`❌ ${reason}${result.signature ? " — check " + solscanTx(result.signature) : ""}`);
-          toast.error(reason.slice(0, 80));
-          dispatchSwapEvent({ type: "swap-failed", internalId, reason });
-        }
+        const connection = new Connection(settings.rpc, { commitment: "confirmed" });
+        const { signature } = await sendAndConfirm(connection, signed.serialize());
+
+        dispatchSwapEvent({ type: "swap-sent", internalId, signature });
+        log("Sent → " + short(signature, 6) + " | " + solscanTx(signature));
+        log("Confirmed → " + short(signature, 6));
+        dispatchSwapEvent({ type: "swap-confirmed", internalId });
+        toast.success("Swap confirmed");
+        incrementSwap();
+        log(solscanTx(signature));
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         log("Execute error: " + msg);
@@ -269,7 +253,7 @@ export function useSwapEngine() {
         }
       }
     },
-    [publicKey, signTransaction, settings, config.fromMint,
+    [publicKey, signTransaction, settings, config.fromMint, config.currentVault,
      solBalance, tokenBalance, log, incrementSwap]
   );
 
