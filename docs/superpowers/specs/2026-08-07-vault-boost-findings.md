@@ -99,6 +99,15 @@ Conclusion: **routing the platform fee to the pond0x affiliate vault is what mak
 Pond0matic's own swaps count toward `proSwapsSol` (and RIG boost).** The v2 fee-free
 migration is exactly why current swaps stopped counting.
 
+### PRODUCTION VALIDATION (2026-08-07, post-merge)
+
+After the vault-fee wiring shipped to `main` (`1c57b79`), the user ran real
+boost-mode swap rounds on the **new** Pond0matic (Jupiter v1 `feeAccount → vault`).
+User wallet `proSwapsSol` climbed **177,157 → 177,183 (+26)**; `proSwapsBx`
+unchanged (2,527). Swaps landed cleanly (send/confirm works). **The reimplemented
+v1 vault-fee path counts toward `proSwapsSol` — feature confirmed working in
+production**, not just the old version. Default fee 1.00%.
+
 ### Implication for wiring (Task 11)
 
 The fix is not a small resolver tweak: the current engine speaks Jupiter **v2**
