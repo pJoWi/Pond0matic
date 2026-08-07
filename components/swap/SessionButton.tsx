@@ -10,6 +10,8 @@ const START_LABEL: Record<string, string> = {
   rewards: "▶ Start rewards session",
 };
 
+const FOCUS = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+
 export function SessionButton({ disabled }: { disabled: boolean }) {
   const { running, paused, stopping } = useSession();
   const { swapMode } = useSwapConfig();
@@ -22,8 +24,13 @@ export function SessionButton({ disabled }: { disabled: boolean }) {
         disabled={disabled}
         onClick={() => void startSession()}
         className={cn(
-          "w-full rounded-xl bg-gradient-to-br from-accent to-accent-strong py-2.5",
-          "text-sm font-bold text-accent-deep transition-opacity disabled:opacity-40"
+          "pond-sheen group relative w-full rounded-xl py-3",
+          "bg-gradient-to-br from-accent to-accent-strong text-sm font-bold tracking-tight text-accent-deep",
+          "shadow-[0_6px_20px_-6px_var(--color-accent)] ring-1 ring-inset ring-white/15",
+          "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_-6px_var(--color-accent)]",
+          "active:translate-y-0 active:shadow-[0_4px_12px_-6px_var(--color-accent)]",
+          "disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none",
+          FOCUS
         )}
       >
         {START_LABEL[swapMode]}
@@ -36,7 +43,11 @@ export function SessionButton({ disabled }: { disabled: boolean }) {
         <button
           type="button"
           onClick={paused ? resumeSession : pauseSession}
-          className="flex-1 rounded-xl border border-edge py-2.5 text-sm font-bold text-ink"
+          className={cn(
+            "flex-1 rounded-xl border border-edge bg-surface py-3 text-sm font-bold text-ink",
+            "transition-colors hover:border-accent/60 hover:text-accent-strong",
+            FOCUS
+          )}
         >
           {paused ? "▶ Resume" : "⏸ Pause"}
         </button>
@@ -45,7 +56,12 @@ export function SessionButton({ disabled }: { disabled: boolean }) {
         type="button"
         onClick={stopSession}
         disabled={stopping}
-        className="flex-[2] rounded-xl bg-gradient-to-br from-warn to-danger py-2.5 text-sm font-bold text-white disabled:opacity-60"
+        className={cn(
+          "flex-[2] rounded-xl bg-gradient-to-br from-warn to-danger py-3 text-sm font-bold text-white",
+          "shadow-[0_6px_18px_-8px_var(--color-danger)] ring-1 ring-inset ring-white/15",
+          "transition-all duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-60",
+          FOCUS
+        )}
       >
         {stopping ? "Stopping…" : "■ Stop session"}
       </button>

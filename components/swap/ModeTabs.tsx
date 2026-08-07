@@ -23,10 +23,11 @@ export function ModeTabs() {
           disabled={running}
           onClick={() => setSwapMode(m.value)}
           className={cn(
-            "flex-1 rounded-lg py-1.5 text-xs font-semibold transition-colors disabled:opacity-50",
+            "flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all duration-200 disabled:opacity-50",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             swapMode === m.value
-              ? "bg-gradient-to-br from-accent to-accent-strong text-accent-deep"
-              : "text-ink-muted hover:text-ink"
+              ? "bg-gradient-to-br from-accent to-accent-strong text-accent-deep shadow-[0_2px_10px_-2px_var(--color-accent)] ring-1 ring-inset ring-white/15"
+              : "text-ink-muted hover:bg-surface/60 hover:text-ink"
           )}
         >
           {m.label}
