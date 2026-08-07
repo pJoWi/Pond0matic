@@ -43,7 +43,11 @@ coverage
 AGENTS.md
 
 .vercel
-.claude
+
+# Ignore local .claude config but keep shared project skills + agents in git
+.claude/*
+!.claude/skills/
+!.claude/agents/
 
 # Autoclicker runtime state (gitignored by contract — later tasks read these files)
 autoclicker/runtime/
