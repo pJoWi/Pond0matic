@@ -3,6 +3,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import { ModeTabs } from "@/components/swap/ModeTabs";
 import { AmountCard } from "@/components/swap/AmountCard";
+import { SwapTuningCard } from "@/components/swap/SwapTuningCard";
 import { ModeConfigRow } from "@/components/swap/ModeConfigRow";
 import { SessionButton } from "@/components/swap/SessionButton";
 import { SessionProgress } from "@/components/swap/SessionProgress";
@@ -21,6 +22,7 @@ export function SwapPanel() {
     >
       <ModeTabs />
       <AmountCard />
+      <SwapTuningCard />
       <ModeConfigRow />
       <SessionButton disabled={!ready} />
       <SessionProgress />

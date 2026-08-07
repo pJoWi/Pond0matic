@@ -3,6 +3,9 @@ import { z } from "zod";
 
 export const SETTINGS_STORAGE_KEY = "pond0matic:settings";
 
+/** Lowest platform-fee bps Jupiter v1 accepts (from the vault-fee spike). */
+export const JUPITER_MIN_FEE_BPS = 5;
+
 const SettingsSchema = z.object({
   rpc: z.string(),
   jupiterApiKey: z.string(),
