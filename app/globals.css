@@ -145,3 +145,69 @@
   .pond-sheen:hover::after { animation: none; }
   .pond-range::-webkit-slider-thumb, .pond-range:hover::-webkit-slider-thumb { transition: none; transform: none; }
 }
+
+/* ─────────────────────── Deep-water dashboard ─────────────────────── */
+
+/* Atmosphere behind the dashboard column: light filters from the top, the
+   water deepens toward the bottom, and soft caustics drift slowly. */
+.deep-water { position: relative; isolation: isolate; }
+.deep-water::before {
+  content: ""; position: absolute; inset: -2rem -1.5rem -0.5rem; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(64% 44% at 10% -3%, color-mix(in oklab, var(--color-accent) 24%, transparent), transparent 62%),
+    radial-gradient(60% 48% at 98% 8%, color-mix(in oklab, var(--color-accent-strong) 20%, transparent), transparent 58%),
+    linear-gradient(180deg, transparent 0%, transparent 18%, color-mix(in oklab, var(--color-accent-deep) 48%, transparent) 92%);
+}
+@keyframes water-caustics {
+  0%, 100% { opacity: .55; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: .95; transform: translate3d(2%, 1.4%, 0) scale(1.07); }
+}
+.deep-water::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(42% 30% at 24% 5%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 72%),
+    radial-gradient(34% 24% at 82% 2%, color-mix(in oklab, var(--color-accent) 13%, transparent), transparent 72%),
+    radial-gradient(48% 34% at 55% 60%, color-mix(in oklab, var(--color-accent-strong) 8%, transparent), transparent 75%);
+  mix-blend-mode: screen;
+  animation: water-caustics 16s ease-in-out infinite;
+}
+
+/* Slow rising bubbles — placed with fixed positions to avoid hydration drift. */
+@keyframes bubble-rise {
+  0% { transform: translateY(0) scale(.5); opacity: 0; }
+  12% { opacity: .8; }
+  85% { opacity: .45; }
+  100% { transform: translateY(-88vh) scale(1); opacity: 0; }
+}
+.bubbles { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.bubble {
+  position: absolute; bottom: -12px; border-radius: 999px;
+  background: radial-gradient(circle at 34% 30%, color-mix(in oklab, white 70%, transparent), color-mix(in oklab, var(--color-accent) 34%, transparent) 66%, transparent 78%);
+  border: 1px solid color-mix(in oklab, var(--color-accent) 32%, transparent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--color-accent) 30%, transparent);
+  animation: bubble-rise linear infinite;
+}
+
+/* Submerged glass card — floats in the water with soft depth + a hover lift. */
+.submerged-card {
+  border: 1px solid var(--color-edge);
+  border-radius: var(--radius-card);
+  background: linear-gradient(180deg, var(--color-surface), color-mix(in oklab, var(--color-surface-2) 60%, var(--color-surface)));
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 7%, transparent), 0 14px 34px -24px var(--color-accent-deep);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.submerged-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-edge));
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 9%, transparent), 0 20px 44px -22px color-mix(in oklab, var(--color-accent) 42%, transparent);
+}
+
+/* Vivid metric glow for the hero numbers. */
+.metric-glow { text-shadow: 0 0 20px color-mix(in oklab, var(--color-accent) 45%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .deep-water::after { animation: none; }
+  .bubble { animation: none; opacity: 0 !important; }
+  .submerged-card { transition: none; }
+  .submerged-card:hover { transform: none; }
+}

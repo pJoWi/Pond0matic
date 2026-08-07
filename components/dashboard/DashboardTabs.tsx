@@ -19,7 +19,7 @@ export function DashboardTabs() {
       <div
         role="tablist"
         aria-label="Dashboard sections"
-        className="flex w-fit gap-1 rounded-xl border border-edge bg-surface p-1"
+        className="submerged-card flex w-fit gap-1 p-1"
       >
         {TABS.map((t) => (
           <button
@@ -28,8 +28,11 @@ export function DashboardTabs() {
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              "rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors",
-              tab === t.id ? "bg-bg text-accent" : "text-ink-muted hover:text-ink"
+              "rounded-lg px-4 py-1.5 text-xs font-semibold transition-all duration-200",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+              tab === t.id
+                ? "bg-bg text-accent ring-1 ring-inset ring-accent/25 shadow-[0_2px_10px_-4px_var(--color-accent)]"
+                : "text-ink-muted hover:text-ink"
             )}
           >
             {t.label}
