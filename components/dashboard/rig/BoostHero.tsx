@@ -16,7 +16,7 @@ export function BoostHero({ rig }: { rig: ReturnType<typeof useRigTelemetry> }) 
   return (
     <div className="grid grid-cols-2 gap-3">
       {/* Boost — user-entered (the live value isn't fetchable) */}
-      <div className="submerged-card p-4">
+      <div className="rounded-xl border border-edge bg-surface p-4">
         <div className="text-[10px] uppercase tracking-wider text-ink-muted">Your boost</div>
         <div className="flex items-baseline gap-1">
           <input
@@ -32,9 +32,9 @@ export function BoostHero({ rig }: { rig: ReturnType<typeof useRigTelemetry> }) 
           />
           <span className="font-num text-sm text-ink-muted">/ {MAX_BOOST}</span>
         </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2 ring-1 ring-inset ring-accent-deep/20">
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-accent-strong shadow-[0_0_12px_var(--color-accent)] transition-[width] duration-500"
+            className="h-full bg-gradient-to-r from-accent to-accent-strong transition-[width] duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -46,9 +46,9 @@ export function BoostHero({ rig }: { rig: ReturnType<typeof useRigTelemetry> }) 
       </div>
 
       {/* Max claim estimate — real cary0x $ (replaces the unobtainable unclaimed) */}
-      <div className="submerged-card p-4">
+      <div className="rounded-xl border border-edge bg-surface p-4">
         <div className="text-[10px] uppercase tracking-wider text-ink-muted">Max claim est.</div>
-        <div className="metric-glow font-num text-3xl text-accent">{maxClaim == null ? "—" : "$" + compact(maxClaim)}</div>
+        <div className="font-num text-3xl text-accent">{maxClaim == null ? "—" : "$" + compact(maxClaim)}</div>
         {rig.health && (
           <div className="mt-2 font-num text-[11px] text-ink-muted">
             {rig.health.miningSessions.toLocaleString("en-US")} sessions · drift {rig.health.drifted}

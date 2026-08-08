@@ -11,9 +11,9 @@ export function BoostMomentum({ rig }: { rig: ReturnType<typeof useRigTelemetry>
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-2 gap-2">
         {/* Total swaps — authoritative cary0x count; climbs as you swap-to-mine */}
-        <div className="submerged-card p-4">
+        <div className="rounded-xl border border-edge bg-surface p-4">
           <div className="text-[10px] uppercase tracking-wider text-ink-muted">Total swaps</div>
-          <div className="metric-glow font-num text-lg text-accent">
+          <div className="font-num text-lg text-accent">
             {totalSwaps != null ? totalSwaps.toLocaleString("en-US") : "—"}
           </div>
           <div className="mt-1 text-[11px] text-ink-muted">
@@ -24,7 +24,7 @@ export function BoostMomentum({ rig }: { rig: ReturnType<typeof useRigTelemetry>
           </div>
         </div>
         {/* Bubbles — cary0x bubbles metric */}
-        <div className="submerged-card p-4">
+        <div className="rounded-xl border border-edge bg-surface p-4">
           <div className="text-[10px] uppercase tracking-wider text-ink-muted">Bubbles</div>
           <div className="font-num text-lg text-ink">
             {rig.bubbles != null ? rig.bubbles.toLocaleString("en-US") : "—"}
