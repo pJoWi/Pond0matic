@@ -3,6 +3,7 @@ import React from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PondwaterPnLPanel } from "./PondwaterPnLPanel";
 import { SwapHistoryPanel } from "./SwapHistoryPanel";
+import { GeoffPortfolioInsight } from "./GeoffPortfolioInsight";
 
 export function PortfolioPage() {
   const { connected } = useWallet();
@@ -33,6 +34,8 @@ export function PortfolioPage() {
               </h2>
               <PondwaterPnLPanel />
             </div>
+
+            <GeoffPortfolioInsight />
 
             <div className="bg-surface border-2 border-edge rounded-[2.5rem_2rem_2.5rem_2rem] p-5">
               <SwapHistoryPanel />
