@@ -24,6 +24,10 @@ export interface PnLBreakdown {
 
   recordCount: number;
   hasNegativeUnaccounted: boolean;
+  /** The wPOND price every USD figure above was computed from. Echoed so
+   *  consumers can quote the price without reaching for a second,
+   *  independently-polled price source that may disagree with these numbers. */
+  currentPrice: number;
 }
 
 const WPOND = "wPOND";
@@ -89,5 +93,6 @@ export function computePondwaterPnL(inputs: PnLInputs): PnLBreakdown {
     totalValue,
     recordCount: records.filter((r) => r.status === "confirmed").length,
     hasNegativeUnaccounted: unaccountedNegative > 0,
+    currentPrice,
   };
 }

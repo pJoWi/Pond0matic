@@ -20,10 +20,11 @@ Welcome to Pond0matic, your unified dashboard and control center for automated t
 8. [Rewards Mode - Earning Points](#rewards-mode---earning-points)
 9. [Monitoring Swap Progress](#monitoring-swap-progress)
 10. [Viewing Balances and Statistics](#viewing-balances-and-statistics)
-11. [Advanced Settings](#advanced-settings)
-12. [Tips and Best Practices](#tips-and-best-practices)
-13. [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-14. [Troubleshooting](#troubleshooting)
+11. [Geoff AI Insights](#geoff-ai-insights)
+12. [Advanced Settings](#advanced-settings)
+13. [Tips and Best Practices](#tips-and-best-practices)
+14. [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+15. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -1398,6 +1399,77 @@ The dashboard automatically refreshes data every 30 seconds to keep information 
 - Reload the page in your browser
 - Click individual **Fetch** buttons where available
 - Disconnect and reconnect wallet
+
+---
+
+## Geoff AI Insights
+
+Pond0matic can hand your dashboard numbers to [Geoff](https://geoff.ai) and get a
+short written briefing back. It is **optional and off by default** — the cards
+only appear when a Geoff API key is configured on the server.
+
+### Enabling it
+
+1. Create an API key: Geoff dashboard → **Settings** → **API Keys**. The key is
+   shown **once** — save it immediately.
+2. Add it to `.env.local`:
+
+   ```
+   GEOFF_API_KEY=your-geoff-api-key
+   ```
+
+3. Restart the dev server. Optional overrides: `GEOFF_BASE_URL` (defaults to
+   `https://geoff.ai/api`) and `GEOFF_MODEL` (`preview` = fast and cheap and the
+   default, `duce`, or `magma` for 1M context).
+
+The key is **server-side only** — it has no `NEXT_PUBLIC_` prefix, so it is
+never shipped to your browser. Every Geoff call goes through Pond0matic's own
+`/api/geoff/insight` route.
+
+### Where the cards live
+
+| Card | Location | Reads |
+| --- | --- | --- |
+| **Geoff on your rig** | Dashboard → Rig tab, below the rig profile | Boost and projection, cary0x health/manifest/luck, bubbles, swaps this session |
+| **Geoff on your pondwater** | Portfolio page, between PnL and swap history | wPOND price, cost basis, mined vs swapped split, PnL totals, swap counts per mode |
+
+### Using a card
+
+Click **Ask Geoff**. A few seconds later the card shows:
+
+- a one-line **headline** verdict, colour-coded (green / amber / red / neutral),
+- up to four **findings**, each citing the actual numbers,
+- one suggested **next step**,
+- the model's own **confidence**, and the model name.
+
+Insights are generated **only when you click** — nothing is polled, so it costs
+Geoff tokens only when you ask. After a run the button holds a 20-second
+cooldown. Click **Refresh** for a fresh read once your numbers change.
+
+### What is sent
+
+Only derived numbers — the same figures already on screen. Specifically **not**
+sent: your wallet address, transaction signatures, private keys, your RPC
+endpoint, or your Jupiter API key. The snapshot is schema-validated on the
+server before it goes anywhere, and any extra field is stripped.
+
+### Reading it critically
+
+Geoff's output is AI-generated commentary on your own data, not financial
+advice and not a protocol oracle. It can be wrong. Treat it the way you would
+treat a friend glancing at your dashboard: useful for spotting something you
+missed, never a reason to skip your own check. Anything it says about drift,
+claims, or PnL should be verified against the underlying cards before you act.
+
+### Troubleshooting
+
+| What you see | Meaning |
+| --- | --- |
+| No card at all | No `GEOFF_API_KEY` on the server, or the server needs a restart |
+| "Geoff rate limit reached" | Your Geoff plan's per-key rate limit — wait and retry |
+| "Geoff timed out." | No reply within 30 seconds; retry |
+| "Geoff returned an unusable response." | The reply failed validation and was discarded rather than shown — retry |
+| Button disabled | The underlying feeds have not loaded yet, or wallet is disconnected |
 
 ---
 

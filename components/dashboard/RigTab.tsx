@@ -4,6 +4,7 @@ import { BoostHero } from "@/components/dashboard/rig/BoostHero";
 import { BoostMomentum } from "@/components/dashboard/rig/BoostMomentum";
 import { RigStats } from "@/components/dashboard/rig/RigStats";
 import { RigProfile } from "@/components/dashboard/rig/RigProfile";
+import { GeoffRigInsight } from "@/components/dashboard/GeoffRigInsight";
 
 export function RigTab() {
   const rig = useRig();
@@ -32,6 +33,7 @@ export function RigTab() {
       <BoostMomentum rig={rig} />
       <RigStats rig={rig} />
       <RigProfile rig={rig} />
+      <GeoffRigInsight />
     </div>
   );
 }

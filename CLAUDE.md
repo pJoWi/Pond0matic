@@ -28,6 +28,12 @@ wallet — treat every change on the swap path as production financial code.**
 - `lib/referral.ts` — Jupiter fee-account routing (financial-critical)
 - `lib/transactionValidation.ts` — pre-signing safety checks
 - `lib/portfolio/` — PnL math (well tested)
+- `lib/geoff/` + `app/api/geoff/insight` + `components/geoff/` — optional
+  Geoff (geoff.ai) AI insight cards. `insights.ts`/`parse.ts` are pure
+  (prompt building, model-reply parsing); `client.ts` is **server-only** — it
+  reads `GEOFF_API_KEY`, so never import it from a `"use client"` module.
+  Snapshots carry derived numbers only: no wallet address, no signatures.
+  Feature is inert without the key — the cards do not render.
 - `tools/` — read-only exploration toolkit (CLI + MCP server, registered in `.mcp.json`); never add signing/sending here
 - `autoclicker/` — opt-in, guard-railed local wallet-popup clicker: Python
   process + `app/api/clicker/*` + `ClickerPanel`, gated by `CLICKER_ENABLED=1`
@@ -68,6 +74,10 @@ wallet — treat every change on the swap path as production financial code.**
   required (portal.jup.ag), collected in the connect flow; Jupiter lands the
   transaction after `/execute`. Price feed `lite-api.jup.ag` stays keyless.
 - Community rig stats: `https://www.cary0x.com/api/{manifest,health}/<wallet>`.
+- Geoff AI gateway: `POST https://geoff.ai/api/v1/text/chat`, `Authorization:
+  Bearer $GEOFF_API_KEY`, responses wrapped in `{ data, trace_id, extra_info }`.
+  Models: `preview` (fast/cheap, our default), `duce`, `magma` (1M ctx).
+  Optional — unset key just disables the insight cards.
 - Public RPC is rate-limited; prefer `SOLANA_RPC` / `NEXT_PUBLIC_DEFAULT_RPC`
   set to a Helius/QuickNode endpoint.
 

@@ -349,6 +349,27 @@ NEXT_PUBLIC_DEFAULT_REWARDS_SWAPS=5
 
 **TIP**: For your first run, keep all defaults as-is. You can adjust these later based on your needs.
 
+#### Geoff AI Insights (Optional)
+
+Leave this unset and nothing changes — the AI insight cards simply do not
+appear. To enable them, create a key at the Geoff dashboard
+(**Settings → API Keys**; it is shown only once) and add it to `.env.local`:
+
+```bash
+# Server-side only — NO NEXT_PUBLIC_ prefix, so the key never reaches the browser
+GEOFF_API_KEY=your-geoff-api-key
+
+# Optional overrides
+GEOFF_BASE_URL=https://geoff.ai/api
+GEOFF_MODEL=preview   # preview (fast/cheap) | duce | magma (1M context)
+```
+
+Restart the dev server after adding the key. Unlike the Jupiter key, this one
+lives in `.env.local` rather than the connect flow, because it must stay on the
+server — the browser only ever talks to Pond0matic's own `/api/geoff/insight`
+route. See [USER_MANUAL.md → Geoff AI Insights](USER_MANUAL.md#geoff-ai-insights)
+for what the cards do and what data they send.
+
 ### Step 5: Verify Configuration
 
 Ensure your `.env.local` file has at minimum:

@@ -25,6 +25,15 @@ function record(overrides: Partial<SwapRecord> = {}): SwapRecord {
 }
 
 describe("computePondwaterPnL", () => {
+  // Consumers (e.g. the Geoff insight card) must be able to quote the price
+  // behind these figures without calling useTokenPrices() again — that hook
+  // polls per call site, so a second instance can disagree with this one.
+  it("echoes the price every USD figure was computed from", () => {
+    const r = computePondwaterPnL({ records: [], currentBalance: 1000, currentPrice: 0.001 });
+    expect(r.currentPrice).toBe(0.001);
+    expect(r.totalValue).toBe(r.currentPrice * 1000);
+  });
+
   it("returns all zeros when there are no records and balance is 0", () => {
     const r = computePondwaterPnL({ records: [], currentBalance: 0, currentPrice: 0.0005 });
     expect(r.totalValue).toBe(0);
