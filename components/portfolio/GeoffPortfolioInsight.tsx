@@ -4,24 +4,29 @@ import { GeoffInsightCard } from "@/components/geoff/GeoffInsightCard";
 import { useGeoffInsight } from "@/hooks/useGeoffInsight";
 import { usePondwaterPnL } from "@/hooks/usePondwaterPnL";
 import { useSwapHistory } from "@/hooks/useSwapHistory";
-import { useTokenPrices } from "@/hooks/useTokenPrices";
 import type { InsightSnapshot } from "@/lib/geoff/types";
 
 /**
  * Geoff briefing on the pondwater position. Sends only the computed PnL
  * breakdown and per-mode swap counts — never signatures or the wallet address.
+ *
+ * The quoted price is read off the breakdown rather than from a second
+ * useTokenPrices() call: that hook polls per call site, so an independent
+ * instance can be a fetch cycle ahead of the one behind these figures and
+ * would have Geoff pairing a live price with stale USD totals.
  */
 export function GeoffPortfolioInsight() {
   const breakdown = usePondwaterPnL();
   const history = useSwapHistory();
-  const prices = useTokenPrices();
 
   const buildSnapshot = useCallback((): InsightSnapshot | null => {
-    if (!breakdown) return null;
+    // A zero price means the wPOND feed has not resolved (or failed) — every
+    // USD figure would be 0, so there is nothing honest to report yet.
+    if (!breakdown || breakdown.currentPrice <= 0) return null;
     const confirmed = history.records.filter((r) => r.status === "confirmed");
     return {
       kind: "portfolio",
-      wpondPriceUsd: prices.wpondPrice,
+      wpondPriceUsd: breakdown.currentPrice,
       netSwappedWpond: breakdown.netSwappedWpond,
       minedWpond: breakdown.minedWpond,
       swapNetCostBasis: breakdown.swapNetCostBasis,
@@ -38,7 +43,7 @@ export function GeoffPortfolioInsight() {
         rewards: confirmed.filter((r) => r.mode === "rewards").length,
       },
     };
-  }, [breakdown, history.records, prices.wpondPrice]);
+  }, [breakdown, history.records]);
 
   const state = useGeoffInsight(buildSnapshot);
 
@@ -47,7 +52,7 @@ export function GeoffPortfolioInsight() {
       {...state}
       title="Geoff on your pondwater"
       hint="Reads your PnL breakdown and swap counts — no wallet address is sent."
-      disabled={!breakdown}
+      disabled={!breakdown || breakdown.currentPrice <= 0}
     />
   );
 }
